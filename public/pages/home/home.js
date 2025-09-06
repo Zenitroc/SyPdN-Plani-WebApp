@@ -1,6 +1,7 @@
 renderMenu();
 
 (async function init() {
+  const mainEl = document.getElementById('main') || document.querySelector('main');
   const loginBox = document.getElementById('loginBox');
   const loginForm = document.getElementById('loginForm');
   const loginMsg = document.getElementById('loginMsg');
@@ -8,8 +9,9 @@ renderMenu();
   const courseSelect = document.getElementById('courseSelect');
   const goStudents = document.getElementById('goStudents');
 
-  // Si no hay token, mostrar login
+  // Si no hay token, mostrar login centrado
   if (!api.getToken()) {
+    if (mainEl) mainEl.classList.add('center-screen');
     loginBox.style.display = 'block';
     loginForm.onsubmit = async (e) => {
       e.preventDefault();
@@ -28,37 +30,48 @@ renderMenu();
     return;
   }
 
-  // Con token: cargar usuario y cursos
+  // Con token → vista normal (sin centrado)
+  if (mainEl) mainEl.classList.remove('center-screen');
+
   try {
     const me = await api.get('/me');
     const list = me.roles.includes('GURU')
       ? await api.get('/courses?scope=all')
       : await api.get('/courses');
 
-    // Render selector
+    // Popular opciones
     courseSelect.innerHTML = list.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+    // Restaurar selección guardada (si existe)
     const saved = courseContext.get();
-    if (saved) courseSelect.value = saved;
+    if (saved && list.some(c => String(c.id) === String(saved))) {
+      courseSelect.value = String(saved);
+    }
+
+    // 🔹 Mejora visual: select custom (dropdown moderno)
+    //    Asegurate de tener cargado ui-select.js en index.html
+   
+
+    // Mostrar bloque de curso
     courseBox.style.display = 'block';
 
     courseSelect.onchange = async () => {
-      await api.post('/session/course', { course_id: Number(courseSelect.value) });
-      courseContext.set(Number(courseSelect.value));
+      const cid = Number(courseSelect.value);
+      await api.post('/session/course', { course_id: cid });
+      courseContext.set(cid);
     };
+
     goStudents.onclick = async () => {
-      if (!courseSelect.value) return;
-      await api.post('/session/course', { course_id: Number(courseSelect.value) });
-      courseContext.set(Number(courseSelect.value));
+      const cid = Number(courseSelect.value);
+      if (!cid) return;
+      await api.post('/session/course', { course_id: cid });
+      courseContext.set(cid);
       location.href = BASE_APP + '/public/pages/estudiantes/';
     };
 
-    // KPIs placeholder
     document.getElementById('kpis').innerHTML = `
-      <div style="padding:.75rem;border:1px dashed #ccc;border-radius:.5rem">
-        <b>Bienvenido, ${me.name}</b>. Seleccioná una comisión para comenzar.
-      </div>`;
+      <div class="card"><b>Bienvenido, ${me.name}</b>. Seleccioná una comisión para comenzar.</div>`;
   } catch (e) {
-    // Token inválido/expirado → limpiar y pedir login
     api.clearToken();
     location.reload();
   }

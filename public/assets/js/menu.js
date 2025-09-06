@@ -17,8 +17,9 @@
         ${item(base + '/asistencia/', 'Asistencia')}
         ${item(base + '/reportes/', 'Reportes')}
         <div class="spacer"></div>
-        <button id="themeBtn" class="btn btn-ghost" title="Cambiar tema">🌓 <span id="themeText">${themeLabel()}</span></button>
-        <button id="logoutBtn" class="btn">Salir</button>
+        <button id="themeBtn" class="btn btn-ghost round" title="Cambiar tema">🌓 <span id="themeText">${themeLabel()}</span></button>
+        <button id="logoutBtn" class="btn btn-neutral">Salir</button>
+
       </div>`;
     const el = document.getElementById(containerId);
     if (el) el.innerHTML = html;
