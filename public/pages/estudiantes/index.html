@@ -3,17 +3,91 @@
 <head>
   <meta charset="utf-8" />
   <title>Estudiantes — SyPdN</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
+  <style>
+    .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:999}
+    .modal{width:min(980px,96vw);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem}
+    .modal h3{margin:.2rem 0 1rem 0}
+    .modal .actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem}
+    .tbl{border-collapse:collapse;width:100%} .tbl th,.tbl td{border:1px solid var(--border);padding:.45rem} .tbl th{background:color-mix(in oklab, var(--surface) 70%, var(--bg));text-align:left}
+    .small{font-size:.92rem;color:var(--muted)}
+  </style>
 </head>
 <body>
   <nav id="appMenu"></nav>
   <main class="container">
-    <h1>Estudiantes</h1>
+    <div class="bar" style="display:flex;gap:.5rem;align-items:center;margin-bottom:.8rem;flex-wrap:wrap">
+      <button id="btnNew" class="btn btn-primary">Nuevo</button>
+      <button id="btnBulk" class="btn btn-tonal">Cargar CSV</button>
+      <button id="btnReid" class="btn btn-soft">Reasignar IDs (A→Z)</button>
+      <button id="btnEdit" class="btn btn-neutral">Editar</button>
+      <button id="btnDelete" class="btn btn-danger" style="display:none">Eliminar</button>
+      <div class="spacer"></div>
+      <select id="fltStatus" class="select select-lg" style="max-width:220px">
+        <option value="ALL">Mostrar: todos</option>
+        <option value="ALTA">Solo ALTA</option>
+        <option value="BAJA">Solo BAJA</option>
+      </select>
+      <button id="btnRefresh" class="btn btn-ghost">Actualizar</button>
+    </div>
+
     <div id="table" class="card"></div>
+    <div id="summary" class="small" style="margin:.6rem 0 0 .2rem"></div>
   </main>
+
+  <!-- Modal: Nuevo estudiante -->
+  <div id="modalNew" class="modal-back">
+    <div class="modal fx-pop">
+      <h3>Nuevo estudiante</h3>
+      <div class="grid cols-2">
+        <div class="field"><label class="label">Apellido</label><input id="n_last" class="input" type="text" required></div>
+        <div class="field"><label class="label">Nombre</label><input id="n_first" class="input" type="text" required></div>
+        <div class="field"><label class="label">Email institucional</label><input id="n_email" class="input" type="email"></div>
+        <div class="field"><label class="label">Legajo</label><input id="n_legajo" class="input" type="text"></div>
+        <div class="field"><label class="label">Grupo (número)</label><input id="n_group" class="input" type="number" min="1" step="1" placeholder="opcional"></div>
+        <div class="field"><label class="label">Observaciones</label><input id="n_obs" class="input" type="text"></div>
+      </div>
+      <div id="n_msg" class="small"></div>
+      <div class="actions">
+        <button class="btn btn-ghost" data-close>Cancelar</button>
+        <button id="n_save" class="btn btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Carga CSV -->
+  <div id="modalBulk" class="modal-back">
+    <div class="modal fx-pop">
+      <h3>Cargar CSV</h3>
+      <div class="card small" style="margin-bottom:.6rem">
+        Formato: <code>last_name, first_name, email_inst, legajo, course_student_id, group_number, observaciones</code>
+      </div>
+      <div class="field"><label class="label">Archivo CSV</label><input id="b_file" type="file" accept=".csv"></div>
+      <div class="field"><label><input id="b_dry" type="checkbox" checked> Validar sin guardar (dry-run)</label></div>
+      <div id="b_msg" class="small"></div>
+      <div class="actions">
+        <button class="btn btn-ghost" data-close>Cancelar</button>
+        <button id="b_upload" class="btn btn-primary">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Edición masiva -->
+  <div id="modalEdit" class="modal-back">
+    <div class="modal fx-pop">
+      <h3>Editar estudiantes</h3>
+      <div id="editTable"></div>
+      <div class="small" id="e_msg"></div>
+      <div class="actions">
+        <button class="btn btn-ghost" data-close>Cancelar</button>
+        <button id="e_save" class="btn btn-primary">Guardar cambios</button>
+      </div>
+    </div>
+  </div>
 
   <script src="/SyPdN-WebApp/public/assets/js/api.js"></script>
   <script src="/SyPdN-WebApp/public/assets/js/theme.js"></script>

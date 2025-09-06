@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Todos los estudiantes — SyPdN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
+  <style>
+    .topbar{display:flex;gap:.6rem;align-items:center;margin-bottom:.8rem}
+    .topbar .spacer{flex:1}
+    .flt{max-width:280px}
+    .tbl{border-collapse:collapse;width:100%}
+    .tbl th,.tbl td{border:1px solid var(--border);padding:.45rem}
+    .tbl th{background:color-mix(in oklab, var(--surface) 70%, var(--bg));text-align:left}
+    .small{font-size:.92rem;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <nav id="appMenu"></nav>
+  <main class="container">
+    <div class="topbar">
+      <h3 style="margin:0">Todos los estudiantes</h3>
+      <div class="spacer"></div>
+      <input id="q" class="input flt" placeholder="Filtrar por nombre, legajo, email o curso">
+      <button id="refresh" class="btn btn-ghost">Actualizar</button>
+    </div>
+    <div id="summary" class="small" style="margin-bottom:.5rem"></div>
+    <div id="table" class="card"></div>
+  </main>
+
+  <script src="/SyPdN-WebApp/public/assets/js/api.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/theme.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/course-context.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/menu.js"></script>
+  <script src="./global.js"></script>
+</body>
+</html>

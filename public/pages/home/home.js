@@ -12,25 +12,26 @@ renderMenu();
   // Si no hay token, mostrar login centrado
   if (!api.getToken()) {
     if (mainEl) mainEl.classList.add('center-screen');
-    loginBox.style.display = 'block';
-    loginForm.onsubmit = async (e) => {
-      e.preventDefault();
-      loginMsg.textContent = '';
-      try {
-        const r = await api.post('/auth/login', {
-          email: document.getElementById('email').value.trim(),
-          password: document.getElementById('password').value
-        }, { noAuth: true });
-        api.setToken(r.token);
-        location.reload();
-      } catch (err) {
-        loginMsg.textContent = err.message || 'Error de login';
-      }
-    };
+    if (loginBox) loginBox.style.display = 'block';
+    if (loginForm) {
+      loginForm.onsubmit = async (e) => {
+        e.preventDefault();
+        loginMsg.textContent = '';
+        try {
+          const r = await api.post('/auth/login', {
+            email: document.getElementById('email').value.trim(),
+            password: document.getElementById('password').value
+          }, { noAuth: true });
+          api.setToken(r.token);
+          location.reload();
+        } catch (err) {
+          loginMsg.textContent = err.message || 'Error de login';
+        }
+      };
+    }
     return;
   }
 
-  // Con token → vista normal (sin centrado)
   if (mainEl) mainEl.classList.remove('center-screen');
 
   try {
@@ -39,38 +40,40 @@ renderMenu();
       ? await api.get('/courses?scope=all')
       : await api.get('/courses');
 
-    // Popular opciones
     courseSelect.innerHTML = list.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-
-    // Restaurar selección guardada (si existe)
     const saved = courseContext.get();
-    if (saved && list.some(c => String(c.id) === String(saved))) {
-      courseSelect.value = String(saved);
-    }
-
-    // 🔹 Mejora visual: select custom (dropdown moderno)
-    //    Asegurate de tener cargado ui-select.js en index.html
-   
-
-    // Mostrar bloque de curso
+    if (saved) courseSelect.value = saved;
     courseBox.style.display = 'block';
 
     courseSelect.onchange = async () => {
-      const cid = Number(courseSelect.value);
-      await api.post('/session/course', { course_id: cid });
-      courseContext.set(cid);
+      await api.post('/session/course', { course_id: Number(courseSelect.value) });
+      courseContext.set(Number(courseSelect.value));
     };
-
     goStudents.onclick = async () => {
-      const cid = Number(courseSelect.value);
-      if (!cid) return;
-      await api.post('/session/course', { course_id: cid });
-      courseContext.set(cid);
+      if (!courseSelect.value) return;
+      await api.post('/session/course', { course_id: Number(courseSelect.value) });
+      courseContext.set(Number(courseSelect.value));
       location.href = BASE_APP + '/public/pages/estudiantes/';
     };
 
+    // KPIs + botón solo Gurú
+    const guruBtn = me.roles.includes('GURU')
+      ? `<div class="login-actions" style="justify-content:flex-start;margin-top:.75rem">
+           <button id="goAllStudents" class="btn btn-tonal">Todos los estudiantes</button>
+         </div>`
+      : '';
+
     document.getElementById('kpis').innerHTML = `
-      <div class="card"><b>Bienvenido, ${me.name}</b>. Seleccioná una comisión para comenzar.</div>`;
+      <div class="card fx-pop">
+        <b>Bienvenido, ${me.name}</b>. Seleccioná una comisión para comenzar.
+        ${guruBtn}
+      </div>`;
+
+    if (me.roles.includes('GURU')) {
+      document.getElementById('goAllStudents').onclick = () => {
+        location.href = BASE_APP + '/public/pages/alumnos-global/';
+      };
+    }
   } catch (e) {
     api.clearToken();
     location.reload();

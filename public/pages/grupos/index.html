@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Grupos — SyPdN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
+  <style>
+    .grid-groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.9rem}
+    @media (max-width:900px){.grid-groups{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:640px){.grid-groups{grid-template-columns:1fr}}
+    .group-card{padding:1rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface)}
+    .small{font-size:.92rem;color:var(--muted)}
+    .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:999}
+    .modal{width:min(720px,96vw);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem}
+    .modal h3{margin:.2rem 0 1rem 0}
+    .modal .actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem}
+    .tbl{border-collapse:collapse;width:100%} .tbl th,.tbl td{border:1px solid var(--border);padding:.45rem} .tbl th{background:color-mix(in oklab, var(--surface) 70%, var(--bg));text-align:left}
+    /* === Estado de conformidad en tarjeta === */
+    :root{
+    --ok:#16a34a;       /* verde */
+    --danger:#ef4444;   /* rojo */
+    }
+    .group-card.ok{
+    border-color: var(--ok);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--ok) 28%, transparent) inset;
+    }
+    .group-card.pending{
+    border-color: var(--danger);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--danger) 28%, transparent) inset;
+    }
+  </style>
+</head>
+<body>
+  <nav id="appMenu"></nav>
+  <main class="container">
+    <div class="card">
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+        <button id="g_new" class="btn btn-primary">Crear grupo</button>
+        <button id="g_assign_open" class="btn btn-tonal">Asignar alumnos</button>
+        <div class="spacer"></div>
+        <button id="g_refresh_top" class="btn btn-ghost">Actualizar</button>
+      </div>
+    </div>
+
+    <div id="groups" class="grid-groups" style="margin-top:.9rem"></div>
+
+    <div class="card" style="margin-top:.9rem">
+      <h3 style="margin:.2rem 0 .6rem 0">Alumnos sin grupo</h3>
+      <div id="noGroup"></div>
+    </div>
+  </main>
+
+  <!-- Modal: crear grupo -->
+  <div id="modalGNew" class="modal-back">
+    <div class="modal fx-pop">
+      <h3>Crear grupo</h3>
+      <div class="field"><label class="label">Nombre (opcional)</label><input id="gn_name" class="input" placeholder="Ej: Equipo Alfa"></div>
+      <div id="gn_msg" class="small"></div>
+      <div class="actions">
+        <button class="btn btn-ghost" data-close>Cancelar</button>
+        <button id="gn_save" class="btn btn-primary">Crear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: asignar alumnos -->
+  <div id="modalGAssign" class="modal-back">
+    <div class="modal fx-pop">
+      <h3>Asignar alumnos a un grupo</h3>
+      <div class="field">
+        <label class="label">Grupo destino</label>
+        <select id="ga_target" class="select select-lg" style="max-width:260px"></select>
+      </div>
+      <div id="ga_list" class="small" style="margin:.5rem 0 .6rem 0"></div>
+      <div id="ga_msg" class="small"></div>
+      <div class="actions">
+        <button class="btn btn-ghost" data-close>Cancelar</button>
+        <button id="ga_apply" class="btn btn-primary">Asignar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: miembros de grupo -->
+  <div id="modalMembers" class="modal-back">
+    <div class="modal fx-pop">
+      <h3 id="gm_title">Miembros</h3>
+      <div id="gm_table"></div>
+      <div class="field" style="margin-top:.6rem">
+        <label class="label">Mover seleccionados a:</label>
+        <select id="gm_move_to" class="select select-lg" style="max-width:240px"></select>
+      </div>
+      <div id="gm_msg" class="small"></div>
+      <div class="actions">
+        <button class="btn btn-danger" id="gm_remove">Quitar del grupo</button>
+        <div class="spacer"></div>
+        <button class="btn btn-ghost" data-close>Cerrar</button>
+        <button class="btn btn-primary" id="gm_move">Mover</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: editar grupo -->
+  <div id="modalGEdit" class="modal-back">
+    <div class="modal fx-pop">
+      <h3 id="ge_title">Editar grupo</h3>
+      <div class="grid cols-2">
+        <div class="field"><label class="label">Nombre</label><input id="ge_name" class="input"></div>
+        <div class="field"><label class="label">Conformidad entregada</label><input id="ge_conf" type="checkbox"></div>
+      </div>
+      <div id="ge_msg" class="small"></div>
+      <div class="actions">
+        <button class="btn btn-danger" id="ge_delete">Eliminar grupo</button>
+        <div class="spacer"></div>
+        <button class="btn btn-ghost" data-close>Cancelar</button>
+        <button class="btn btn-primary" id="ge_save">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/SyPdN-WebApp/public/assets/js/api.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/theme.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/course-context.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/menu.js"></script>
+  <script src="./grupos.js"></script>
+</body>
+</html>
