@@ -215,7 +215,7 @@ function payload(res){ return (res && typeof res==='object' && 'data' in res) ? 
   function cardHtml(c, canEdit){
     const subtitle = [
       c.year ? `Año: ${escapeHtml(String(c.year))}` : '',
-      c.term ? `Cuatri: ${escapeHtml(String(c.term))}` : '',
+      c.term ? `Comisión: ${escapeHtml(String(c.term))}` : '',
       c.extra ? `Comisión: ${escapeHtml(String(c.extra))}` : ''
     ].filter(Boolean).join(' · ');
     const accent = c.color || '';
