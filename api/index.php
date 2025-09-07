@@ -55,10 +55,12 @@ require __DIR__ . '/src/routes/session.php';
 require __DIR__ . '/src/routes/courses.php';
 require __DIR__ . '/src/routes/estudiantes.php';
 require __DIR__ . '/src/routes/grupos.php';
+require __DIR__ . '/src/routes/entregas.php';  
 
 register_session_routes();
 register_course_routes();
 register_student_routes();
 register_group_routes();
+register_entregas_routes(); 
 
 dispatch();

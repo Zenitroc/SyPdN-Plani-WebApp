@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Entregas — SyPdN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
+  <style>
+    /* Modal + tabla (igual a tu versión) */
+    .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:999}
+    .modal{width:min(820px,96vw);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem}
+    .modal h3{margin:.2rem 0 1rem 0}
+    .modal .actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem}
+    .tbl{border-collapse:collapse;width:100%}
+    .tbl th,.tbl td{padding:.55rem;border-bottom:1px solid var(--border);text-align:left}
+    .tbl th{position:sticky;top:0;background:color-mix(in oklab, var(--surface) 70%, var(--bg));z-index:1}
+    .scroll-x{overflow-x:auto}
+    .small{font-size:.92rem;color:var(--muted)}
+    .badge{display:inline-block;padding:.2rem .55rem;border:1px solid var(--border);border-radius:999px;font-size:.9rem;background:color-mix(in oklab,var(--surface) 85%, var(--bg))}
+    .badge.ok{border-color:#16a34a;color:#16a34a}
+    .badge.danger{border-color:#ef4444;color:#ef4444}
+    .row{display:flex;gap:.5rem;align-items:center}
+    .spacer{flex:1}
+    .link{background:none;border:none;color:var(--link);cursor:pointer;padding:.1rem .25rem}
+    .link:disabled{opacity:.5;cursor:not-allowed}
+  </style>
+</head>
+<body>
+  <nav id="appMenu"></nav>
+
+  <main class="container">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;flex-wrap:wrap">
+        <h1 style="margin:.2rem 0">Entregas (Trabajos Prácticos)</h1>
+        <div class="row" style="gap:.5rem">
+          <label class="row">
+            <span>Cuatrimestre:</span>
+            <select id="termFilter" class="select" style="max-width:180px">
+              <option value="ALL">General</option>
+              <option value="1">1° Cuatri</option>
+              <option value="2">2° Cuatri</option>
+            </select>
+          </label>
+          <div class="spacer"></div>
+          <button id="btnNew" class="btn btn-primary">+ Nueva entrega</button>
+        </div>
+      </div>
+      <div id="content" style="margin-top:.8rem"></div>
+    </div>
+  </main>
+
+  <!-- Modal nueva entrega -->
+  <div class="modal-back" id="modalNew">
+    <div class="modal">
+      <h3>Nueva entrega</h3>
+      <div class="grid cols-2">
+        <label class="label">Tipo
+          <select id="f_type" class="select">
+            <option value="TP">TP</option>
+            <option value="TPC">TPC</option>
+            <option value="TPR">TPR</option>
+          </select>
+        </label>
+        <label class="label">Cuatrimestre
+          <select id="f_term" class="select">
+            <option value="1">1°</option>
+            <option value="2">2°</option>
+          </select>
+        </label>
+        <label class="label">Tema
+          <select id="f_topic" class="select">
+            <option>ORG</option><option>MET</option><option>PLS</option><option>CUR</option>
+          </select>
+        </label>
+        <label class="label">Fecha cierre
+          <input id="f_due" type="date" class="input"/>
+        </label>
+        <label class="label" style="grid-column:1 / -1">Nombre
+          <input id="f_name" type="text" class="input" placeholder="Nombre visible (p.ej. Caso ORG #1)"/>
+        </label>
+        <div id="nextNumberHint" class="small" style="grid-column:1 / -1"></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" data-close>Cancelar</button>
+        <button class="btn btn-primary" id="btnCreate">Crear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal editar entrega -->
+  <div class="modal-back" id="modalEdit">
+    <div class="modal">
+      <h3>Editar entrega</h3>
+      <div class="grid cols-2">
+        <label class="label">Tema
+          <select id="e_topic" class="select">
+            <option>ORG</option><option>MET</option><option>PLS</option><option>CUR</option>
+          </select>
+        </label>
+        <label class="label">Fecha cierre
+          <input id="e_due" type="date" class="input"/>
+        </label>
+        <label class="label" style="grid-column:1 / -1">Nombre
+          <input id="e_name" type="text" class="input"/>
+        </label>
+      </div>
+      <div class="actions">
+        <button class="btn" data-close>Cancelar</button>
+        <button class="btn btn-primary" id="btnEditSave">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal baja entrega -->
+  <div class="modal-back" id="modalDel">
+    <div class="modal">
+      <h3>Eliminar entrega</h3>
+      <p class="small">Escribí <strong>ELIMINAR</strong> para confirmar (solo GURU).</p>
+      <input id="d_confirm" class="input" placeholder="ELIMINAR"/>
+      <div class="actions">
+        <button class="btn" data-close>Cancelar</button>
+        <button class="btn btn-primary" id="btnDelConfirm" disabled>Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/SyPdN-WebApp/public/assets/js/api.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/theme.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/course-context.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/menu.js"></script>
+  <script src="./entregas.js"></script>
+</body>
+</html>
