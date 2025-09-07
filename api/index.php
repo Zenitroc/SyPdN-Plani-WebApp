@@ -57,6 +57,9 @@ require __DIR__ . '/src/routes/estudiantes.php';
 require __DIR__ . '/src/routes/grupos.php';
 require __DIR__ . '/src/routes/entregas.php';  
 
+require_once __DIR__ . '/src/routes/course_color.php';
+register_course_color_routes();
+
 register_session_routes();
 register_course_routes();
 register_student_routes();

@@ -3,57 +3,63 @@
 <head>
   <meta charset="utf-8" />
   <title>Home — SyPdN</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
 </head>
 <body>
   <nav id="appMenu"></nav>
+
   <main class="container" id="main">
-  <h1 style="display:none">Home</h1>
+    <h1 style="display:none">Home</h1>
 
-  <!-- Login centrado con animación -->
-  <section id="loginBox" class="card login-card fx-pop" style="display:none">
-    <h3>Ingresar</h3>
-    <form id="loginForm">
-      <label>Email<br><input id="email" class="input" type="email" required value="guru@example.com"></label><br>
-      <label>Contraseña<br><input id="password" class="input" type="password" required value="admin123"></label>
-      <div class="login-actions">
-        <button type="submit" class="btn btn-primary">Entrar</button>
+    <!-- Login centrado -->
+    <section id="loginBox" class="card login-card fx-pop" style="display:none">
+      <h3>Ingresar</h3>
+      <form id="loginForm">
+        <label>Email<br><input id="email" class="input" type="email" required value="guru@example.com"></label><br>
+        <label>Contraseña<br><input id="password" class="input" type="password" required value="admin123"></label>
+        <div class="login-actions">
+          <button type="submit" class="btn btn-primary">Entrar</button>
+        </div>
+      </form>
+      <div id="loginMsg" style="color:#c00;margin-top:.5rem"></div>
+    </section>
+
+    <!-- Barra curso seleccionado -->
+    <section id="selectedCourse" class="card" style="display:none;margin-top:1rem"></section>
+
+    <!-- Grid de comisiones (cards) -->
+    <section id="courseBox" class="card" style="display:none;margin-top:1rem">
+      <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:.5rem">
+        <div>
+          <div class="label">Tus comisiones</div>
+          <small class="hint">Elegí la comisión que querés gestionar.</small>
+        </div>
+        <div class="row" style="gap:.4rem">
+          <input id="searchInput" class="input" placeholder="Buscar comisión / año / cuatri" style="min-width:220px">
+        </div>
       </div>
-    </form>
-    <div id="loginMsg" style="color:#c00;margin-top:.5rem"></div>
-  </section>
+      <div id="courseGrid" style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.75rem"></div>
+    </section>
 
-<!-- Selector de comisión (post-login) -->
-<section id="courseBox" class="card" style="display:none;margin-top:1rem">
-  <div class="field">
-    <label for="courseSelect" class="label">Comisión</label>
-    <div class="select-wrap">
-      <select id="courseSelect" class="select select-lg"></select>
-    </div>
-    <small class="hint">Elegí la comisión que querés visualizar o gestionar.</small>
-  </div>
-  <div class="login-actions" style="justify-content:flex-start">
-    <button id="goStudents" class="btn btn-tonal">Ver Estudiantes</button>
-  </div>
-</section>
-
-  <section id="kpis" style="margin-top:1rem"></section>
-</main>
+    <section id="kpis" style="margin-top:1rem"></section>
+  </main>
 
   <div class="card">
-  <h3>Botones</h3>
-  <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-    <button class="btn btn-primary">Primario</button>
-    <button class="btn btn-neutral">Neutral</button>
-    <button class="btn btn-tonal">Tonal</button>
-    <button class="btn btn-soft">Soft</button>
-    <button class="btn btn-outline">Outline</button>
-    <button class="btn btn-ghost">Ghost</button>
-    <button class="btn btn-icon" title="Acción">★</button>
+    <h3>Botones</h3>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <button class="btn btn-primary">Primario</button>
+      <button class="btn btn-neutral">Neutral</button>
+      <button class="btn btn-tonal">Tonal</button>
+      <button class="btn btn-soft">Soft</button>
+      <button class="btn btn-outline">Outline</button>
+      <button class="btn btn-ghost">Ghost</button>
+      <button class="btn btn-icon" title="Acción">★</button>
+    </div>
   </div>
+
 </div>
 
 <div class="row gap-8">
@@ -70,11 +76,11 @@
   <!-- <button class="btn" onclick="theme.next()">Tema</button> -->
 </div>
 
-    <script src="/SyPdN-WebApp/public/assets/js/api.js"></script>
-    <script src="/SyPdN-WebApp/public/assets/js/theme.js"></script>
-    <script src="/SyPdN-WebApp/public/assets/js/course-context.js"></script>
-    <script src="/SyPdN-WebApp/public/assets/js/menu.js"></script>
-    <script src="./home.js"></script>
 
+  <script src="/SyPdN-WebApp/public/assets/js/api.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/theme.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/course-context.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/menu.js"></script>
+  <script src="./home.js"></script>
 </body>
 </html>
