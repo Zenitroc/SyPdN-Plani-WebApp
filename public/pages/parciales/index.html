@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Parciales — SyPdN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
+    <style>
+        :root {
+            --col-org: #e0f2fe;
+            /* ORG / PLS */
+            --col-met: #ffedd5;
+            /* MET / CUR  */
+            --col-teo: #fef9c3;
+            /* TEO1 / TEO2 */
+            --max-ape: 180px;
+            --col-pls: #e9d5ff;
+            /* lila pastel  */
+            --col-cur: #fbcfe8;
+            /* rosa pastel  */
+            --col-teo2: #fed7aa;
+            /* naranja pastel */
+            /* naranja fuerte */
+            /* ancho máximo para Apellido */
+            --max-nom: 180px;
+            /* ancho máximo para Nombre   */
+            --hdr-fg: #0c111a;
+            --ok: #16a34a;
+            --bad: #ef4444;
+
+            /* anchos izquierda (los fija JS una sola vez) */
+            --w-id: 72px;
+            --w-ape: 220px;
+            --w-nom: 220px;
+            --w-leg: 110px;
+            --w-p1: 60px;
+            --w-p2: 60px;
+
+            /* ancho fijo de selects (evita “saltos”) */
+            --score-w: 7.5rem;
+        }
+
+        body.parciales main.container {
+            max-width: 100%;
+            padding: 0 1rem
+        }
+
+        .toolbar {
+            display: flex;
+            gap: .75rem;
+            align-items: center;
+            justify-content: space-between;
+            margin: .75rem 0;
+            flex-wrap: wrap
+        }
+
+        .toolbar .left,
+        .toolbar .right {
+            display: flex;
+            gap: .5rem;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        /* ===== Doble tabla pegada ===== */
+        .twin {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface)
+        }
+
+        .twin-inner {
+            display: grid;
+            grid-template-columns: auto 1fr
+        }
+
+        .leftWrap {
+            overflow: hidden;
+            border-right: 1px solid var(--border)
+        }
+
+        .rightWrap {
+            overflow-x: auto;
+            overflow-y: hidden
+        }
+
+        .tbl {
+            border-collapse: separate;
+            border-spacing: 0
+        }
+
+        .tbl th,
+        .tbl td {
+            border-bottom: 1px solid var(--border);
+            padding: .45rem .55rem;
+            font-size: .92rem;
+            white-space: nowrap
+        }
+
+        /* Encabezados neutros: mismo tono que la superficie del tema */
+        .leftWrap thead th,
+        .rightWrap thead th:not(.tone-org):not(.tone-met):not(.tone-teo) {
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            background: var(--surface);
+            /* <- se adapta automático a light/dark */
+            color: var(--fg);
+            /* texto del tema */
+            font-weight: 800;
+            box-shadow: 0 1px 0 var(--border) inset;
+            /* leve separación */
+        }
+
+
+
+        .tone-org {
+            background: var(--col-org) !important;
+            color: var(--hdr-fg) !important
+        }
+
+        .tone-met {
+            background: var(--col-met) !important;
+            color: var(--hdr-fg) !important
+        }
+
+        .tone-teo {
+            background: var(--col-teo) !important;
+            color: var(--hdr-fg) !important
+        }
+
+        .tone-pls {
+            background: color-mix(in oklab, var(--col-pls) 65%, var(--surface)) !important;
+            color: var(--hdr-fg) !important;
+        }
+
+        .tone-cur {
+            background: color-mix(in oklab, var(--col-cur) 65%, var(--surface)) !important;
+            color: var(--hdr-fg) !important;
+        }
+
+        .tone-teo2 {
+            background: color-mix(in oklab, var(--col-teo2) 65%, var(--surface)) !important;
+            color: var(--hdr-fg) !important;
+        }
+
+        /* widths izquierda via colgroup */
+        .w-id {
+            width: var(--w-id)
+        }
+
+        .w-ape {
+            width: var(--w-ape)
+        }
+
+        .w-nom {
+            width: var(--w-nom)
+        }
+
+        .w-leg {
+            width: var(--w-leg)
+        }
+
+        .w-p1 {
+            width: var(--w-p1)
+        }
+
+        .w-p2 {
+            width: var(--w-p2)
+        }
+
+        /* estado compacto 1°P/2°P */
+        .txt-ok {
+            color: var(--ok);
+            font-weight: 800
+        }
+
+        .txt-bad {
+            color: var(--bad);
+            font-weight: 800
+        }
+
+        /* pintado de celdas */
+        .td-pass {
+            background: color-mix(in oklab, var(--ok) 18%, var(--surface))
+        }
+
+        .td-fail {
+            background: color-mix(in oklab, var(--bad) 18%, var(--surface))
+        }
+
+        .td-partial-ap {
+            background: color-mix(in oklab, var(--ok) 22%, var(--surface))
+        }
+
+        /* La grilla da a la izquierda el ancho de su contenido (no más) */
+        .twin-inner {
+            display: grid;
+            grid-template-columns: max-content 1fr
+        }
+
+        /* Aplico elipsis a Apellido y Nombre para que no estiren la tabla */
+        .leftWrap td.c-ape,
+        .leftWrap td.c-nom {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* select con ancho fijo (no refluye) */
+        select.score {
+            width: var(--score-w);
+            min-width: var(--score-w);
+            max-width: var(--score-w);
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            padding: .25rem .55rem;
+            font: inherit;
+            background: transparent;
+        }
+
+        select.score.pass {
+            border-color: var(--ok);
+            box-shadow: 0 0 0 2px color-mix(in oklab, var(--ok) 20%, transparent)
+        }
+
+        select.score.fail {
+            border-color: var(--bad);
+            box-shadow: 0 0 0 2px color-mix(in oklab, var(--bad) 20%, transparent)
+        }
+
+        /* Alineación y centrado consistentes */
+        .tbl th,
+        .tbl td {
+            vertical-align: middle;
+        }
+
+        /* Encabezados alineados a la izquierda como el contenido */
+        .tbl thead th {
+            text-align: left;
+        }
+
+        /* ID centrado (header + celdas) y con mismo padding que el resto */
+        .leftWrap th:nth-child(1),
+        .leftWrap td.c-id {
+            text-align: center;
+            padding-left: .55rem;
+            padding-right: .55rem;
+        }
+
+        /* 1°P y 2°P centrados */
+        .leftWrap th:nth-child(5),
+        .leftWrap th:nth-child(6),
+        .leftWrap td.c-p1,
+        .leftWrap td.c-p2 {
+            text-align: center;
+        }
+
+        /* Apellido/Nombre: mismo padding y ellipsis (ya lo tenías) */
+        .leftWrap td.c-ape,
+        .leftWrap td.c-nom {
+            padding-left: .55rem;
+            padding-right: .55rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body class="parciales">
+    <div id="appMenu"></div>
+    <main class="container">
+        <h1>Parciales</h1>
+
+        <div class="toolbar">
+            <div class="left">
+                <label class="muted">Ver:</label>
+                <select id="statusFilter" class="input" style="width:auto">
+                    <option value="ALL">Todos</option>
+                    <option value="ALTA">Solo ALTA</option>
+                    <option value="BAJA">Solo BAJA</option>
+                </select>
+                <label class="muted">Columnas:</label>
+                <select id="showCols" class="input" style="width:auto">
+                    <option value="ALL">Todos</option>
+                    <option value="P1">Sólo 1° Parcial</option>
+                    <option value="P2">Sólo 2° Parcial</option>
+                </select>
+                <label class="muted">Intento:</label>
+                <select id="attemptFilter" class="input" style="width:auto">
+                    <option value="ALL">Todos</option>
+                    <option value="PA">Parcial</option>
+                    <option value="1R">1° Recup</option>
+                    <option value="2R">2° Recup</option>
+                    <option value="REC">Solo recuperatorios</option>
+                </select>
+            </div>
+            <div class="right">
+                <input id="q" class="input" placeholder="Buscar por apellido o nombre..." style="min-width:260px" />
+            </div>
+        </div>
+
+        <div class="twin">
+            <div class="twin-inner">
+                <!-- IZQUIERDA (fija) -->
+                <div class="leftWrap">
+                    <table class="tbl" id="tblLeft">
+                        <colgroup>
+                            <col class="w-id">
+                            <col class="w-ape">
+                            <col class="w-nom">
+                            <col class="w-leg">
+                            <col class="w-p1">
+                            <col class="w-p2">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Apellido</th>
+                                <th>Nombre</th>
+                                <th>Legajo</th>
+                                <th>1°P</th>
+                                <th>2°P</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyLeft"></tbody>
+                    </table>
+                </div>
+                <!-- DERECHA (scroll) -->
+                <div class="rightWrap" id="rightWrap">
+                    <table class="tbl" id="tblRight">
+                        <thead id="theadRight"></thead>
+                        <tbody id="tbodyRight"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/SyPdN-WebApp/public/assets/js/api.js"></script>
+    <script src="/SyPdN-WebApp/public/assets/js/theme.js"></script>
+    <script src="/SyPdN-WebApp/public/assets/js/course-context.js"></script>
+    <script src="/SyPdN-WebApp/public/assets/js/menu.js"></script>
+    <script src="./parciales.js"></script>
+</body>
+
+</html>

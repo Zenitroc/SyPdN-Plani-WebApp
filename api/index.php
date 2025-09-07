@@ -51,11 +51,13 @@ function dispatch(): void {
 }
 
 // Rutas
+
 require __DIR__ . '/src/routes/session.php';
 require __DIR__ . '/src/routes/courses.php';
 require __DIR__ . '/src/routes/estudiantes.php';
 require __DIR__ . '/src/routes/grupos.php';
 require __DIR__ . '/src/routes/entregas.php';  
+require __DIR__ . '/src/routes/parciales.php';
 
 require_once __DIR__ . '/src/routes/course_color.php';
 register_course_color_routes();
@@ -65,5 +67,6 @@ register_course_routes();
 register_student_routes();
 register_group_routes();
 register_entregas_routes(); 
+register_parciales_routes();
 
 dispatch();

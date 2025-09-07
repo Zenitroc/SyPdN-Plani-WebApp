@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8" />
   <title>Home — SyPdN</title>
@@ -8,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
 </head>
+
 <body>
   <nav id="appMenu"></nav>
 
@@ -60,21 +62,36 @@
     </div>
   </div>
 
-</div>
+  </div>
 
-<div class="row gap-8">
-  <h3>Probador de Temas ✨</h3>
-  <button class="btn btn-ghost" onclick="theme.set('dark')">Oscuro</button>
-  <button class="btn btn-ghost" onclick="theme.set('light')">Claro</button>
-  <button class="btn btn-ghost" onclick="theme.set('aesthetic')">Aesthetic</button>
-  <button class="btn btn-ghost" onclick="theme.set('minimal')">Minimal</button>
-  <button class="btn btn-ghost" onclick="theme.set('pinkgirly')">Abru 💅</button>
-  <button class="btn btn-ghost" onclick="theme.set('teammate')">Team Mate 🧉</button>
-  <button class="btn btn-ghost" onclick="theme.set('pollitos')">Pollitos 🐣</button>
+  <div class="row gap-8">
+    <h3>Probador de Temas ✨</h3>
+    <button class="btn btn-icon" title="Oscuro" onclick="theme.set('dark')">🌑</button>
+    <button class="btn btn-icon" title="Claro" onclick="theme.set('light')">🌞</button>
+    <button class="btn btn-icon" title="Aesthetic" onclick="theme.set('aesthetic')">✨</button>
+    <button class="btn btn-icon" title="Minimal" onclick="theme.set('minimal')">🔲</button>
+    <button class="btn btn-icon" title="Abru" onclick="theme.set('pinkgirly')">Abru 💅</button>
+    <button class="btn btn-icon" title="Team Mate" onclick="theme.set('teammate')">Team Mate 🧉</button>
+    <button class="btn btn-icon" title="Pollito" onclick="theme.set('pollitos')">Pollito 🐣</button>
 
-  <!-- o un ciclo -->
-  <!-- <button class="btn" onclick="theme.next()">Tema</button> -->
-</div>
+    <!-- o un ciclo -->
+    <!-- <button class="btn" onclick="theme.next()">Tema</button> -->
+  </div>
+
+  <script>
+    (function () {
+      if (!('serviceWorker' in navigator)) return;
+
+      // Detecta BASE_APP sin depender de variables globales
+      const parts = location.pathname.split('/').filter(Boolean);
+      const i = parts.indexOf('public');
+      const BASE_APP = i > 0 ? '/' + parts.slice(0, i).join('/') : '';
+
+      navigator.serviceWorker.register(BASE_APP + '/public/sw.js')
+        .then(r => console.log('[SW] registrado en', r.scope))
+        .catch(err => console.warn('[SW] error', err));
+    })();
+  </script>
 
 
   <script src="/SyPdN-WebApp/public/assets/js/api.js"></script>
@@ -83,4 +100,5 @@
   <script src="/SyPdN-WebApp/public/assets/js/menu.js"></script>
   <script src="./home.js"></script>
 </body>
+
 </html>
