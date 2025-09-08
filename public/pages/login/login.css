@@ -10,7 +10,7 @@
 /* Login hero panel */
 .login-hero{display:flex;align-items:center;justify-content:center;padding:2rem;min-height:calc(100vh - 68px)}
 .login-hero-panel{width:100%;max-width:1100px;display:flex;border-radius:40px;overflow:hidden;position:relative;box-shadow:var(--shadow);background:linear-gradient(135deg,#ffa726,#fb8c00)}
-.login-hero-panel::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 25% 30%,rgba(255,255,255,.2)0,transparent55%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.15)0,transparent50%)}
+.login-hero-panel::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 25% 30%,rgba(255,255,255,.2)0,transparent 55%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.15)0,transparent 50%)}
 .login-info{flex:1;padding:3rem 2.5rem;color:#fff;display:flex;flex-direction:column;justify-content:center}
 .login-info h1{margin:0 0 .5rem 0;font-size:2rem}
 .login-info h2{margin:0 0 1rem 0;font-weight:400;font-size:1.25rem}
