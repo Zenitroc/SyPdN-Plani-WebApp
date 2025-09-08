@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
   <link rel="stylesheet" href="./login.css">
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
 <body>
@@ -40,10 +41,13 @@
             </div>
             <div class="login-extra">
               <label><input type="checkbox" id="remember"> Recordame</label>
-              <a href="#">Olvidé mi contraseña</a>
+              <button type="button" id="forgotBtn" class="link-btn">Olvidé mi contraseña</button>
+            </div>
+            <div class="captcha">
+              <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%">Ingresar</button>
-            <p class="account-link">¿No tenés cuenta? <a href="#">Solicitar cuenta</a></p>
+            <p class="account-link">¿No tenés cuenta? <a id="requestAccount" href="https://forms.gle/" target="_blank" rel="noopener">Solicitar cuenta</a></p>
           </form>
           <div id="loginMsg" style="color:#c00;margin-top:.5rem"></div>
         </section>
