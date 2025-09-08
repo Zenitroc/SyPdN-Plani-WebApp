@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Login — SyPdN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
+</head>
+
+<body>
+  <nav id="appMenu"></nav>
+
+  <main class="container center-screen" id="main">
+    <section id="loginBox" class="card login-card fx-pop">
+      <h3>Ingresar</h3>
+      <form id="loginForm">
+        <label>Usuario<br><input id="username" class="input" required></label><br>
+        <label>Contraseña<br><input id="password" class="input" type="password" required></label>
+        <div class="login-actions">
+          <button type="submit" class="btn btn-primary">Entrar</button>
+        </div>
+      </form>
+      <div id="loginMsg" style="color:#c00;margin-top:.5rem"></div>
+    </section>
+  </main>
+
+  <script src="/SyPdN-WebApp/public/assets/js/api.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/theme.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/menu.js"></script>
+  <script src="./login.js"></script>
+</body>
+
+</html>

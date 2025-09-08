@@ -3,15 +3,15 @@ function register_session_routes(): void {
   // Login (público)
   route('POST', '/api/auth/login', function (): void {
     $in = read_json();
-    $email = trim($in['email'] ?? '');
+    $username = trim($in['username'] ?? '');
     $pass  = (string)($in['password'] ?? '');
-    if ($email === '' || $pass === '') {
-      json_error('Email y password requeridos', 422);
+    if ($username === '' || $pass === '') {
+      json_error('Usuario y password requeridos', 422);
     }
 
     $pdo = db();
-    $st = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-    $st->execute([$email]);
+    $st = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+    $st->execute([$username]);
     $u = $st->fetch();
     if (!$u || !password_verify($pass, $u['password_hash'])) {
       json_error('Credenciales inválidas', 401);

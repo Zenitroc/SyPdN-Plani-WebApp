@@ -1,43 +1,40 @@
 renderMenu();
 
 // Helpers API con fallback /api
-function isNotFound(val){
+function isNotFound(val) {
   const s = String(val?.message || val?.error || val || '').toLowerCase();
   return s.includes('not found') || s.includes('404');
 }
-async function apiTryGet(path){ // prueba /path luego /api/path
-  try{
+async function apiTryGet(path) { // prueba /path luego /api/path
+  try {
     const r = await api.get(path);
     if (r && r.error && isNotFound(r)) throw new Error('NF1');
     return r;
-  }catch(e1){
-    try{
+  } catch (e1) {
+    try {
       const r2 = await api.get('/api' + path);
       if (r2 && r2.error && isNotFound(r2)) throw new Error('NF2');
       return r2;
-    }catch(e2){ throw e2; }
+    } catch (e2) { throw e2; }
   }
 }
-async function apiTryPost(path, body, opts){
-  try{
+async function apiTryPost(path, body, opts) {
+  try {
     const r = await api.post(path, body, opts);
     if (r && r.error && isNotFound(r)) throw new Error('NF1');
     return r;
-  }catch(e1){
-    try{
+  } catch (e1) {
+    try {
       const r2 = await api.post('/api' + path, body, opts);
       if (r2 && r2.error && isNotFound(r2)) throw new Error('NF2');
       return r2;
-    }catch(e2){ throw e2; }
+    } catch (e2) { throw e2; }
   }
 }
-function payload(res){ return (res && typeof res==='object' && 'data' in res) ? res.data : res; }
+function payload(res) { return (res && typeof res === 'object' && 'data' in res) ? res.data : res; }
 
 (async function init() {
   const mainEl = document.getElementById('main') || document.querySelector('main');
-  const loginBox = document.getElementById('loginBox');
-  const loginForm = document.getElementById('loginForm');
-  const loginMsg = document.getElementById('loginMsg');
 
   const selectedCourseBox = document.getElementById('selectedCourse');
   const courseBox = document.getElementById('courseBox');
@@ -52,37 +49,27 @@ function payload(res){ return (res && typeof res==='object' && 'data' in res) ? 
   };
   ensureMenuVisibility();
 
-  // LOGIN
+  // Redirigir a login si no hay token
   if (!api.getToken()) {
-    if (mainEl) mainEl.classList.add('center-screen');
-    if (loginBox) loginBox.style.display = 'block';
-    if (loginForm) {
-      loginForm.onsubmit = async (e) => {
-        e.preventDefault();
-        loginMsg.textContent = '';
-        try {
-          const r = await apiTryPost('/auth/login', {
-            email: document.getElementById('email').value.trim(),
-            password: document.getElementById('password').value
-          }, { noAuth: true });
-          const tk = r?.token || r?.data?.token;
-          if (!tk) throw new Error('Token no recibido');
-          api.setToken(tk);
-          location.reload();
-        } catch (err) {
-          loginMsg.textContent = err.message || 'Error de login';
-        }
-      };
-    }
+    location.href = '../login/';
     return;
   }
 
   if (mainEl) mainEl.classList.remove('center-screen');
 
+  let me;
+  let isGuru = false;
   try {
-    // Perfil
-    const me = payload(await apiTryGet('/me'));
-    const isGuru = Array.isArray(me?.roles) && me.roles.includes('GURU');
+    // Perfil (verifica token)
+    me = payload(await apiTryGet('/me'));
+    isGuru = Array.isArray(me?.roles) && me.roles.includes('GURU');
+  } catch {
+    api.clearToken();
+    location.href = '../login/';
+    return;
+  }
+
+  try {
 
     // Cursos (GURÚ ve todos)
     const list = payload(await apiTryGet(isGuru ? '/courses?scope=all' : '/courses'));
@@ -125,7 +112,7 @@ function payload(res){ return (res && typeof res==='object' && 'data' in res) ? 
       courseGrid.querySelectorAll('[data-select]').forEach(btn => {
         btn.onclick = async () => {
           const id = Number(btn.getAttribute('data-select'));
-          try { await apiTryPost('/session/course', { course_id: id }); } catch {}
+          try { await apiTryPost('/session/course', { course_id: id }); } catch { }
           courseContext.set(id);
           ensureMenuVisibility();
           const sel = courses.find(c => c.id === id);
@@ -184,11 +171,11 @@ function payload(res){ return (res && typeof res==='object' && 'data' in res) ? 
   } catch (e) {
     // Si algo falla, mostramos mensaje y NO entramos en loop
     document.getElementById('kpis').innerHTML = `
-      <div class="card" style="border-color:#ef4444">Error cargando Home: ${escapeHtml(e.message||'')}</div>`;
+      <div class="card" style="border-color:#ef4444">Error cargando Home: ${escapeHtml(e.message || '')}</div>`;
   }
 
   // === helpers ===
-  function renderSelected(c){
+  function renderSelected(c) {
     if (!c) { selectedCourseBox.style.display = 'none'; return; }
     selectedCourseBox.style.display = 'block';
     const subtitle = [
@@ -212,7 +199,7 @@ function payload(res){ return (res && typeof res==='object' && 'data' in res) ? 
     `;
   }
 
-  function cardHtml(c, canEdit){
+  function cardHtml(c, canEdit) {
     const subtitle = [
       c.year ? `Año: ${escapeHtml(String(c.year))}` : '',
       c.term ? `Comisión: ${escapeHtml(String(c.term))}` : '',
@@ -243,9 +230,9 @@ function payload(res){ return (res && typeof res==='object' && 'data' in res) ? 
     `;
   }
 
-  function escapeHtml(s){
-    return (s||'').toString().replace(/[&<>"']/g, m => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'
+  function escapeHtml(s) {
+    return (s || '').toString().replace(/[&<>"']/g, m => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
     }[m]));
   }
 })();
