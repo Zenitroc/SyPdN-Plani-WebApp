@@ -8,23 +8,47 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
+  <link rel="stylesheet" href="./login.css">
 </head>
 
 <body>
   <nav id="appMenu"></nav>
 
-  <main class="container center-screen" id="main">
-    <section id="loginBox" class="card login-card fx-pop">
-      <h3>Ingresar</h3>
-      <form id="loginForm">
-        <label>Usuario<br><input id="username" class="input" required></label><br>
-        <label>Contraseña<br><input id="password" class="input" type="password" required></label>
-        <div class="login-actions">
-          <button type="submit" class="btn btn-primary">Entrar</button>
-        </div>
-      </form>
-      <div id="loginMsg" style="color:#c00;margin-top:.5rem"></div>
-    </section>
+  <main class="login-hero">
+    <div class="login-hero-panel">
+      <div class="login-info">
+        <h1>Sistemas y Procesos de Negocios</h1>
+        <h2>Plataforma de gestión unificada</h2>
+        <p>Accedé con tu cuenta para continuar.</p>
+      </div>
+      <div class="login-form-wrap">
+        <section class="card login-card">
+          <h3>INGRESAR</h3>
+          <form id="loginForm">
+            <div class="field">
+              <span class="field-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </span>
+              <input id="username" class="input" required placeholder="Usuario">
+            </div>
+            <div class="field">
+              <span class="field-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input id="password" class="input" type="password" required placeholder="Contraseña">
+              <button type="button" id="showPass" class="show-btn" aria-label="Mostrar contraseña">Ver</button>
+            </div>
+            <div class="login-extra">
+              <label><input type="checkbox" id="remember"> Recordame</label>
+              <a href="#">Olvidé mi contraseña</a>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%">Ingresar</button>
+            <p class="account-link">¿No tenés cuenta? <a href="#">Solicitar cuenta</a></p>
+          </form>
+          <div id="loginMsg" style="color:#c00;margin-top:.5rem"></div>
+        </section>
+      </div>
+    </div>
   </main>
 
   <script src="/SyPdN-WebApp/public/assets/js/api.js"></script>
@@ -34,3 +58,4 @@
 </body>
 
 </html>
+

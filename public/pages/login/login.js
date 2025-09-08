@@ -20,8 +20,18 @@ async function apiTryPost(path, body, opts){
 }
 
 (async function init(){
-  const loginForm = document.getElementById('loginForm');
-  const loginMsg = document.getElementById('loginMsg');
+    const loginForm = document.getElementById('loginForm');
+    const loginMsg = document.getElementById('loginMsg');
+    const password = document.getElementById('password');
+    const toggle = document.getElementById('showPass');
+
+    // Mostrar contraseña mientras se mantiene presionado
+    if (password && toggle) {
+      const hide = () => (password.type = 'password');
+      toggle.addEventListener('mousedown', () => (password.type = 'text'));
+      toggle.addEventListener('mouseup', hide);
+      toggle.addEventListener('mouseleave', hide);
+    }
 
   // Si ya hay token, ir al home
   if (api.getToken()) {
