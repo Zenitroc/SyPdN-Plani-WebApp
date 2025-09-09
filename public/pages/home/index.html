@@ -19,7 +19,7 @@
 
     <!-- Barra curso seleccionado -->
     <section id="selectedCourse" class="card" style="display:none;margin-top:1rem"></section>
-
+    <section id="kpis" style="margin-top:1rem"></section>
     <!-- Grid de comisiones (cards) -->
     <section id="courseBox" class="card" style="display:none;margin-top:1rem">
       <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:.5rem">
@@ -34,7 +34,7 @@
       <div id="courseGrid" style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.75rem"></div>
     </section>
 
-    <section id="kpis" style="margin-top:1rem"></section>
+   
   </main>
 
   <div class="card">
@@ -52,20 +52,7 @@
 
   </div>
 
-  <div class="row gap-8">
-    <h3>Probador de Temas ✨</h3>
-    <button class="btn btn-icon" title="Oscuro" onclick="theme.set('dark')">🌑</button>
-    <button class="btn btn-icon" title="Claro" onclick="theme.set('light')">🌞</button>
-    <button class="btn btn-icon" title="Aesthetic" onclick="theme.set('aesthetic')">✨</button>
-    <button class="btn btn-icon" title="Minimal" onclick="theme.set('minimal')">🔲</button>
-    <button class="btn btn-icon" title="Abru" onclick="theme.set('pinkgirly')">Abru 💅</button>
-    <button class="btn btn-icon" title="Team Mate" onclick="theme.set('teammate')">Team Mate 🧉</button>
-    <button class="btn btn-icon" title="Pollito" onclick="theme.set('pollitos')">Pollito 🐣</button>
-
-    <!-- o un ciclo -->
-    <!-- <button class="btn" onclick="theme.next()">Tema</button> -->
-  </div>
-
+  
   <script>
     (function () {
       if (!('serviceWorker' in navigator)) return;
