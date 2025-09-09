@@ -1,0 +1,43 @@
+/* Login centering and animation overrides */
+.center-screen{min-height:calc(100vh - 68px);display:flex;align-items:center;justify-content:center;padding:2rem}
+.fx-pop{animation:pop-in .8s cubic-bezier(.2,.7,.3,1) both;transform-origin:center}
+@keyframes pop-in{0%{opacity:0;transform:scale(.9)}100%{opacity:1;transform:scale(1)}}
+.login-card h2{margin:0 0 .5rem 0;text-align:center;font-size:1.4rem}
+.login-card h3{margin:.25rem 0 1rem 0;text-align:center}
+.login-card .input{margin-top:.25rem}
+.login-actions{display:flex;gap:.6rem;justify-content:flex-end;margin-top:1rem}
+
+/* Login hero panel */
+.login-hero{display:flex;align-items:center;justify-content:center;padding:2rem;min-height:calc(100vh - 68px)}
+.login-hero-panel{width:100%;max-width:1100px;display:flex;border-radius:40px;overflow:hidden;position:relative;box-shadow:var(--shadow);background:linear-gradient(135deg,#ffa726,#fb8c00)}
+.login-hero-panel::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 25% 30%,rgba(255,255,255,.2)0,transparent 55%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.15)0,transparent 50%)}
+.login-info{flex:1;padding:3rem 2.5rem;color:#fff;display:flex;flex-direction:column;justify-content:center}
+.login-info h1{margin:0 0 .5rem 0;font-size:2rem}
+.login-info h2{margin:0 0 1rem 0;font-weight:400;font-size:1.25rem}
+.login-info p{margin:0;font-size:1rem;max-width:28ch}
+.login-form-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:3rem 2.5rem}
+.login-card{width:100%;max-width:360px;padding:2rem}
+
+/* Inputs con ícono y botón mostrar */
+.field{position:relative;margin-top:1rem}
+.field:first-of-type{margin-top:0}
+.field-icon{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
+.field input{padding-left:2.5rem;padding-right:3rem}
+.show-btn{position:absolute;right:.5rem;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--primary);cursor:pointer;font-size:.85rem;padding:.25rem}
+.show-btn:active{opacity:.7}
+
+/* Extras del login */
+.login-extra{display:flex;justify-content:space-between;align-items:center;margin:.75rem 0 1rem;font-size:.9rem}
+.login-extra label{display:flex;align-items:center;gap:.35rem}
+.account-link{margin-top:1rem;text-align:center;font-size:.9rem}
+
+@media(max-width:760px){
+  .login-hero-panel{flex-direction:column}
+  .login-info{text-align:center}
+  .login-info p{margin-left:auto;margin-right:auto}
+  .login-form-wrap{padding-top:0}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .fx-pop{animation:none;transition:none}
+}
