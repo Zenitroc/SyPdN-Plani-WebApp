@@ -162,7 +162,7 @@ function renderEditTable(rows){
       });
       const txt = await res.text(); const data = txt ? JSON.parse(txt) : {};
       if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
-      qs('b_msg').textContent = `OK: inserted=${data.inserted||0}, updated=${data.updated||0}, dry_run=${data.dry_run}. ${data.errors?.length ? 'Errores: '+data.errors.join(' | ') : ''}`;
+      qs('b_msg').textContent = `OK: Insertados=${data.inserted||0}, Actualizados=${data.updated||0}, dry_run=${data.dry_run}. ${data.errors?.length ? 'Errores: '+data.errors.join(' | ') : ''}`;
       if (!dry) { await load(); setTimeout(()=>modalHide('modalBulk'), 800); }
     } catch (e) { qs('b_msg').textContent = e.message || 'Error en carga'; }
   };
