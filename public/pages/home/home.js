@@ -154,12 +154,12 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
     // KPIs + botón solo Gurú (igual a tu UX)
     const guruBtn = isGuru
       ? `<div class="login-actions" style="justify-content:flex-start;margin-top:.75rem">
-           <button id="goAllStudents" class="btn btn-tonal">Todos los estudiantes</button>
+           <button id="goAllStudents" class="btn btn-tonal">Ver todos los estudiantes</button>
          </div>`
       : '';
     document.getElementById('kpis').innerHTML = `
       <div class="card fx-pop">
-        <b>Bienvenido, ${me.name}</b>. Seleccioná una comisión para comenzar.
+        <b>Hola, ${me.name}!</b>. Seleccioná una comisión para comenzar.
         ${guruBtn}
       </div>`;
     if (isGuru) {
