@@ -12,6 +12,7 @@
       <div class="menu">
         ${item(base + '/home/', 'Home')}
         ${item(base + '/curso-dashboard/', 'Dashboard')}
+        ${item(base + '/planificacion/', 'Planificación')}
         ${item(base + '/estudiantes/', 'Estudiantes')}
         ${item(base + '/grupos/', 'Grupos')}
         ${item(base + '/entregas/', 'Trabajos Prácticos')}
