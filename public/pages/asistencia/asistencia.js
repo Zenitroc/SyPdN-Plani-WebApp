@@ -6,8 +6,8 @@ function esc(s){ return (s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;","
 const partialFilter = qs('partialFilter');
 const attemptFilter = qs('attemptFilter');
 const content = qs('content');
-const btnExportCsv = qs('btnExportCsv');
-const btnExportPdf = qs('btnExportPdf');
+const btnDownloadXls = qs('btnDownloadXls');
+const btnDownloadPdf = qs('btnDownloadPdf');
 
 let COURSE_ID = null;
 let students = [];
@@ -50,8 +50,8 @@ function payload(res){ return (res && typeof res==='object' && 'data' in res) ? 
 
   partialFilter.onchange = load;
   attemptFilter.onchange = load;
-  btnExportCsv.onclick = exportCsv;
-  btnExportPdf.onclick = exportPdf;
+  btnDownloadXls.onclick = downloadXls;
+  btnDownloadPdf.onclick = downloadPdf;
 
   await load();
 })();
@@ -71,7 +71,8 @@ async function load(){
   html += '</tr></thead><tbody>';
 
   students.forEach(s => {
-    html += `<tr data-enroll="${s.enrollment_id}">`+
+    const rowCls = s.present ? 'row-present' : '';
+    html += `<tr data-enroll="${s.enrollment_id}" class="${rowCls}">`+
       '<td><input type="checkbox" class="sel"></td>'+
       `<td>${s.course_id_seq}</td>`+
       `<td>${esc(s.apellido)}</td>`+
@@ -80,7 +81,8 @@ async function load(){
     currentTopics.forEach(t => {
       const checked = s.topics[t] ? ' checked' : '';
       const dis = s.present ? '' : ' disabled';
-      html += `<td><input type="checkbox" class="topic" data-topic="${t}"${checked}${dis}></td>`;
+      const cls = s.topics[t] ? 'topic-delivered' : 'topic-missing';
+      html += `<td class="${cls}"><input type="checkbox" class="topic" data-topic="${t}"${checked}${dis}></td>`;
     });
     html += '</tr>';
   });
@@ -96,16 +98,19 @@ async function load(){
       const en = parseInt(tr.getAttribute('data-enroll'),10);
       const present = ev.target.checked;
       tr.querySelectorAll('.topic').forEach(tcb => { tcb.disabled = !present; if(!present) tcb.checked = false; });
+      updateRowStyles(tr);
       await save(en);
     };
   });
   document.querySelectorAll('tbody .topic').forEach(cb=>{
     cb.onchange = async ev => {
       const tr = ev.target.closest('tr');
+      updateRowStyles(tr);
       const en = parseInt(tr.getAttribute('data-enroll'),10);
       await save(en);
     };
   });
+  document.querySelectorAll('tbody tr').forEach(updateRowStyles);
 }
 
 async function save(enrollId){
@@ -122,6 +127,16 @@ async function save(enrollId){
     topics
   };
   try { await apiPost('/guardar', body); } catch(e){ console.error(e); }
+}
+
+function updateRowStyles(tr){
+  const present = tr.querySelector('.present').checked;
+  tr.classList.toggle('row-present', present);
+  tr.querySelectorAll('.topic').forEach(cb => {
+    const td = cb.parentElement;
+    td.classList.remove('topic-delivered','topic-missing');
+    td.classList.add(cb.checked ? 'topic-delivered' : 'topic-missing');
+  });
 }
 
 function collectSelected(){
@@ -143,28 +158,22 @@ function collectSelected(){
   return rows;
 }
 
-function exportCsv(){
+function downloadXls(){
   const rows = collectSelected();
   if(!rows.length){ alert('Seleccioná al menos un estudiante'); return; }
   const header = ['ID','Apellido','Nombre','Presente', ...currentTopics];
-  const lines = [header.join(',')];
-  rows.forEach(r => lines.push(r.map(v=>`"${v}"`).join(',')));
-  const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'asistencia.csv';
-  a.click();
+  const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Asistencia');
+  XLSX.writeFile(wb, 'asistencia.xlsx');
 }
 
-function exportPdf(){
+function downloadPdf(){
   const rows = collectSelected();
   if(!rows.length){ alert('Seleccioná al menos un estudiante'); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  let y = 10;
   const header = ['ID','Apellido','Nombre','Presente', ...currentTopics];
-  doc.text(header.join(' | '), 10, y);
-  y += 8;
-  rows.forEach(r => { doc.text(r.join(' | '), 10, y); y += 8; });
+  doc.autoTable({ head: [header], body: rows });
   doc.save('asistencia.pdf');
 }

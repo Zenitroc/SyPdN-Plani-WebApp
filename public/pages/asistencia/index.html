@@ -31,6 +31,18 @@
             text-align: left;
             white-space: nowrap
         }
+
+        .row-present {
+            background: #d1fae5
+        }
+
+        .topic-delivered {
+            background: #bfdbfe
+        }
+
+        .topic-missing {
+            background: #fecaca
+        }
     </style>
 </head>
 
@@ -53,8 +65,8 @@
                 </select>
             </label>
             <div class="spacer"></div>
-            <button id="btnExportCsv" class="btn">Exportar Excel</button>
-            <button id="btnExportPdf" class="btn">Exportar PDF</button>
+            <button id="btnDownloadXls" class="btn">Descargar Excel</button>
+            <button id="btnDownloadPdf" class="btn">Descargar PDF</button>
         </div>
         <div id="content"></div>
     </main>
@@ -63,6 +75,8 @@
     <script src="/SyPdN-WebApp/public/assets/js/course-context.js"></script>
     <script src="/SyPdN-WebApp/public/assets/js/menu.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="./asistencia.js"></script>
 </body>
 
