@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Cursos — SyPdN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
+  <style>
+    .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+    .tbl{border-collapse:collapse;width:100%}
+    .tbl th,.tbl td{border:1px solid var(--border);padding:.5rem;text-align:left}
+    .tbl th{background:color-mix(in oklab, var(--surface) 70%, var(--bg))}
+    .pill{font-size:.85rem;padding:.1rem .5rem;border-radius:999px;border:1px solid var(--border)}
+    .pill.on{background:color-mix(in oklab, var(--accent) 18%, transparent)}
+    .pill.off{opacity:.6}
+    .list{display:flex;flex-direction:column;gap:.35rem}
+    .row-between{display:flex;gap:.5rem;justify-content:space-between;align-items:center;flex-wrap:wrap}
+    .muted{opacity:.7}
+  </style>
+</head>
+<body>
+  <nav id="appMenu"></nav>
+  <main class="container">
+    <h1>Cursos</h1>
+    <div id="accessMsg" class="card" style="display:none"></div>
+
+    <section id="adminPanel" style="display:none">
+      <div class="row-between" style="margin-bottom:1rem">
+        <div>
+          <div class="label">Administración de cursos</div>
+          <small class="hint">Creá cursos, modificá sus datos y asigná docentes.</small>
+        </div>
+        <button id="btnRefresh" class="btn btn-ghost">↻ Recargar</button>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-top:0">Cursos existentes</h3>
+          <div id="coursesTable"></div>
+          <small class="muted">Seleccioná un curso para editar o asignar usuarios.</small>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-top:0">Nuevo curso</h3>
+          <div class="row" style="gap:.5rem;flex-wrap:wrap">
+            <input id="newCode" class="input" placeholder="Código" style="min-width:120px">
+            <input id="newName" class="input" placeholder="Nombre" style="flex:1;min-width:180px">
+          </div>
+          <div class="row" style="gap:.5rem;flex-wrap:wrap;margin-top:.5rem">
+            <input id="newTerm" class="input" placeholder="Cuatri / Año" style="min-width:140px">
+            <input id="newPlanUrl" class="input" placeholder="Link de planificación" style="flex:1;min-width:180px">
+            <label class="row" style="gap:.35rem;align-items:center">
+              <input id="newActive" type="checkbox" checked>
+              <span>Activo</span>
+            </label>
+          </div>
+          <div class="row" style="margin-top:.75rem;gap:.5rem;justify-content:flex-end">
+            <button id="btnCreate" class="btn btn-primary">Crear curso</button>
+          </div>
+          <div id="createMsg" class="hint"></div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:1rem">
+        <div class="card">
+          <h3 style="margin-top:0">Editar curso</h3>
+          <div id="editEmpty" class="hint">Elegí un curso en la tabla.</div>
+          <div id="editForm" style="display:none">
+            <div class="row" style="gap:.5rem;flex-wrap:wrap">
+              <input id="editCode" class="input" placeholder="Código" style="min-width:120px">
+              <input id="editName" class="input" placeholder="Nombre" style="flex:1;min-width:180px">
+            </div>
+            <div class="row" style="gap:.5rem;flex-wrap:wrap;margin-top:.5rem">
+              <input id="editTerm" class="input" placeholder="Cuatri / Año" style="min-width:140px">
+              <input id="editPlanUrl" class="input" placeholder="Link de planificación" style="flex:1;min-width:180px">
+              <label class="row" style="gap:.35rem;align-items:center">
+                <input id="editActive" type="checkbox">
+                <span>Activo</span>
+              </label>
+            </div>
+            <div class="row" style="margin-top:.75rem;gap:.5rem;justify-content:flex-end">
+              <button id="btnUpdate" class="btn btn-tonal">Guardar cambios</button>
+              <button id="btnDelete" class="btn btn-outline">Eliminar</button>
+            </div>
+            <div id="editMsg" class="hint"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-top:0">Asignar usuarios</h3>
+          <div id="assignEmpty" class="hint">Seleccioná un curso para ver los usuarios asignados.</div>
+          <div id="assignPanel" style="display:none">
+            <div class="row" style="gap:.5rem;flex-wrap:wrap">
+              <select id="assignUser" class="input" style="flex:1;min-width:200px"></select>
+              <button id="btnAssign" class="btn btn-primary">Asignar</button>
+            </div>
+            <div style="margin-top:.75rem">
+              <div class="label">Usuarios asignados</div>
+              <div id="assignedList" class="list" style="margin-top:.5rem"></div>
+            </div>
+            <div id="assignMsg" class="hint"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/SyPdN-WebApp/public/assets/js/api.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/theme.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/course-context.js"></script>
+  <script src="/SyPdN-WebApp/public/assets/js/menu.js"></script>
+  <script src="./cursos-admin.js"></script>
+</body>
+</html>

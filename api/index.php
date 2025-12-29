@@ -62,9 +62,12 @@ require __DIR__ . '/src/routes/parciales.php';
 require __DIR__ . '/src/routes/reportes.php';
 require __DIR__ . '/src/routes/asistencia.php';
 require __DIR__ . '/src/routes/planificacion.php';
+require __DIR__ . '/src/routes/course_admin.php';
 
 require_once __DIR__ . '/src/routes/course_color.php';
 register_course_color_routes();
+register_planificacion_routes();
+register_course_admin_routes();
 
 register_session_routes();
 register_course_routes();
@@ -74,6 +77,5 @@ register_entregas_routes();
 register_parciales_routes();
 register_report_routes();
 register_asistencia_routes();
-register_planificacion_routes();
 
 dispatch();

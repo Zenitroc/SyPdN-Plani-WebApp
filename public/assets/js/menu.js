@@ -6,13 +6,23 @@
   }
   function themeLabel() { return theme.get()==='dark' ? 'Oscuro' : 'Claro'; }
 
-  window.renderMenu = function (containerId = 'appMenu') {
+  window.renderMenu = async function (containerId = 'appMenu') {
     const base = BASE_APP + '/public/pages';
+    let isGuru = false;
+    if (api.getToken()) {
+      try {
+        const me = await api.get('/me');
+        isGuru = Array.isArray(me.roles) && me.roles.includes('GURU');
+      } catch (e) {
+        isGuru = false;
+      }
+    }
     const html = `
       <div class="menu">
         ${item(base + '/home/', 'Home')}
         ${item(base + '/curso-dashboard/', 'Dashboard')}
         ${item(base + '/planificacion/', 'Planificación')}
+        ${isGuru ? item(base + '/cursos-admin/', 'Cursos') : ''}
         ${item(base + '/estudiantes/', 'Estudiantes')}
         ${item(base + '/grupos/', 'Grupos')}
         ${item(base + '/entregas/', 'Trabajos Prácticos')}

@@ -153,8 +153,9 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
 
     // KPIs + botón solo Gurú (igual a tu UX)
     const guruBtn = isGuru
-      ? `<div class="login-actions" style="justify-content:flex-start;margin-top:.75rem">
+      ? `<div class="login-actions" style="justify-content:flex-start;margin-top:.75rem;gap:.5rem;flex-wrap:wrap">
            <button id="goAllStudents" class="btn btn-tonal">Ver todos los estudiantes</button>
+           <button id="goCourseAdmin" class="btn btn-ghost">Administrar cursos</button>
          </div>`
       : '';
     document.getElementById('kpis').innerHTML = `
@@ -165,6 +166,9 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
     if (isGuru) {
       document.getElementById('goAllStudents').onclick = () => {
         location.href = BASE_APP + '/public/pages/alumnos-global/';
+      };
+      document.getElementById('goCourseAdmin').onclick = () => {
+        location.href = BASE_APP + '/public/pages/cursos-admin/';
       };
     }
 
