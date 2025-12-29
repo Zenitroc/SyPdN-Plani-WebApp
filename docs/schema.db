@@ -290,8 +290,15 @@ INSERT INTO `roles` (`id`, `code`, `description`) VALUES
 CREATE TABLE `users` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `name` varchar(120) NOT NULL,
+  `last_name` varchar(120) DEFAULT NULL,
   `email` varchar(190) NOT NULL,
+  `personal_email` varchar(190) DEFAULT NULL,
+  `legajo` varchar(60) DEFAULT NULL,
+  `phone` varchar(60) DEFAULT NULL,
+  `photo_data` longtext DEFAULT NULL,
+  `photo_mime` varchar(120) DEFAULT NULL,
   `password_hash` varchar(255) NOT NULL,
+  `must_change_password` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `username` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -300,8 +307,8 @@ CREATE TABLE `users` (
 -- Volcado de datos para la tabla `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `password_hash`, `created_at`, `username`) VALUES
-(1, 'Gurú', 'guru@example.com', '$2y$10$F/8WOLWTePcnBPYHrb7ZwOXsO/4YIOIGEgpZhOVF4DP/XYA9NMqXu', '2025-09-06 18:46:27', 'guru');
+INSERT INTO `users` (`id`, `name`, `last_name`, `email`, `personal_email`, `legajo`, `phone`, `photo_data`, `photo_mime`, `password_hash`, `must_change_password`, `created_at`, `username`) VALUES
+(1, 'Gurú', NULL, 'guru@example.com', NULL, NULL, NULL, NULL, NULL, '$2y$10$F/8WOLWTePcnBPYHrb7ZwOXsO/4YIOIGEgpZhOVF4DP/XYA9NMqXu', 0, '2025-09-06 18:46:27', 'guru');
 
 -- --------------------------------------------------------
 

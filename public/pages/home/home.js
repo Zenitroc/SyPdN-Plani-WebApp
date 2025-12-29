@@ -161,6 +161,7 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
       ? `<div class="login-actions" style="justify-content:flex-start;margin-top:.75rem;gap:.5rem;flex-wrap:wrap">
            <button id="goAllStudents" class="btn btn-tonal">Ver todos los estudiantes</button>
            <button id="goCourseAdmin" class="btn btn-primary">Gestionar cursos</button>
+           <button id="goUserAdmin" class="btn btn-primary">Gestionar usuarios</button>
          </div>`
       : '';
     document.getElementById('kpis').innerHTML = `
@@ -174,6 +175,9 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
       };
       document.getElementById('goCourseAdmin').onclick = () => {
         location.href = BASE_APP + '/public/pages/cursos-admin/';
+      };
+      document.getElementById('goUserAdmin').onclick = () => {
+        location.href = BASE_APP + '/public/pages/usuarios-admin/';
       };
     }
 

@@ -43,68 +43,6 @@
       <div id="courseGrid" style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.75rem"></div>
     </section>
 
-    <section id="userManager" class="card" style="display:none;margin-top:1rem">
-      <div class="row-between">
-        <div>
-          <div class="label">Gestor de usuarios</div>
-          <small class="hint">Administrá usuarios, roles y cursos asignados.</small>
-        </div>
-        <div class="row" style="gap:.5rem">
-          <input id="userSearch" class="input" placeholder="Buscar por nombre, usuario o email" style="min-width:240px">
-          <button id="btnToggleCreate" class="btn btn-primary">+ Nuevo usuario</button>
-        </div>
-      </div>
-
-      <div id="userCreatePanel" class="card" style="margin-top:1rem;display:none">
-        <h3 style="margin-top:0">Alta de usuario</h3>
-        <div class="grid cols-3">
-          <label class="label">Nombre
-            <input id="newUserName" class="input" type="text" placeholder="Nombre" />
-          </label>
-          <label class="label">Apellido
-            <input id="newUserLastName" class="input" type="text" placeholder="Apellido" />
-          </label>
-          <label class="label">Usuario
-            <input id="newUserUsername" class="input" type="text" placeholder="usuario" />
-          </label>
-          <label class="label">Email institucional
-            <input id="newUserEmail" class="input" type="email" placeholder="usuario@institucion.edu" />
-          </label>
-          <label class="label">Email personal (opcional)
-            <input id="newUserPersonalEmail" class="input" type="email" placeholder="usuario@gmail.com" />
-          </label>
-          <label class="label">Legajo
-            <input id="newUserLegajo" class="input" type="text" placeholder="Legajo" />
-          </label>
-          <label class="label">Teléfono (opcional)
-            <input id="newUserPhone" class="input" type="text" placeholder="+54 11 ..." />
-          </label>
-          <label class="label">Foto (opcional)
-            <input id="newUserPhoto" class="input" type="file" accept="image/*" />
-            <small class="hint">Máximo 200KB.</small>
-          </label>
-        </div>
-        <div class="label" style="margin-top:1rem">Roles</div>
-        <div id="newUserRoles" class="row" style="flex-wrap:wrap;gap:.5rem"></div>
-        <div class="row" style="margin-top:1rem;justify-content:flex-end;gap:.5rem">
-          <button id="btnCancelCreate" class="btn btn-ghost">Cancelar</button>
-          <button id="btnCreateUser" class="btn btn-primary">Crear usuario</button>
-        </div>
-        <div id="createUserMsg" class="muted" style="margin-top:.5rem"></div>
-      </div>
-
-      <div class="grid cols-2" style="margin-top:1rem">
-        <div>
-          <div id="userList" class="grid" style="gap:.75rem"></div>
-        </div>
-        <div>
-          <div id="userDetail" class="card" style="min-height:200px">
-            <div class="muted">Seleccioná un usuario para ver el detalle.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-   
   </main>
 
 

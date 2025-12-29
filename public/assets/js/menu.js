@@ -1,5 +1,5 @@
 (function () {
-   function escapeHtml(s) {
+  function escapeHtml(s) {
     return (s || '').toString().replace(/[&<>"']/g, m => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
     }[m]));
@@ -15,8 +15,7 @@
     let me = null;
     if (api.getToken()) {
       try {
-         me = await api.get('/me');
-        const me = await api.get('/me');
+        me = await api.get('/me');
         isGuru = Array.isArray(me.roles) && me.roles.includes('GURU');
       } catch (e) {
         isGuru = false;
@@ -35,7 +34,6 @@
       </a>` : '';
     const html = `
       <div class="menu">
-       ${profile}
         ${item(base + '/home/', 'Home')}
         ${item(base + '/curso-dashboard/', 'Dashboard')}
         ${item(base + '/planificacion/', 'Planificación')}
@@ -48,7 +46,7 @@
         
         <div class="spacer"></div>
         <button class="btn btn-ghost round" onclick="theme.toggle()">🌓 Modo</button>
-        
+        ${profile}
         <button id="logoutBtn" class="btn btn-neutral">Salir</button>
       </div>`;
     const el = document.getElementById(containerId);
