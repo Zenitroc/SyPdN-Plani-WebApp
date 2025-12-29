@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8" />
   <title>Estudiantes — SyPdN</title>
@@ -7,16 +8,61 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
+  <link rel="stylesheet" href="../../../public/assets/css/base.css">
   <style>
-    .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:999}
-    .modal{width:min(980px,96vw);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem}
-    .modal h3{margin:.2rem 0 1rem 0}
-    .modal .actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem}
-    .tbl{border-collapse:collapse;width:100%} .tbl th,.tbl td{border:1px solid var(--border);padding:.45rem} .tbl th{background:color-mix(in oklab, var(--surface) 70%, var(--bg));text-align:left}
-    .small{font-size:.92rem;color:var(--muted)}
+    .modal-back {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999
+    }
+
+    .modal {
+      width: min(980px, 96vw);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1rem
+    }
+
+    .modal h3 {
+      margin: .2rem 0 1rem 0
+    }
+
+    .modal .actions {
+      display: flex;
+      gap: .5rem;
+      justify-content: flex-end;
+      margin-top: 1rem
+    }
+
+    .tbl {
+      border-collapse: collapse;
+      width: 100%
+    }
+
+    .tbl th,
+    .tbl td {
+      border: 1px solid var(--border);
+      padding: .45rem
+    }
+
+    .tbl th {
+      background: color-mix(in oklab, var(--surface) 70%, var(--bg));
+      text-align: left
+    }
+
+    .small {
+      font-size: .92rem;
+      color: var(--muted)
+    }
   </style>
 </head>
+
 <body>
   <nav id="appMenu"></nav>
   <main class="container">
@@ -44,11 +90,15 @@
     <div class="modal fx-pop">
       <h3>Nuevo estudiante</h3>
       <div class="grid cols-2">
-        <div class="field"><label class="label">Apellido</label><input id="n_last" class="input" type="text" required></div>
-        <div class="field"><label class="label">Nombre</label><input id="n_first" class="input" type="text" required></div>
-        <div class="field"><label class="label">Email institucional</label><input id="n_email" class="input" type="email"></div>
+        <div class="field"><label class="label">Apellido</label><input id="n_last" class="input" type="text" required>
+        </div>
+        <div class="field"><label class="label">Nombre</label><input id="n_first" class="input" type="text" required>
+        </div>
+        <div class="field"><label class="label">Email institucional</label><input id="n_email" class="input"
+            type="email"></div>
         <div class="field"><label class="label">Legajo</label><input id="n_legajo" class="input" type="text"></div>
-        <div class="field"><label class="label">Grupo (número)</label><input id="n_group" class="input" type="number" min="1" step="1" placeholder="opcional"></div>
+        <div class="field"><label class="label">Grupo (número)</label><input id="n_group" class="input" type="number"
+            min="1" step="1" placeholder="opcional"></div>
         <div class="field"><label class="label">Observaciones</label><input id="n_obs" class="input" type="text"></div>
       </div>
       <div id="n_msg" class="small"></div>
@@ -64,7 +114,7 @@
     <div class="modal fx-pop">
       <h3>Cargar CSV</h3>
       <div class="card small" style="margin-bottom:.6rem">
-        Formato: <code>last_name, first_name, email_inst, legajo, course_student_id, group_number, observaciones</code>
+        Formato: <code>apellido, nombre, legajo, email_inst</code> (separado por coma o punto y coma)
       </div>
       <div class="field"><label class="label">Archivo CSV</label><input id="b_file" type="file" accept=".csv"></div>
       <div class="field"><label><input id="b_dry" type="checkbox" checked> Validar sin guardar (dry-run)</label></div>
@@ -89,10 +139,11 @@
     </div>
   </div>
 
-  <script src="/SyPdN-WebApp/public/assets/js/api.js"></script>
-  <script src="/SyPdN-WebApp/public/assets/js/theme.js"></script>
-  <script src="/SyPdN-WebApp/public/assets/js/course-context.js"></script>
-  <script src="/SyPdN-WebApp/public/assets/js/menu.js"></script>
+  <script src="../../../public/assets/js/api.js"></script>
+  <script src="../../../public/assets/js/theme.js"></script>
+  <script src="../../../public/assets/js/course-context.js"></script>
+  <script src="../../../public/assets/js/menu.js"></script>
   <script src="./estudiantes.js"></script>
 </body>
+
 </html>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Asistencia Parciales — SyPdN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../../../public/assets/css/base.css">
+    <style>
+        .toolbar {
+            display: flex;
+            gap: .5rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: .75rem 0
+        }
+
+        .toolbar .spacer {
+            flex: 1
+        }
+
+        table.tbl {
+            border-collapse: collapse;
+            width: 100%
+        }
+
+        .tbl th,
+        .tbl td {
+            border-bottom: 1px solid var(--border);
+            padding: .45rem .55rem;
+            text-align: left;
+            white-space: nowrap
+        }
+
+        .row-present {
+            background: #d1fae5
+        }
+
+        .topic-delivered {
+            background: #bfdbfe
+        }
+
+        .topic-missing {
+            background: #fecaca
+        }
+    </style>
+</head>
+
+<body>
+    <nav id="appMenu"></nav>
+    <main class="container">
+        <h1>Asistencia a parciales</h1>
+        <div class="toolbar">
+            <label>Parcial:
+                <select id="partialFilter" class="select" style="width:auto">
+                    <option value="1">1° Parcial</option>
+                    <option value="2">2° Parcial</option>
+                </select>
+            </label>
+            <label>Recuperatorio:
+                <select id="attemptFilter" class="select" style="width:auto">
+                    <option value="PA">Parcial</option>
+                    <option value="1R">1° Recu</option>
+                    <option value="2R">2° Recu</option>
+                </select>
+            </label>
+            <div class="spacer"></div>
+            <button id="btnDownloadXls" class="btn">Descargar Excel</button>
+            <button id="btnDownloadPdf" class="btn">Descargar PDF</button>
+        </div>
+        <div id="content"></div>
+    </main>
+    <script src="../../../public/assets/js/api.js"></script>
+    <script src="../../../public/assets/js/theme.js"></script>
+    <script src="../../../public/assets/js/course-context.js"></script>
+    <script src="../../../public/assets/js/menu.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="./asistencia.js"></script>
+</body>
+
+</html>

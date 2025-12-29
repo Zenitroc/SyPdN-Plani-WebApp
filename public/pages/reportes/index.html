@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Reportes — SyPdN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../public/assets/css/base.css">
+  <style>
+    .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:999}
+    .modal{width:min(520px,96vw);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem}
+    .modal h3{margin:.2rem 0 1rem 0}
+    .modal .actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem}
+  </style>
+</head>
+<body>
+  <nav id="appMenu"></nav>
+  <main class="container">
+    <div class="card">
+      <h1>Centro de reportes y novedades</h1>
+      <p>Acá se publicarán actualizaciones, comentarios y links importantes de la cátedra.</p>
+      <button id="btnReport" class="btn btn-primary">Enviar reporte</button>
+    </div>
+  </main>
+
+  <div class="modal-back" id="reportModal">
+    <div class="modal">
+      <h3>Enviar reporte</h3>
+      <div class="field">
+        <label class="label" for="r_type">Tipo</label>
+        <select id="r_type" class="select">
+          <option value="bug">Bug/Fallo</option>
+          <option value="solicitud">Solicitud</option>
+          <option value="idea">Idea</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label" for="r_message">Comentario</label>
+        <textarea id="r_message" class="input" rows="4" placeholder="Describe tu reporte..."></textarea>
+      </div>
+      <div class="field">
+        <label class="label" for="r_link">Link (opcional)</label>
+        <input id="r_link" class="input" placeholder="Enlace relacionado" />
+      </div>
+      <div class="field">
+        <label class="label" for="r_image">Imagen (opcional)</label>
+        <input id="r_image" type="file" accept="image/*" class="input" />
+      </div>
+      <div class="actions">
+        <button class="btn btn-neutral" id="r_cancel">Cancelar</button>
+        <button class="btn btn-primary" id="r_send">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../../public/assets/js/api.js"></script>
+  <script src="../../../public/assets/js/theme.js"></script>
+  <script src="../../../public/assets/js/course-context.js"></script>
+  <script src="../../../public/assets/js/menu.js"></script>
+  <script src="./reportes.js"></script>
+</body>
+</html>

@@ -120,7 +120,7 @@ function register_entregas_routes() {
   // Helpers
   $getGradeOptions = function(PDO $pdo): array {
     try {
-      $rows = $pdo->query("SELECT code FROM grade_lookup")->fetchAll(PDO::FETCH_COLUMN);
+      $rows = $pdo->query("SELECT code FROM grade_lookup ORDER BY ordinal ASC")->fetchAll(PDO::FETCH_COLUMN);
       if ($rows && is_array($rows)) return array_values(array_unique(array_map('strval', $rows)));
     } catch (Throwable $e) { /* fallback */ }
     return ['A','N_E','NO_SAT','SAT-','SAT','SAT+','DIST-','DIST'];

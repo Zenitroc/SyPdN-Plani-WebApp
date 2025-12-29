@@ -336,9 +336,6 @@ function register_student_routes(): void
 
         $email = trim((string) ($r['email_inst'] ?? ''));
         $leg = trim((string) ($r['legajo'] ?? ''));
-        $obs = (string) ($r['observaciones'] ?? '');
-        $cid = (int) ($r['course_student_id'] ?? 0);
-        $gnum = isset($r['group_number']) ? (int) $r['group_number'] : null;
 
         if ($dry) {
           continue;
@@ -354,25 +351,18 @@ function register_student_routes(): void
           continue;
         }
 
-        $gid = $gnum ? ensure_group_in_course($pdo, $courseId, $gnum) : null;
-
-        $sel = $pdo->prepare("SELECT id, course_student_id FROM enrollments WHERE course_id=? AND person_id=?");
+        $sel = $pdo->prepare("SELECT id FROM enrollments WHERE course_id=? AND person_id=?");
         $sel->execute([$courseId, $pid]);
         $enr = $sel->fetch();
 
         if ($enr) {
-          $newCid = $cid > 0 ? $cid : (int) $enr['course_student_id'];
-          if ($newCid !== (int) $enr['course_student_id'])
-            ensure_course_student_id_free($pdo, $courseId, $newCid);
-          $upd = $pdo->prepare("UPDATE enrollments SET course_student_id=?, group_id=?, observaciones=? WHERE id=?");
-          $upd->execute([$newCid, $gid, $obs, $enr['id']]);
           $updated++;
         } else {
-          $assigned = $cid > 0 ? $cid : next_course_student_id($pdo, $courseId);
+          $assigned = next_course_student_id($pdo, $courseId);
           ensure_course_student_id_free($pdo, $courseId, $assigned);
           $ins = $pdo->prepare("INSERT INTO enrollments(course_id, person_id, course_student_id, status, group_id, observaciones)
                                 VALUES (?,?,?,?,?,?)");
-          $ins->execute([$courseId, $pid, $assigned, 'ALTA', $gid, $obs]);
+          $ins->execute([$courseId, $pid, $assigned, 'ALTA', null, '']);
           $inserted++;
         }
       }
@@ -465,9 +455,17 @@ function parse_csv_rows(string $tmpfile): array
   $fh = fopen($tmpfile, 'r');
   if (!$fh)
     throw new Exception('No se pudo leer el CSV');
+
+  // detectar delimitador: preferir ';' si aparece más que ',' en la primera línea
+  $first = fgets($fh);
+  $delim = ',';
+  if ($first !== false && substr_count($first, ';') > substr_count($first, ','))
+    $delim = ';';
+  rewind($fh);
+
   $rows = [];
   $header = null;
-  while (($data = fgetcsv($fh, 0, ",")) !== false) {
+  while (($data = fgetcsv($fh, 0, $delim, '"', '\\')) !== false) {
     if ($header === null) {
       $header = array_map('trim', $data);
       $lc = array_map(fn($x) => strtolower($x), $header);
@@ -485,8 +483,6 @@ function parse_csv_rows(string $tmpfile): array
     }
   }
   fclose($fh);
-  if ($header === null)
-    return $rows;
   return $rows;
 }
 function row_from_fixed(array $d): array
@@ -494,16 +490,15 @@ function row_from_fixed(array $d): array
   return normalize_row([
     'last_name' => $d[0] ?? '',
     'first_name' => $d[1] ?? '',
-    'email_inst' => $d[2] ?? '',
-    'legajo' => $d[3] ?? '',
-    'course_student_id' => $d[4] ?? '',
-    'group_number' => $d[5] ?? '',
-    'observaciones' => $d[6] ?? ''
+    'legajo' => $d[2] ?? '',
+    'email_inst' => $d[3] ?? ''
   ]);
 }
 function normalize_row(array $r): array
 {
   $r['last_name'] = $r['last_name'] ?? ($r['apellido'] ?? '');
   $r['first_name'] = $r['first_name'] ?? ($r['nombre'] ?? '');
+  if (isset($r['email']))
+    $r['email_inst'] = $r['email'];
   return $r;
 }
