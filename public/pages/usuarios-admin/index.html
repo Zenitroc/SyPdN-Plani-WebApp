@@ -1,0 +1,99 @@
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Gestión de usuarios — SyPdN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../public/assets/css/base.css">
+  <style>
+    .row{display:flex;gap:.6rem;align-items:center}
+    .row-between{display:flex;gap:.6rem;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .pill{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .6rem;border-radius:999px;border:1px solid var(--border);font-size:.85rem}
+    .user-card{border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;background:color-mix(in oklab, var(--surface) 90%, var(--bg))}
+    .user-card.active{border-color:color-mix(in oklab, var(--primary) 45%, var(--border));background:color-mix(in oklab, var(--primary) 10%, var(--surface))}
+    .user-avatar{width:46px;height:46px;border-radius:50%;object-fit:cover;border:1px solid var(--border)}
+    .user-avatar.fallback{display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;background:color-mix(in oklab, var(--surface) 80%, var(--bg))}
+    .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:999}
+    .modal{width:min(980px,96vw);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem}
+    .modal h3{margin:.2rem 0 1rem 0}
+    .modal .actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem}
+  </style>
+</head>
+<body>
+  <nav id="appMenu"></nav>
+
+  <main class="container">
+    <section class="card">
+      <div class="row-between">
+        <div>
+          <h1 style="margin:.2rem 0">Gestor de usuarios</h1>
+          <small class="hint">Administrá usuarios, roles y cursos asignados.</small>
+        </div>
+        <div class="row" style="gap:.5rem">
+          <input id="userSearch" class="input" placeholder="Buscar por nombre, usuario o email" style="min-width:240px">
+          <button id="btnToggleCreate" class="btn btn-primary">+ Nuevo usuario</button>
+        </div>
+      </div>
+
+      <div class="grid cols-2" style="margin-top:1rem">
+        <div>
+          <div id="userList" class="grid" style="gap:.75rem"></div>
+        </div>
+        <div>
+          <div id="userDetail" class="card" style="min-height:200px">
+            <div class="muted">Seleccioná un usuario para ver el detalle.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-back" id="userCreateModal">
+    <div class="modal">
+      <h3>Alta de usuario</h3>
+      <div class="grid cols-3">
+        <label class="label">Nombre
+          <input id="newUserName" class="input" type="text" placeholder="Nombre" />
+        </label>
+        <label class="label">Apellido
+          <input id="newUserLastName" class="input" type="text" placeholder="Apellido" />
+        </label>
+        <label class="label">Usuario
+          <input id="newUserUsername" class="input" type="text" placeholder="usuario" />
+        </label>
+        <label class="label">Email institucional
+          <input id="newUserEmail" class="input" type="email" placeholder="usuario@institucion.edu" />
+        </label>
+        <label class="label">Email personal (opcional)
+          <input id="newUserPersonalEmail" class="input" type="email" placeholder="usuario@gmail.com" />
+        </label>
+        <label class="label">Legajo
+          <input id="newUserLegajo" class="input" type="text" placeholder="Legajo" />
+        </label>
+        <label class="label">Teléfono (opcional)
+          <input id="newUserPhone" class="input" type="text" placeholder="+54 11 ..." />
+        </label>
+        <label class="label">Foto (opcional)
+          <input id="newUserPhoto" class="input" type="file" accept="image/*" />
+          <small class="hint">Máximo 200KB.</small>
+        </label>
+      </div>
+      <div class="label" style="margin-top:1rem">Roles</div>
+      <div id="newUserRoles" class="row" style="flex-wrap:wrap;gap:.5rem"></div>
+      <div class="actions">
+        <button id="btnCancelCreate" class="btn btn-ghost">Cancelar</button>
+        <button id="btnCreateUser" class="btn btn-primary">Crear usuario</button>
+      </div>
+      <div id="createUserMsg" class="muted" style="margin-top:.5rem"></div>
+    </div>
+  </div>
+
+  <script src="../../../public/assets/js/api.js"></script>
+  <script src="../../../public/assets/js/theme.js"></script>
+  <script src="../../../public/assets/js/course-context.js"></script>
+  <script src="../../../public/assets/js/menu.js"></script>
+  <script src="./usuarios-admin.js"></script>
+</body>
+</html>

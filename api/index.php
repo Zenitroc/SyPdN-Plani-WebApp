@@ -63,11 +63,13 @@ require __DIR__ . '/src/routes/reportes.php';
 require __DIR__ . '/src/routes/asistencia.php';
 require __DIR__ . '/src/routes/planificacion.php';
 require __DIR__ . '/src/routes/course_admin.php';
+require __DIR__ . '/src/routes/user_admin.php';
 
 require_once __DIR__ . '/src/routes/course_color.php';
 register_course_color_routes();
 register_planificacion_routes();
 register_course_admin_routes();
+register_user_admin_routes();
 
 register_session_routes();
 register_course_routes();

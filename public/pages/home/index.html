@@ -8,6 +8,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../../public/assets/css/base.css">
+  <style>
+    .row{display:flex;gap:.6rem;align-items:center}
+    .row-between{display:flex;gap:.6rem;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .pill{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .6rem;border-radius:999px;border:1px solid var(--border);font-size:.85rem}
+    .user-card{border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;background:color-mix(in oklab, var(--surface) 90%, var(--bg))}
+    .user-card.active{border-color:color-mix(in oklab, var(--primary) 45%, var(--border));background:color-mix(in oklab, var(--primary) 10%, var(--surface))}
+    .user-avatar{width:46px;height:46px;border-radius:50%;object-fit:cover;border:1px solid var(--border)}
+    .user-avatar.fallback{display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;background:color-mix(in oklab, var(--surface) 80%, var(--bg))}
+  </style>
 </head>
 
 <body>
@@ -34,7 +43,6 @@
       <div id="courseGrid" style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.75rem"></div>
     </section>
 
-   
   </main>
 
 
