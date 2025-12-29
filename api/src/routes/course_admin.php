@@ -99,13 +99,6 @@ function register_course_admin_routes(): void {
     json_ok(['deleted' => true, 'course_id' => $courseId]);
   });
 
-  route('GET', '/api/admin/users', function (): void {
-    $pdo = db();
-    $u = auth_user();
-    require_role($u, ['GURU']);
-    $q = $pdo->query('SELECT id, name, username FROM users ORDER BY name');
-    json_ok($q->fetchAll());
-  });
 
   route('GET', '/api/admin/course-users', function (): void {
     $pdo = db();

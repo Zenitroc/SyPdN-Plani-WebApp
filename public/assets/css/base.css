@@ -192,6 +192,45 @@ small, .muted{color:var(--muted)}
   background:var(--surface);
   box-shadow:0 10px 25px rgba(15, 23, 42, 0.06);
 }
+.menu-profile{
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+  padding:.35rem .6rem;
+  border-radius:999px;
+  border:1px solid transparent;
+  color:var(--text);
+  font-weight:600;
+}
+.menu-profile:hover{
+  text-decoration:none;
+  border-color:color-mix(in oklab, var(--primary) 25%, transparent);
+  background:color-mix(in oklab, var(--primary) 10%, transparent);
+}
+.menu-profile-name{
+  display:inline-block;
+  max-width:200px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.menu-avatar{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid var(--border);
+  background:color-mix(in oklab, var(--surface) 70%, var(--bg));
+}
+.menu-avatar--fallback{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.75rem;
+  font-weight:700;
+  color:color-mix(in oklab, var(--primary) 80%, var(--text));
+  text-transform:uppercase;
+}
 .menu a{padding:.45rem .7rem;border-radius:.7rem;color:var(--text)}
 .menu a.active{background:color-mix(in oklab, var(--primary) 16%, transparent)}
 .menu .spacer{flex:1}
