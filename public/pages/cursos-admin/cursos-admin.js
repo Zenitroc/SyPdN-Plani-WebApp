@@ -6,6 +6,7 @@ let COURSES = [];
 let USERS = [];
 let ASSIGNED = [];
 let SELECTED_ID = null;
+let SELECTED_ACTIVE = null;
 
 function setMessage(id, msg){ qs(id).textContent = msg || ''; }
 
@@ -19,34 +20,35 @@ function renderCourses(){
   }
   const rows = COURSES.map(c => {
     const active = Number(c.is_active) === 1;
-    const checked = Number(c.id) === Number(SELECTED_ID) ? 'checked' : '';
+    const selected = Number(c.id) === Number(SELECTED_ID) ? 'style="background:color-mix(in oklab, var(--primary) 10%, var(--surface))"' : '';
     return `
-      <tr>
-        <td><input type="radio" name="coursePick" value="${c.id}" ${checked}></td>
+      <tr ${selected}>
         <td>${c.code ?? ''}</td>
         <td>${c.name ?? ''}</td>
         <td>${c.term ?? ''}</td>
         <td><span class="pill ${active ? 'on' : 'off'}">${active ? 'Activo' : 'Inactivo'}</span></td>
+        <td><button class="btn btn-ghost" data-edit="${c.id}">Editar</button></td>
       </tr>`;
   }).join('');
   el.innerHTML = `
     <table class="tbl">
       <thead>
         <tr>
-          <th></th>
           <th>Código</th>
           <th>Nombre</th>
-          <th>Term</th>
+          <th>Comisión</th>
           <th>Estado</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>`;
 
-  Array.from(document.querySelectorAll('input[name="coursePick"]')).forEach(radio => {
-    radio.addEventListener('change', () => {
-      SELECTED_ID = Number(radio.value);
+  Array.from(document.querySelectorAll('[data-edit]')).forEach(btn => {
+    btn.addEventListener('click', () => {
+      SELECTED_ID = Number(btn.dataset.edit);
       applySelection();
+      qs('editForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
 }
@@ -65,11 +67,12 @@ function applySelection(){
   qs('assignEmpty').style.display = 'none';
   qs('assignPanel').style.display = 'block';
 
+  SELECTED_ACTIVE = Number(course.is_active) === 1;
   qs('editCode').value = course.code ?? '';
   qs('editName').value = course.name ?? '';
   qs('editTerm').value = course.term ?? '';
   qs('editPlanUrl').value = course.plan_url ?? '';
-  qs('editActive').checked = Number(course.is_active) === 1;
+  updateStatusBadge();
 
   loadAssigned();
 }
@@ -92,9 +95,18 @@ function renderAssignedList(){
     el.innerHTML = '<div class="muted">No hay usuarios asignados.</div>';
     return;
   }
+  const roleLabel = (u) => {
+    if (u.role) return u.role;
+    if (Array.isArray(u.roles) && u.roles.length) return u.roles.join(', ');
+    if (u.rol) return u.rol;
+    return 'Sin rol';
+  };
   el.innerHTML = ASSIGNED.map(u => `
     <div class="row-between">
-      <div>${u.name} <span class="muted">(${u.username})</span></div>
+      <div>
+        <div>${u.name} <span class="muted">(${u.username})</span></div>
+        <div class="muted" style="font-size:.85rem">Rol: ${roleLabel(u)}</div>
+      </div>
       <button class="btn btn-ghost" data-unassign="${u.id}">Quitar</button>
     </div>`).join('');
 
@@ -105,6 +117,16 @@ function renderAssignedList(){
       await loadAssigned();
     });
   });
+}
+
+function updateStatusBadge() {
+  const status = qs('editStatus');
+  const btn = qs('btnToggleActive');
+  if (!status || !btn) return;
+  const active = Boolean(SELECTED_ACTIVE);
+  status.textContent = active ? 'Activo' : 'Inactivo';
+  status.className = `pill ${active ? 'on' : 'off'}`;
+  btn.textContent = active ? 'Desactivar' : 'Activar';
 }
 
 async function loadCourses(){
@@ -156,7 +178,7 @@ async function loadAssigned(){
       name: qs('newName').value.trim(),
       term: qs('newTerm').value.trim(),
       plan_url: qs('newPlanUrl').value.trim(),
-      is_active: qs('newActive').checked ? 1 : 0,
+      is_active: 1,
     };
     try {
       const res = await api.post('/admin/courses/create', payload);
@@ -165,7 +187,7 @@ async function loadAssigned(){
       qs('newName').value = '';
       qs('newTerm').value = '';
       qs('newPlanUrl').value = '';
-      qs('newActive').checked = true;
+      closeCreateModal();
       await loadCourses();
     } catch (e) {
       setMessage('createMsg', e.message || 'Error al crear el curso.');
@@ -181,7 +203,7 @@ async function loadAssigned(){
       name: qs('editName').value.trim(),
       term: qs('editTerm').value.trim(),
       plan_url: qs('editPlanUrl').value.trim(),
-      is_active: qs('editActive').checked ? 1 : 0,
+      is_active: SELECTED_ACTIVE ? 1 : 0,
     };
     try {
       await api.post('/admin/courses/update', payload);
@@ -222,4 +244,35 @@ async function loadAssigned(){
       setMessage('assignMsg', e.message || 'Error al asignar.');
     }
   });
+
+  qs('btnToggleActive').addEventListener('click', () => {
+    if (SELECTED_ID === null) return;
+    SELECTED_ACTIVE = !SELECTED_ACTIVE;
+    updateStatusBadge();
+  });
+
+  qs('btnOpenCreate').addEventListener('click', () => {
+    openCreateModal();
+  });
+  qs('btnCloseCreate').addEventListener('click', closeCreateModal);
+  qs('btnCancelCreate').addEventListener('click', closeCreateModal);
+  qs('createModal').addEventListener('click', (event) => {
+    if (event.target === qs('createModal')) closeCreateModal();
+  });
 })();
+
+function openCreateModal() {
+  const modal = qs('createModal');
+  if (!modal) return;
+  modal.classList.add('active');
+  modal.setAttribute('aria-hidden', 'false');
+  setMessage('createMsg', '');
+}
+
+function closeCreateModal() {
+  const modal = qs('createModal');
+  if (!modal) return;
+  modal.classList.remove('active');
+  modal.setAttribute('aria-hidden', 'true');
+  setMessage('createMsg', '');
+}

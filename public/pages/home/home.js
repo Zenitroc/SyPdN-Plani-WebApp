@@ -155,7 +155,7 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
     const guruBtn = isGuru
       ? `<div class="login-actions" style="justify-content:flex-start;margin-top:.75rem;gap:.5rem;flex-wrap:wrap">
            <button id="goAllStudents" class="btn btn-tonal">Ver todos los estudiantes</button>
-           <button id="goCourseAdmin" class="btn btn-ghost">Administrar cursos</button>
+           <button id="goCourseAdmin" class="btn btn-primary">Gestionar cursos</button>
          </div>`
       : '';
     document.getElementById('kpis').innerHTML = `

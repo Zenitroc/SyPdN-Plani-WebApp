@@ -1,20 +1,13 @@
 // public/assets/js/theme.js
 window.theme = (function(){
   const KEY = 'spn_theme';
-  const THEMES = ['light','dark','aesthetic','minimal','pinkgirly','teammate','pollitos'];
+  const THEMES = ['light','dark'];
 
 
 
   // Cargamos solo las fuentes de Google (las locales no van acá)
   const FONT_URL_ALL = 'https://fonts.googleapis.com/css2'
     + '?family=Inter:wght@400;600;800'
-    + '&family=The+Girl+Next+Door'
-    + '&family=Sansita:wght@400;700'
-    + '&family=Poppins:wght@400;600;700'        // <— ejemplo agregado
-    + '&family=Merriweather:wght@400;700'       // <— ejemplo agregado
-    + '&family=Crafty+Girls'
-    + '&family=Indie+Flower'
-    + '&family=Montserrat:ital,wght@0,100..900;1,100..900'
     + '&display=swap';
 
   function ensureFonts(){
@@ -36,12 +29,16 @@ window.theme = (function(){
   }
 
   function get(){
-    return localStorage.getItem(KEY)
-      || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const stored = localStorage.getItem(KEY);
+    if (THEMES.includes(stored)) return stored;
+    const fallback = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    localStorage.setItem(KEY, fallback);
+    return fallback;
   }
   function set(t){ apply(t); }
   function next(){ const i = THEMES.indexOf(get()); set(THEMES[(i+1)%THEMES.length]); }
+  function toggle(){ set(get() === 'dark' ? 'light' : 'dark'); }
 
   document.addEventListener('DOMContentLoaded', ()=> apply(get()));
-  return { get, set, next, all: THEMES };
+  return { get, set, next, toggle, all: THEMES };
 })();
