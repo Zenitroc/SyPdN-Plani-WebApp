@@ -1,0 +1,596 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 29-12-2025 a las 21:45:27
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de datos: `spn`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `assignments`
+--
+
+CREATE TABLE `assignments` (
+  `id` int(11) NOT NULL,
+  `course_id` bigint(20) UNSIGNED NOT NULL,
+  `term` tinyint(4) NOT NULL,
+  `type` varchar(8) NOT NULL,
+  `number` int(11) NOT NULL,
+  `topic` varchar(8) NOT NULL,
+  `due_date` date DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `returned` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `assignment_grades`
+--
+
+CREATE TABLE `assignment_grades` (
+  `id` int(11) NOT NULL,
+  `assignment_id` int(11) NOT NULL,
+  `group_id` bigint(20) UNSIGNED NOT NULL,
+  `grade_code` varchar(32) DEFAULT NULL,
+  `updated_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `courses`
+--
+
+CREATE TABLE `courses` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `code` varchar(32) NOT NULL,
+  `name` varchar(120) NOT NULL,
+  `color_hex` char(7) DEFAULT NULL,
+  `term` varchar(32) DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `plan_url` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `courses`
+--
+
+INSERT INTO `courses` (`id`, `code`, `name`, `color_hex`, `term`, `is_active`, `created_at`, `updated_at`, `plan_url`) VALUES
+(1, 'SyPdN-K1030', 'Lunes', '#EED73F', 'K1030', 1, '2025-09-07 02:49:10', '2025-09-07 02:52:28', NULL),
+(2, 'SyPdN-K1027', 'Martes', '#E8ABE6', 'K1027', 1, '2025-09-07 02:49:10', '2025-12-29 20:24:57', NULL),
+(3, 'SyPdN-K1029', 'Jueves', '#1DB8D7', 'K1029', 1, '2025-09-07 02:49:10', '2025-09-10 21:30:24', NULL),
+(4, 'SyPdN-K1028', 'Viernes 1', '#106A1A', 'K1028', 1, '2025-09-06 18:45:03', '2025-12-29 20:24:52', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSzG6M924tXqHgxD6uVEN6KRCIfSzxw-Dz_1zkA_FpzH0VDmfIQsUflu8ICFzp7wtur-gJX2F6jxyiN/pubhtml?gid=1756005347&single=true'),
+(5, 'SyPdN-K1022', 'Viernes 2', '#E9A353', 'K1022', 1, '2025-09-06 21:05:33', '2025-09-07 02:52:28', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `enrollments`
+--
+
+CREATE TABLE `enrollments` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `course_id` bigint(20) UNSIGNED NOT NULL,
+  `person_id` bigint(20) UNSIGNED NOT NULL,
+  `course_student_id` int(11) NOT NULL,
+  `status` enum('ALTA','BAJA') NOT NULL DEFAULT 'ALTA',
+  `group_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `observaciones` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `enrollments`
+--
+
+INSERT INTO `enrollments` (`id`, `course_id`, `person_id`, `course_student_id`, `status`, `group_id`, `observaciones`) VALUES
+(29, 4, 8, 1, 'ALTA', NULL, '');
+
+--
+-- Disparadores `enrollments`
+--
+DELIMITER $$
+CREATE TRIGGER `enroll_group_check_ins` BEFORE INSERT ON `enrollments` FOR EACH ROW BEGIN\n  IF NEW.group_id IS NOT NULL AND\n     (SELECT g.course_id FROM groups g WHERE g.id = NEW.group_id) <> NEW.course_id THEN\n    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'group_id no pertenece al course_id';\n  END IF;\nEND
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `enroll_group_check_upd` BEFORE UPDATE ON `enrollments` FOR EACH ROW BEGIN\n  IF NEW.group_id IS NOT NULL AND\n     (SELECT g.course_id FROM groups g WHERE g.id = NEW.group_id) <> NEW.course_id THEN\n    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'group_id no pertenece al course_id';\n  END IF;\nEND
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `enroll_unique_active_ins` BEFORE INSERT ON `enrollments` FOR EACH ROW BEGIN\n  IF NEW.status = 'ALTA' AND\n     EXISTS (\n       SELECT 1 FROM enrollments e\n       WHERE e.person_id = NEW.person_id\n         AND e.status = 'ALTA'\n         AND e.course_id <> NEW.course_id\n     ) THEN\n    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La persona ya está ALTA en otro curso';\n  END IF;\nEND
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `enroll_unique_active_upd` BEFORE UPDATE ON `enrollments` FOR EACH ROW BEGIN\n  IF NEW.status = 'ALTA' AND\n     EXISTS (\n       SELECT 1 FROM enrollments e\n       WHERE e.person_id = NEW.person_id\n         AND e.status = 'ALTA'\n         AND e.course_id <> NEW.course_id\n         AND e.id <> NEW.id\n     ) THEN\n    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La persona ya está ALTA en otro curso';\n  END IF;\nEND
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `grade_lookup`
+--
+
+CREATE TABLE `grade_lookup` (
+  `code` varchar(8) NOT NULL,
+  `ordinal` tinyint(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `grade_lookup`
+--
+
+INSERT INTO `grade_lookup` (`code`, `ordinal`) VALUES
+('A', 0),
+('DIST', 7),
+('DIST-', 6),
+('NO_SAT', 2),
+('N_E', 1),
+('SAT', 4),
+('SAT+', 5),
+('SAT-', 3);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `groups`
+--
+
+CREATE TABLE `groups` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `course_id` bigint(20) UNSIGNED NOT NULL,
+  `number` int(11) NOT NULL,
+  `name` varchar(120) DEFAULT NULL,
+  `conformity_submitted` tinyint(1) NOT NULL DEFAULT 0,
+  `conformity_url` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `partial_attendance`
+--
+
+CREATE TABLE `partial_attendance` (
+  `id` int(11) NOT NULL,
+  `course_id` bigint(20) UNSIGNED NOT NULL,
+  `enrollment_id` bigint(20) UNSIGNED NOT NULL,
+  `partial_no` tinyint(4) NOT NULL,
+  `attempt` enum('PA','1R','2R') NOT NULL,
+  `present` tinyint(1) NOT NULL DEFAULT 0,
+  `org` tinyint(1) NOT NULL DEFAULT 0,
+  `met` tinyint(1) NOT NULL DEFAULT 0,
+  `teo1` tinyint(1) NOT NULL DEFAULT 0,
+  `pls` tinyint(1) NOT NULL DEFAULT 0,
+  `cur` tinyint(1) NOT NULL DEFAULT 0,
+  `teo2` tinyint(1) NOT NULL DEFAULT 0,
+  `updated_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `partial_attendance`
+--
+
+INSERT INTO `partial_attendance` (`id`, `course_id`, `enrollment_id`, `partial_no`, `attempt`, `present`, `org`, `met`, `teo1`, `pls`, `cur`, `teo2`, `updated_at`) VALUES
+(66, 4, 29, 1, 'PA', 0, 0, 0, 0, 0, 0, 0, '2025-12-29 16:34:50'),
+(71, 4, 29, 2, 'PA', 0, 0, 0, 0, 0, 0, 0, '2025-12-29 16:34:47');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `partial_grades`
+--
+
+CREATE TABLE `partial_grades` (
+  `id` int(11) NOT NULL,
+  `course_id` bigint(20) UNSIGNED NOT NULL,
+  `enrollment_id` bigint(20) UNSIGNED NOT NULL,
+  `partial_no` tinyint(4) NOT NULL,
+  `topic` varchar(8) NOT NULL,
+  `attempt` enum('PA','1R','2R') NOT NULL,
+  `grade_code` varchar(32) DEFAULT NULL,
+  `updated_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `people`
+--
+
+CREATE TABLE `people` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `last_name` varchar(80) NOT NULL,
+  `first_name` varchar(80) NOT NULL,
+  `legajo` varchar(10) NOT NULL,
+  `email_inst` varchar(190) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `people`
+--
+
+INSERT INTO `people` (`id`, `last_name`, `first_name`, `legajo`, `email_inst`, `created_at`) VALUES
+(8, 'Cortinez', 'Franco Matias', '1762060', 'fcortnez@frba.utn.edu.ar', '2025-09-07 03:11:50'),
+(9, 'Berro', 'Camila Andrea', '1723418', 'cberro@frba.utn.edu.ar', '2025-09-07 19:35:53'),
+(10, 'eeeee', 'eeeee', '12312312', 'eeeee', '2025-09-09 01:42:42'),
+(11, '﻿apellido', 'nombre', 'legajo', 'email_inst', '2025-09-09 01:50:04'),
+(12, 'aaaaa', 'aaaaa', '12345', 'aaaa', '2025-09-09 01:50:04'),
+(13, 'bbbb', 'bbbb', '12313', 'bbbbb', '2025-09-09 01:50:04'),
+(14, 'ccccc', 'cccccc ccc', '34234', 'cccc', '2025-09-09 01:50:04');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `planning`
+--
+
+CREATE TABLE `planning` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `course_id` bigint(20) UNSIGNED NOT NULL,
+  `class_no` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `mod1_teorico` varchar(255) DEFAULT NULL,
+  `mod2_practico` varchar(255) DEFAULT NULL,
+  `tarea_proxima` varchar(255) DEFAULT NULL,
+  `entrega_hoy` varchar(255) DEFAULT NULL,
+  `observaciones` text DEFAULT NULL,
+  `estado` enum('PLANEADA','EN_CURSO','DICTADA','CANCELADA') NOT NULL DEFAULT 'PLANEADA'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `roles`
+--
+
+CREATE TABLE `roles` (
+  `id` tinyint(3) UNSIGNED NOT NULL,
+  `code` varchar(16) NOT NULL,
+  `description` varchar(120) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `roles`
+--
+
+INSERT INTO `roles` (`id`, `code`, `description`) VALUES
+(1, 'GURU', 'Administrador funcional total'),
+(2, 'SENIOR', 'Operaciones avanzadas'),
+(3, 'AYUDANTE', 'Operaciones acotadas');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `users`
+--
+
+CREATE TABLE `users` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(120) NOT NULL,
+  `email` varchar(190) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `username` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `email`, `password_hash`, `created_at`, `username`) VALUES
+(1, 'Gurú', 'guru@example.com', '$2y$10$F/8WOLWTePcnBPYHrb7ZwOXsO/4YIOIGEgpZhOVF4DP/XYA9NMqXu', '2025-09-06 18:46:27', 'guru');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `user_courses`
+--
+
+CREATE TABLE `user_courses` (
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `course_id` bigint(20) UNSIGNED NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `user_courses`
+--
+
+INSERT INTO `user_courses` (`user_id`, `course_id`, `created_at`) VALUES
+(1, 1, '2025-12-29 20:31:12'),
+(1, 4, '2025-09-06 18:46:27');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `user_roles`
+--
+
+CREATE TABLE `user_roles` (
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `role_id` tinyint(3) UNSIGNED NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `user_roles`
+--
+
+INSERT INTO `user_roles` (`user_id`, `role_id`, `created_at`) VALUES
+(1, 1, '2025-09-06 18:46:27');
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `assignments`
+--
+ALTER TABLE `assignments`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `ux_assign_course_term_type_num` (`course_id`,`term`,`type`,`number`),
+  ADD KEY `ix_assign_course` (`course_id`);
+
+--
+-- Indices de la tabla `assignment_grades`
+--
+ALTER TABLE `assignment_grades`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `ux_ag_unique` (`assignment_id`,`group_id`),
+  ADD KEY `ix_ag_assign` (`assignment_id`),
+  ADD KEY `ix_ag_group` (`group_id`);
+
+--
+-- Indices de la tabla `courses`
+--
+ALTER TABLE `courses`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`);
+
+--
+-- Indices de la tabla `enrollments`
+--
+ALTER TABLE `enrollments`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_course_student` (`course_id`,`course_student_id`),
+  ADD UNIQUE KEY `uniq_course_person` (`course_id`,`person_id`),
+  ADD KEY `idx_enroll_person` (`person_id`),
+  ADD KEY `fk_enroll_group` (`group_id`),
+  ADD KEY `idx_enroll_person_status` (`person_id`,`status`);
+
+--
+-- Indices de la tabla `grade_lookup`
+--
+ALTER TABLE `grade_lookup`
+  ADD PRIMARY KEY (`code`);
+
+--
+-- Indices de la tabla `groups`
+--
+ALTER TABLE `groups`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_group_per_course` (`course_id`,`number`),
+  ADD UNIQUE KEY `uniq_group_course_id` (`course_id`,`id`);
+
+--
+-- Indices de la tabla `partial_attendance`
+--
+ALTER TABLE `partial_attendance`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `ux_pa_unique` (`enrollment_id`,`partial_no`,`attempt`),
+  ADD KEY `ix_pa_course` (`course_id`);
+
+--
+-- Indices de la tabla `partial_grades`
+--
+ALTER TABLE `partial_grades`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `ux_pg_unique` (`enrollment_id`,`partial_no`,`topic`,`attempt`),
+  ADD KEY `ix_pg_course` (`course_id`);
+
+--
+-- Indices de la tabla `people`
+--
+ALTER TABLE `people`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_people_email` (`email_inst`),
+  ADD UNIQUE KEY `uniq_people_legajo` (`legajo`);
+
+--
+-- Indices de la tabla `planning`
+--
+ALTER TABLE `planning`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_planning_class` (`course_id`,`class_no`),
+  ADD KEY `idx_planning_date` (`course_id`,`date`);
+
+--
+-- Indices de la tabla `roles`
+--
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`);
+
+--
+-- Indices de la tabla `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
+-- Indices de la tabla `user_courses`
+--
+ALTER TABLE `user_courses`
+  ADD PRIMARY KEY (`user_id`,`course_id`),
+  ADD KEY `fk_user_courses_course` (`course_id`);
+
+--
+-- Indices de la tabla `user_roles`
+--
+ALTER TABLE `user_roles`
+  ADD PRIMARY KEY (`user_id`,`role_id`),
+  ADD KEY `fk_user_roles_role` (`role_id`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `assignments`
+--
+ALTER TABLE `assignments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT de la tabla `assignment_grades`
+--
+ALTER TABLE `assignment_grades`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+
+--
+-- AUTO_INCREMENT de la tabla `courses`
+--
+ALTER TABLE `courses`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT de la tabla `enrollments`
+--
+ALTER TABLE `enrollments`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+
+--
+-- AUTO_INCREMENT de la tabla `groups`
+--
+ALTER TABLE `groups`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT de la tabla `partial_attendance`
+--
+ALTER TABLE `partial_attendance`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
+
+--
+-- AUTO_INCREMENT de la tabla `partial_grades`
+--
+ALTER TABLE `partial_grades`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=127;
+
+--
+-- AUTO_INCREMENT de la tabla `people`
+--
+ALTER TABLE `people`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT de la tabla `planning`
+--
+ALTER TABLE `planning`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `roles`
+--
+ALTER TABLE `roles`
+  MODIFY `id` tinyint(3) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de la tabla `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `assignments`
+--
+ALTER TABLE `assignments`
+  ADD CONSTRAINT `fk_assign_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `assignment_grades`
+--
+ALTER TABLE `assignment_grades`
+  ADD CONSTRAINT `fk_ag_assign` FOREIGN KEY (`assignment_id`) REFERENCES `assignments` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_ag_group` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `enrollments`
+--
+ALTER TABLE `enrollments`
+  ADD CONSTRAINT `fk_enroll_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_enroll_person` FOREIGN KEY (`person_id`) REFERENCES `people` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `groups`
+--
+ALTER TABLE `groups`
+  ADD CONSTRAINT `fk_groups_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `partial_attendance`
+--
+ALTER TABLE `partial_attendance`
+  ADD CONSTRAINT `fk_pa_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_pa_enroll` FOREIGN KEY (`enrollment_id`) REFERENCES `enrollments` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `partial_grades`
+--
+ALTER TABLE `partial_grades`
+  ADD CONSTRAINT `fk_pg_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_pg_enroll` FOREIGN KEY (`enrollment_id`) REFERENCES `enrollments` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `planning`
+--
+ALTER TABLE `planning`
+  ADD CONSTRAINT `fk_planning_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `user_courses`
+--
+ALTER TABLE `user_courses`
+  ADD CONSTRAINT `fk_user_courses_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_user_courses_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `user_roles`
+--
+ALTER TABLE `user_roles`
+  ADD CONSTRAINT `fk_user_roles_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_user_roles_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

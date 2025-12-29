@@ -74,3 +74,4 @@ Este documento resume los cambios por período a partir del historial de commits
 - `b130614` — Merge pull request #17 from Zenitroc/nuevoLogin
 - `ca12345` - Se eliminan todos los temas, se agrega gestior de cursos, falta arreglar que no se ven los roles
 - `0151cba` - Merge pull request #18 from Zenitroc/nuevoLogin
+- `6d4304b` - agrego docs de actualizaciones y explicaciòn pantallas

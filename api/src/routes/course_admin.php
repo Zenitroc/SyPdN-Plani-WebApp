@@ -115,13 +115,24 @@ function register_course_admin_routes(): void {
     $courseId = (int)($_GET['course_id'] ?? 0);
     if ($courseId <= 0) json_error('course_id requerido', 422);
 
-    $st = $pdo->prepare('SELECT u.id, u.name, u.username
+    $st = $pdo->prepare('SELECT u.id, u.name, u.username,
+                                GROUP_CONCAT(r.code ORDER BY r.code SEPARATOR \',\') AS roles
                          FROM users u
                          JOIN user_courses uc ON uc.user_id=u.id
+                         LEFT JOIN user_roles ur ON ur.user_id=u.id
+                         LEFT JOIN roles r ON r.id=ur.role_id
                          WHERE uc.course_id=?
+                         GROUP BY u.id
                          ORDER BY u.name');
     $st->execute([$courseId]);
-    json_ok($st->fetchAll());
+    $rows = $st->fetchAll();
+    foreach ($rows as &$row) {
+      $row['roles'] = $row['roles'] !== null && $row['roles'] !== ''
+        ? array_values(array_filter(explode(',', $row['roles'])))
+        : [];
+    }
+    unset($row);
+    json_ok($rows);
   });
 
   route('POST', '/api/admin/course-users/assign', function (): void {
