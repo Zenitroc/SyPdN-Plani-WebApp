@@ -4,8 +4,6 @@
     const active = here.startsWith(href.toLowerCase());
     return `<a href="${href}" class="${active ? 'active' : ''}">${label}</a>`;
   }
-  function themeLabel() { return theme.get()==='dark' ? 'Oscuro' : 'Claro'; }
-
   window.renderMenu = async function (containerId = 'appMenu') {
     const base = BASE_APP + '/public/pages';
     let isGuru = false;
@@ -22,7 +20,6 @@
         ${item(base + '/home/', 'Home')}
         ${item(base + '/curso-dashboard/', 'Dashboard')}
         ${item(base + '/planificacion/', 'Planificación')}
-        ${isGuru ? item(base + '/cursos-admin/', 'Cursos') : ''}
         ${item(base + '/estudiantes/', 'Estudiantes')}
         ${item(base + '/grupos/', 'Grupos')}
         ${item(base + '/entregas/', 'Trabajos Prácticos')}
@@ -31,7 +28,7 @@
         ${item(base + '/reportes/', 'Reportes')}
         
         <div class="spacer"></div>
-        <button class="btn btn-ghost round" onclick="theme.next()">🎨Tema</button>
+        <button class="btn btn-ghost round" onclick="theme.toggle()">🌓 Modo</button>
         
         <button id="logoutBtn" class="btn btn-neutral">Salir</button>
       </div>`;
@@ -40,10 +37,6 @@
 
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
       api.clearToken(); courseContext.clear(); location.href = BASE_APP + '/public/pages/home/';
-    });
-    document.getElementById('themeBtn')?.addEventListener('click', () => {
-      theme.toggle();
-      const t = document.getElementById('themeText'); if (t) t.textContent = themeLabel();
     });
   };
 })();

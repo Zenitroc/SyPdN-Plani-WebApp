@@ -1,5 +1,5 @@
 // public/sw.js
-const CACHE_NAME = 'spn-assets';
+const CACHE_NAME = 'spn-assets-v2';
 
 self.addEventListener('install', (event) => {
   // activación inmediata del SW actualizado
