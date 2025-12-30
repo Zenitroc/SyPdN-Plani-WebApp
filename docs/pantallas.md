@@ -71,4 +71,7 @@ Este documento resume las pantallas del front-end y su función principal.
 
 ## Curso dashboard
 **Ruta:** `public/pages/curso-dashboard/index.html`
-- Pantalla reservada sin implementación actual.
+- Estructura completa del dashboard del curso con filtros globales (comisión, cuatrimestre, tema y vista).
+- Resumen rápido con cards de próximas clases, hitos, aprobación, entregas y consultas.
+- Secciones de fechas clave, equipo, anuncios, rendimiento, analítica histórica y seguimiento operativo.
+- Paneles de consultas, correcciones y accesos rápidos con reglas por rol.

@@ -75,3 +75,12 @@ Este documento resume los cambios por período a partir del historial de commits
 - `ca12345` - Se eliminan todos los temas, se agrega gestior de cursos, falta arreglar que no se ven los roles
 - `0151cba` - Merge pull request #18 from Zenitroc/nuevoLogin
 - `6d4304b` - agrego docs de actualizaciones y explicaciòn pantallas
+- 
+## Periodo: 30 de diciembre de 2025
+**Enfoque:** estructura del dashboard de curso.
+
+**Cambios destacados**
+- Se diseñó la pantalla de dashboard del curso con filtros, cards de resumen y secciones operativas.
+- Se añadieron placeholders para rendimiento, analítica histórica y accesos rápidos por rol.
+- Se incorporó un script liviano para reflejar cambios en los filtros activos.
+- Se actualizó la documentación de pantallas.
