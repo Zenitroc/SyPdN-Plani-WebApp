@@ -1,4 +1,7 @@
-renderMenu();
+window.appNavigate = window.appNavigate || function (path) { location.href = path; };
+function navigateTo(path) { window.appNavigate(path); }
+
+renderMenu();;
 
 // Helpers API con fallback /api
 function isNotFound(val){
@@ -61,7 +64,7 @@ async function apiTryPost(path, body, opts){
 
   // Si ya hay token, ir al home
   if (api.getToken()) {
-    location.href = '../home/';
+    navigateTo('../home/');
     return;
   }
 
@@ -88,7 +91,7 @@ async function apiTryPost(path, body, opts){
           localStorage.removeItem('password');
         }
         api.setToken(tk);
-        location.href = '../home/';
+        navigateTo('../home/');
       } catch (err) {
         loginMsg.textContent = err.message || 'Error de login';
       }

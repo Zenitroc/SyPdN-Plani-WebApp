@@ -1,4 +1,7 @@
-renderMenu();
+window.appNavigate = window.appNavigate || function (path) { location.href = path; };
+function navigateTo(path) { window.appNavigate(path); }
+
+renderMenu();;
 
 function qs(id){ return document.getElementById(id); }
 
@@ -160,7 +163,7 @@ async function loadAssigned(){
 }
 
 (async function init(){
-  if (!api.getToken()) { location.href = BASE_APP + '/public/pages/home/'; return; }
+  if (!api.getToken()) { navigateTo(BASE_APP + '/public/pages/home/'); return; }
   const me = await api.get('/me');
   if (!Array.isArray(me.roles) || !me.roles.includes('GURU')) {
     qs('accessMsg').style.display = 'block';

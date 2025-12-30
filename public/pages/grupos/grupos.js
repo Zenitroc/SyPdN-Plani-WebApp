@@ -1,4 +1,7 @@
-renderMenu();
+window.appNavigate = window.appNavigate || function (path) { location.href = path; };
+function navigateTo(path) { window.appNavigate(path); }
+
+renderMenu();;
 
 function option(v, t) { return `<option value="${v}">${t}</option>`; }
 function qs(id) { return document.getElementById(id); }
@@ -9,7 +12,7 @@ let COURSE_ID = null;
 let GROUPS = [];
 
 (async function () {
-    if (!api.getToken()) { location.href = BASE_APP + '/public/pages/home/'; return; }
+    if (!api.getToken()) { navigateTo(BASE_APP + '/public/pages/home/'); return; }
     COURSE_ID = await courseContext.require();
 
     // Helpers de UI

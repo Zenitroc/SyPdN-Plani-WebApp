@@ -1,4 +1,7 @@
-renderMenu();
+window.appNavigate = window.appNavigate || function (path) { location.href = path; };
+function navigateTo(path) { window.appNavigate(path); }
+
+renderMenu();;
 
 function qs(id){ return document.getElementById(id); }
 
@@ -41,7 +44,7 @@ function bindPasswordToggle(inputId, buttonId){
 
 
 async function loadProfile(){
-  if (!api.getToken()) { location.href = BASE_APP + '/public/pages/login/'; return; }
+  if (!api.getToken()) { lnavigateTo(BASE_APP + '/public/pages/login/'); return; }
   const me = await api.get('/me');
   const fullName = `${me.name || ''}${me.last_name ? ' ' + me.last_name : ''}`.trim();
   qs('profileName').textContent = fullName || me.username || '';

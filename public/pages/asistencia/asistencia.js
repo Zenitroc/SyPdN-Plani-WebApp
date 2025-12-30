@@ -1,4 +1,7 @@
-renderMenu();
+window.appNavigate = window.appNavigate || function (path) { location.href = path; };
+function navigateTo(path) { window.appNavigate(path); }
+
+renderMenu();;
 
 function qs(id){ return document.getElementById(id); }
 function esc(s){ return (s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
@@ -45,7 +48,7 @@ async function apiPost(path, body) {
 function payload(res){ return (res && typeof res==='object' && 'data' in res) ? res.data : res; }
 
 (async function(){
-  if (!api.getToken()) { location.href = BASE_APP + '/public/pages/home/'; return; }
+  if (!api.getToken()) { navigateTo(BASE_APP + '/public/pages/home/'); return; }
   COURSE_ID = parseInt(await courseContext.require(), 10);
 
   partialFilter.onchange = load;

@@ -1,4 +1,5 @@
 (function () {
+  window.appNavigate = window.appNavigate || function (path) { location.href = path; };
   window.courseContext = {
     get() { return localStorage.getItem('spn_selected_course_id'); },
     set(id) { localStorage.setItem('spn_selected_course_id', String(id)); },
@@ -6,7 +7,7 @@
     async require() {
       const id = this.get();
       if (!id) {
-        location.href = BASE_APP + '/public/pages/home/';
+        window.appNavigate(BASE_APP + '/public/pages/home/');
         throw new Error('No hay curso seleccionado');
       }
       return id;

@@ -1,4 +1,7 @@
-renderMenu();
+window.appNavigate = window.appNavigate || function (path) { location.href = path; };
+function navigateTo(path) { window.appNavigate(path); }
+
+renderMenu();;
 
 // Helpers API con fallback /api
 function isNotFound(val) {
@@ -51,7 +54,7 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
 
   // Redirigir a login si no hay token
   if (!api.getToken()) {
-    location.href = '../login/';
+    navigateTo('../login/');
     return;
   }
 
@@ -65,12 +68,12 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
     isGuru = Array.isArray(me?.roles) && me.roles.includes('GURU');
     if (me?.must_change_password) {
       alert('Por seguridad, necesitás cambiar tu contraseña antes de continuar.');
-      location.href = BASE_APP + '/public/pages/perfil/?force=1';
+      navigateTo(BASE_APP + '/public/pages/perfil/?force=1');
       return;
     }
   } catch {
     api.clearToken();
-    location.href = '../login/';
+    navigateTo('../login/');
     return;
   }
 
@@ -171,13 +174,13 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
       </div>`;
     if (isGuru) {
       document.getElementById('goAllStudents').onclick = () => {
-        location.href = BASE_APP + '/public/pages/alumnos-global/';
+        navigateTo(BASE_APP + '/public/pages/alumnos-global/');
       };
       document.getElementById('goCourseAdmin').onclick = () => {
-        location.href = BASE_APP + '/public/pages/cursos-admin/';
+        navigateTo(BASE_APP + '/public/pages/cursos-admin/');
       };
       document.getElementById('goUserAdmin').onclick = () => {
-        location.href = BASE_APP + '/public/pages/usuarios-admin/';
+        navigateTo(BASE_APP + '/public/pages/usuarios-admin/');
       };
     }
 
@@ -210,8 +213,8 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
           <div class="muted">${subtitle || '&nbsp;'}</div>
         </div>
         <div class="row" style="gap:.5rem">
-          <button class="btn" onclick="location.href='${BASE_APP}/public/pages/entregas/'">Ir a Entregas</button>
-          <button class="btn btn-tonal" onclick="location.href='${BASE_APP}/public/pages/estudiantes/'">Ver Estudiantes</button>
+          <button class="btn" onclick="appNavigate('${BASE_APP}/public/pages/entregas/')">Ir a Entregas</button>
+          <button class="btn btn-tonal" onclick="appNavigate('${BASE_APP}/public/pages/estudiantes/')">Ver Estudiantes</button>
         </div>
       </div>
     `;

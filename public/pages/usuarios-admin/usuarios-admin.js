@@ -1,4 +1,7 @@
-renderMenu();
+window.appNavigate = window.appNavigate || function (path) { location.href = path; };
+function navigateTo(path) { window.appNavigate(path); }
+
+renderMenu();;
 
 function isNotFound(val) {
   const s = String(val?.message || val?.error || val || '').toLowerCase();
@@ -38,14 +41,14 @@ function escapeHtml(s) {
 
 (async function init(){
   if (!api.getToken()) {
-    location.href = BASE_APP + '/public/pages/login/';
+    navigateTo(BASE_APP + '/public/pages/login/');
     return;
   }
 
   const me = payload(await apiTryGet('/me'));
   if (!Array.isArray(me.roles) || !me.roles.includes('GURU')) {
     alert('Solo el rol GURÚ puede administrar usuarios.');
-    location.href = BASE_APP + '/public/pages/home/';
+    navigateTo(BASE_APP + '/public/pages/home/');
     return;
   }
 

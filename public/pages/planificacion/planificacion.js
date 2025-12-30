@@ -1,5 +1,8 @@
 (async function () {
-  renderMenu();
+  window.appNavigate = window.appNavigate || function (path) { location.href = path; };
+function navigateTo(path) { window.appNavigate(path); }
+
+renderMenu();;
   const courseId = await courseContext.require();
   const msg = document.getElementById('msg');
   const frame = document.getElementById('planFrame');

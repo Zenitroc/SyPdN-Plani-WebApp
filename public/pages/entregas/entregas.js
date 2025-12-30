@@ -1,4 +1,7 @@
-renderMenu();
+window.appNavigate = window.appNavigate || function (path) { location.href = path; };
+function navigateTo(path) { window.appNavigate(path); }
+
+renderMenu();;
 
 function qs(id){ return document.getElementById(id); }
 function modalShow(id){ qs(id).style.display='flex'; }
@@ -74,7 +77,7 @@ const btnDelConfirm = qs('btnDelConfirm');
 let currentAssignmentId = null; // para editar/eliminar
 
 (async function () {
-  if (!api.getToken()) { location.href = BASE_APP + '/public/pages/home/'; return; }
+  if (!api.getToken()) { navigateTo(BASE_APP + '/public/pages/home/'); return; }
   COURSE_ID = Number.parseInt(await courseContext.require(), 10);
 
   termFilter.onchange = load;

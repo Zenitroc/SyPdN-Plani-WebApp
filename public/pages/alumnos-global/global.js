@@ -1,4 +1,7 @@
-renderMenu();
+window.appNavigate = window.appNavigate || function (path) { location.href = path; };
+function navigateTo(path) { window.appNavigate(path); }
+
+renderMenu();;
 
 let ALL = [];
 let FILTER = '';
@@ -8,9 +11,9 @@ let FILTER = '';
   api.get('/me').then(me => {
     if (!me.roles.includes('GURU')) {
       alert('Solo disponible para Gurú');
-      location.href = BASE_APP + '/public/pages/home/';
+      navigateTo(BASE_APP + '/public/pages/home/');
     }
-  }).catch(()=>location.href = BASE_APP + '/public/pages/home/');
+  }).catch(()=>navigateTo(BASE_APP + '/public/pages/home/'));
 })();
 
 function rowHTML(r){

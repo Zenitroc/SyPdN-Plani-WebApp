@@ -1,4 +1,7 @@
-renderMenu();
+window.appNavigate = window.appNavigate || function (path) { location.href = path; };
+function navigateTo(path) { window.appNavigate(path); }
+
+renderMenu();;
 
 function qs(id){ return document.getElementById(id); }
 function modalShow(id){ qs(id).style.display='flex'; }
@@ -84,7 +87,7 @@ function renderEditTable(rows){
 }
 
 (async function () {
-  if (!api.getToken()) { location.href = BASE_APP + '/public/pages/home/'; return; }
+  if (!api.getToken()) { navigateTo(BASE_APP + '/public/pages/home/'); return; }
   const me = await api.get('/me');
   IS_GURU = me.roles.includes('GURU');
   if (IS_GURU) qs('btnDelete').style.display = 'inline-flex';

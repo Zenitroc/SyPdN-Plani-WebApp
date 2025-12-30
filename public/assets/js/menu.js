@@ -1,4 +1,5 @@
 (function () {
+  window.appNavigate = window.appNavigate || function (path) { location.href = path; };
   function escapeHtml(s) {
     return (s || '').toString().replace(/[&<>"']/g, m => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
@@ -53,7 +54,7 @@
     if (el) el.innerHTML = html;
 
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
-      api.clearToken(); courseContext.clear(); location.href = BASE_APP + '/public/pages/home/';
+      api.clearToken(); courseContext.clear(); window.appNavigate(BASE_APP + '/public/pages/home/');;
     });
   };
 })();
