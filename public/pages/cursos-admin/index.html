@@ -7,7 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/SyPdN-WebApp/public/assets/css/base.css">
+  <link rel="stylesheet" href="../../../public/assets/css/base.css">
+
   <style>
     .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
     .tbl{border-collapse:collapse;width:100%}
@@ -44,7 +45,10 @@
       </div>
 
       <div class="card">
-        <h3 style="margin-top:0">Cursos existentes</h3>
+        <div class="row-between" style="margin-bottom:.75rem;gap:.75rem">
+          <h3 style="margin:0">Cursos existentes</h3>
+          <input id="courseFilter" class="input" placeholder="Filtrar por código, nombre o comisión" style="min-width:220px;max-width:320px">
+        </div>
         <div id="coursesTable"></div>
         <small class="muted">Seleccioná un curso para editar o asignar usuarios.</small>
       </div>

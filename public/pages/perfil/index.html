@@ -14,6 +14,11 @@
     .profile-avatar--fallback{display:flex;align-items:center;justify-content:center;background:color-mix(in oklab,var(--surface) 80%, var(--bg));font-weight:700;font-size:1.2rem;color:color-mix(in oklab, var(--primary) 70%, var(--text))}
     .pill{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .6rem;border-radius:999px;border:1px solid var(--border);font-size:.85rem}
     .notice{border:1px solid color-mix(in oklab, var(--primary) 40%, var(--border));background:color-mix(in oklab, var(--primary) 10%, var(--surface));padding:.75rem 1rem;border-radius:var(--radius)}
+    .password-fields{display:flex;flex-direction:column;gap:.75rem;max-width:420px}
+    .password-field{position:relative}
+    .password-field .input{padding-right:3rem}
+    .password-toggle{position:absolute;right:.65rem;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--primary);cursor:pointer;font-size:.85rem;padding:.25rem}
+    .password-toggle:active{opacity:.7}
   </style>
 </head>
 <body>
@@ -65,15 +70,24 @@
 
     <section class="card" style="margin-top:1rem">
       <h2>Cambiar contraseña</h2>
-      <div class="grid cols-2">
+      <div class="password-fields">
         <label class="label">Contraseña actual
-          <input id="currentPassword" class="input" type="password" />
+          <div class="password-field">
+            <input id="currentPassword" class="input" type="password" />
+            <button type="button" id="toggleCurrentPassword" class="password-toggle" aria-label="Mostrar contraseña actual">Ver</button>
+          </div>
         </label>
         <label class="label">Nueva contraseña
-          <input id="newPassword" class="input" type="password" />
+          <div class="password-field">
+            <input id="newPassword" class="input" type="password" />
+            <button type="button" id="toggleNewPassword" class="password-toggle" aria-label="Mostrar nueva contraseña">Ver</button>
+          </div>
         </label>
-        <label class="label">Confirmar contraseña
-          <input id="confirmPassword" class="input" type="password" />
+        <label class="label">Confirmar nueva contraseña
+          <div class="password-field">
+            <input id="confirmPassword" class="input" type="password" />
+            <button type="button" id="toggleConfirmPassword" class="password-toggle" aria-label="Mostrar confirmación de contraseña">Ver</button>
+          </div>
         </label>
       </div>
       <div class="row" style="margin-top:1rem;justify-content:flex-end">
