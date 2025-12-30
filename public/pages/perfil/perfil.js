@@ -26,6 +26,20 @@ function setAvatar(photoUrl, name, username){
   }
 }
 
+function bindPasswordToggle(inputId, buttonId){
+  const input = qs(inputId);
+  const toggle = qs(buttonId);
+  if (!input || !toggle) return;
+  const show = () => { input.type = 'text'; };
+  const hide = () => { input.type = 'password'; };
+  toggle.addEventListener('mousedown', show);
+  toggle.addEventListener('mouseup', hide);
+  toggle.addEventListener('mouseleave', hide);
+  toggle.addEventListener('touchstart', show, { passive: true });
+  toggle.addEventListener('touchend', hide);
+}
+
+
 async function loadProfile(){
   if (!api.getToken()) { location.href = BASE_APP + '/public/pages/login/'; return; }
   const me = await api.get('/me');
@@ -114,6 +128,9 @@ async function savePassword(){
 (async function init(){
   await loadProfile();
   bindPhotoInput();
+  bindPasswordToggle('currentPassword', 'toggleCurrentPassword');
+  bindPasswordToggle('newPassword', 'toggleNewPassword');
+  bindPasswordToggle('confirmPassword', 'toggleConfirmPassword');
   qs('btnSaveProfile').addEventListener('click', saveProfile);
   qs('btnSavePassword').addEventListener('click', savePassword);
   qs('btnRemovePhoto').addEventListener('click', () => {

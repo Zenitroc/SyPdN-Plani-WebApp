@@ -12,13 +12,24 @@ function setMessage(id, msg){ qs(id).textContent = msg || ''; }
 
 function courseById(id){ return COURSES.find(c => Number(c.id) === Number(id)); }
 
+function getFilteredCourses(){
+  const query = (qs('courseFilter')?.value || '').trim().toLowerCase();
+  if (!query) return COURSES;
+  return COURSES.filter(c => {
+    const hay = [c.code, c.name, c.term].filter(Boolean).join(' ').toLowerCase();
+    return hay.includes(query);
+  });
+}
+
 function renderCourses(){
   const el = qs('coursesTable');
-  if (!COURSES.length) {
-    el.innerHTML = '<div class="card">No hay cursos cargados.</div>';
+  const filtered = getFilteredCourses();
+  if (!filtered.length) {
+    const hasFilter = (qs('courseFilter')?.value || '').trim().length > 0;
+    el.innerHTML = `<div class="card">${hasFilter ? 'No hay cursos que coincidan.' : 'No hay cursos cargados.'}</div>`;
     return;
   }
-  const rows = COURSES.map(c => {
+  const rows = filtered.map(c => {
     const active = Number(c.is_active) === 1;
     const selected = Number(c.id) === Number(SELECTED_ID) ? 'style="background:color-mix(in oklab, var(--primary) 10%, var(--surface))"' : '';
     return `
@@ -254,6 +265,7 @@ async function loadAssigned(){
   qs('btnOpenCreate').addEventListener('click', () => {
     openCreateModal();
   });
+  qs('courseFilter').addEventListener('input', renderCourses);
   qs('btnCloseCreate').addEventListener('click', closeCreateModal);
   qs('btnCancelCreate').addEventListener('click', closeCreateModal);
   qs('createModal').addEventListener('click', (event) => {

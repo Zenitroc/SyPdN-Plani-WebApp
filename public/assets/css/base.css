@@ -80,13 +80,14 @@ p{margin:0 0 1rem 0;color:var(--text)}
 small, .muted{color:var(--muted)}
 
 /* ===== Layout ===== */
-.container{max-width:var(--content-max);margin:2rem auto;padding:0 1.5rem}
+.container{max-width:var(--content-max);margin:2rem auto;padding:0 1.5rem; padding-bottom: 5rem;}
 .card{
   background:var(--surface);
   border:1px solid color-mix(in oklab, var(--border) 80%, transparent);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
   padding:1.5rem;
+  
 }
 
 /* ===== Botones ===== */
