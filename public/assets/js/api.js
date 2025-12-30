@@ -24,7 +24,15 @@
       const res = await fetch(API_BASE + url, opts);
       if (res.status === 204) return null;
       const text = await res.text();
-      let data = text ? JSON.parse(text) : null;
+      let data = null;
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch (err) {
+          if (!res.ok) throw new Error(text.trim() || `HTTP ${res.status}`);
+          return text;
+        }
+      }
       if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
       return data;
     },
