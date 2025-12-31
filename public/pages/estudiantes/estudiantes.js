@@ -1,7 +1,6 @@
 window.appNavigate = window.appNavigate || function (path) { location.href = path; };
 function navigateTo(path) { window.appNavigate(path); }
 
-renderMenu();;
 
 function qs(id){ return document.getElementById(id); }
 function modalShow(id){ qs(id).style.display='flex'; }
@@ -86,7 +85,8 @@ function renderEditTable(rows){
   qs('editTable').innerHTML = `<div class="card"><table class="tbl">${th}${tr}</table></div>`;
 }
 
-(async function () {
+export async function mount() {
+  renderMenu();
   if (!api.getToken()) { navigateTo(BASE_APP + '/public/pages/home/'); return; }
   const me = await api.get('/me');
   IS_GURU = me.roles.includes('GURU');
@@ -221,4 +221,6 @@ function renderEditTable(rows){
 
   // init
   await load();
-})();
+}
+
+export function unmount() {}

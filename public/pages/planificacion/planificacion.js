@@ -1,8 +1,8 @@
-(async function () {
-  window.appNavigate = window.appNavigate || function (path) { location.href = path; };
+window.appNavigate = window.appNavigate || function (path) { location.href = path; };
 function navigateTo(path) { window.appNavigate(path); }
 
-renderMenu();;
+export async function mount() {
+  renderMenu();
   const courseId = await courseContext.require();
   const msg = document.getElementById('msg');
   const frame = document.getElementById('planFrame');
@@ -19,4 +19,6 @@ renderMenu();;
   } catch (err) {
     msg.textContent = 'Error al cargar planificación: ' + err.message;
   }
-})();
+}
+
+export function unmount() {}

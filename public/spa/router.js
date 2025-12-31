@@ -57,16 +57,28 @@ function redirectLegacyUrl() {
   location.replace(`${spaBase}#/${target}${search}`);
 }
 
-async function loadHtml(route, viewEl) {
+let currentView = null;
+
+async function loadView(route, viewEl, query) {
   const meta = routes[route];
-  if (!meta) return false;
+  if (!meta?.view) return false;
+  if (currentView?.module?.unmount) {
+    try {
+      currentView.module.unmount({ route: currentView.route, viewEl });
+    } catch (err) {
+      console.warn('Error en unmount de vista', err);
+    }
+  }
   try {
-    const res = await fetch(BASE_APP + meta.html);
-    if (!res.ok) return false;
-    const html = await res.text();
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const main = doc.querySelector('main');
-    viewEl.innerHTML = main ? main.outerHTML : '<main><div class="card">Vista no disponible.</div></main>';
+    const module = await meta.view();
+    const template = module?.template || '<main><div class="card">Vista no disponible.</div></main>';
+    viewEl.innerHTML = template;
+    const mainEl = viewEl.querySelector('main');
+    if (!mainEl) {
+      viewEl.innerHTML = '<main><div class="card">Vista no disponible.</div></main>';
+    }
+    await module?.mount?.({ route, query, viewEl, mainEl: viewEl.querySelector('main') });
+    currentView = { module, route };
     return true;
   } catch (err) {
     return false;
@@ -89,17 +101,6 @@ function swapPageStyle(route) {
   } else if (existing) {
     existing.remove();
   }
-}
-
-function swapPageScript(route) {
-  const meta = routes[route];
-  const existing = document.getElementById('spa-page-script');
-  if (existing) existing.remove();
-  if (!meta?.script) return;
-  const script = document.createElement('script');
-  script.id = 'spa-page-script';
-  script.src = BASE_APP + meta.script;
-  document.body.appendChild(script);
 }
 
 function setLoading(viewEl) {
@@ -130,13 +131,12 @@ export function initRouter({ viewEl, onRouteChange } = {}) {
       return;
     }
     swapPageStyle(route);
-    const loaded = await loadHtml(route, viewEl);
+    const loaded = await loadView(route, viewEl, query);
     if (!loaded) {
       viewEl.innerHTML = renderNotFound();
       updateMeta(route, null, true);
       return;
     }
-    swapPageScript(route);
     updateMeta(route, meta, false);
     if (query) {
       const url = new URL(location.href);

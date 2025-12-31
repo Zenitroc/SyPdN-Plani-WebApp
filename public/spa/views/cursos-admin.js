@@ -1,0 +1,98 @@
+import { mount as mountController, unmount as unmountController } from '../../pages/cursos-admin/cursos-admin.js';
+
+export const template = `<style>
+    .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+    .tbl{border-collapse:collapse;width:100%}
+    .tbl th,.tbl td{border:1px solid var(--border);padding:.5rem;text-align:left}
+    .tbl th{background:color-mix(in oklab, var(--surface) 70%, var(--bg))}
+    .pill{font-size:.85rem;padding:.1rem .5rem;border-radius:999px;border:1px solid var(--border)}
+    .pill.on{background:color-mix(in oklab, var(--accent) 18%, transparent)}
+    .pill.off{opacity:.6}
+    .list{display:flex;flex-direction:column;gap:.35rem}
+    .row-between{display:flex;gap:.5rem;justify-content:space-between;align-items:center;flex-wrap:wrap}
+    .muted{opacity:.7}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:40;padding:1rem}
+    .modal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);width:min(560px,96vw);padding:1.5rem}
+    .modal-backdrop.active{display:flex}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+  </style>
+<main class="container">
+    <h1>Cursos</h1>
+    <div id="accessMsg" class="card" style="display:none"></div>
+
+    <section id="adminPanel" style="display:none">
+      <div class="row-between" style="margin-bottom:1rem">
+        <div>
+          <div class="label">Administración de cursos</div>
+          <small class="hint">Creá cursos, modificá sus datos y asigná docentes.</small>
+        </div>
+        <div class="row" style="gap:.5rem;flex-wrap:wrap">
+          <button id="btnOpenCreate" class="btn btn-primary">Crear curso</button>
+          <button id="btnRefresh" class="btn btn-ghost">↻ Recargar</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row-between" style="margin-bottom:.75rem;gap:.75rem">
+          <h3 style="margin:0">Cursos existentes</h3>
+          <input id="courseFilter" class="input" placeholder="Filtrar por código, nombre o comisión" style="min-width:220px;max-width:320px">
+        </div>
+        <div id="coursesTable"></div>
+        <small class="muted">Seleccioná un curso para editar o asignar usuarios.</small>
+      </div>
+
+      <div class="grid-2" style="margin-top:1rem">
+        <div class="card">
+          <h3 style="margin-top:0">Editar curso</h3>
+          <div id="editEmpty" class="hint">Elegí un curso en la tabla.</div>
+          <div id="editForm" style="display:none">
+            <div class="row" style="gap:.5rem;flex-wrap:wrap">
+              <input id="editCode" class="input" placeholder="Código" style="min-width:120px">
+              <input id="editName" class="input" placeholder="Nombre" style="flex:1;min-width:180px">
+            </div>
+            <div class="row" style="gap:.5rem;flex-wrap:wrap;margin-top:.5rem">
+              <input id="editTerm" class="input" placeholder="Comisión" style="min-width:140px">
+              <input id="editPlanUrl" class="input" placeholder="Link de planificación" style="flex:1;min-width:180px">
+              <div class="row" style="gap:.5rem;align-items:center">
+                <span id="editStatus" class="pill"></span>
+                <button id="btnToggleActive" class="btn btn-outline" type="button">Desactivar</button>
+              </div>
+            </div>
+            <div class="row" style="margin-top:.75rem;gap:.5rem;justify-content:flex-end">
+              <button id="btnUpdate" class="btn btn-tonal">Guardar cambios</button>
+              <button id="btnDelete" class="btn btn-outline">Eliminar</button>
+            </div>
+            <div id="editMsg" class="hint"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-top:0">Asignar usuarios</h3>
+          <div id="assignEmpty" class="hint">Seleccioná un curso para ver los usuarios asignados.</div>
+          <div id="assignPanel" style="display:none">
+            <div class="row" style="gap:.5rem;flex-wrap:wrap">
+              <select id="assignUser" class="input" style="flex:1;min-width:200px"></select>
+              <button id="btnAssign" class="btn btn-primary">Asignar</button>
+            </div>
+            <div style="margin-top:.75rem">
+              <div class="label">Usuarios asignados</div>
+              <div id="assignedList" class="list" style="margin-top:.5rem"></div>
+            </div>
+            <div id="assignMsg" class="hint"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>`;
+
+export async function mount(ctx) {
+  if (typeof mountController === 'function') {
+    return mountController(ctx);
+  }
+}
+
+export function unmount(ctx) {
+  if (typeof unmountController === 'function') {
+    return unmountController(ctx);
+  }
+}

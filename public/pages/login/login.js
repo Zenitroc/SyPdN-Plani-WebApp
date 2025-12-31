@@ -1,8 +1,6 @@
 window.appNavigate = window.appNavigate || function (path) { location.href = path; };
 function navigateTo(path) { window.appNavigate(path); }
 
-renderMenu();;
-
 // Helpers API con fallback /api
 function isNotFound(val){
   const s = String(val?.message || val?.error || val || '').toLowerCase();
@@ -22,45 +20,55 @@ async function apiTryPost(path, body, opts){
   }
 }
 
-(async function init(){
-    const loginForm = document.getElementById('loginForm');
-    const loginMsg = document.getElementById('loginMsg');
-    const username = document.getElementById('username');
-    const password = document.getElementById('password');
-    const toggle = document.getElementById('showPass');
-    const remember = document.getElementById('remember');
-    const forgotBtn = document.getElementById('forgotBtn');
-    const requestAccount = document.getElementById('requestAccount');
+let cleanup = null;
 
-    // Mostrar contraseña mientras se mantiene presionado
-    if (password && toggle) {
-      const hide = () => (password.type = 'password');
-      toggle.addEventListener('mousedown', () => (password.type = 'text'));
-      toggle.addEventListener('mouseup', hide);
-      toggle.addEventListener('mouseleave', hide);
-    }
+export async function mount() {
+  renderMenu();
+  const loginForm = document.getElementById('loginForm');
+  const loginMsg = document.getElementById('loginMsg');
+  const username = document.getElementById('username');
+  const password = document.getElementById('password');
+  const toggle = document.getElementById('showPass');
+  const remember = document.getElementById('remember');
+  const forgotBtn = document.getElementById('forgotBtn');
+  const requestAccount = document.getElementById('requestAccount');
 
-    if (remember && username && password) {
-      const saved = localStorage.getItem('remember') === 'true';
-      if (saved) {
-        remember.checked = true;
-        username.value = localStorage.getItem('username') || '';
-        password.value = localStorage.getItem('password') || '';
-      }
-    }
+  const listeners = [];
+  const addListener = (el, event, handler) => {
+    if (!el) return;
+    el.addEventListener(event, handler);
+    listeners.push(() => el.removeEventListener(event, handler));
+  };
 
-    if (forgotBtn) {
-      forgotBtn.addEventListener('click', () => {
-        alert('Por favor contactá a un administrador info@spn.com.ar');
-      });
-    }
+  // Mostrar contraseña mientras se mantiene presionado
+  if (password && toggle) {
+    const hide = () => (password.type = 'password');
+    addListener(toggle, 'mousedown', () => (password.type = 'text'));
+    addListener(toggle, 'mouseup', hide);
+    addListener(toggle, 'mouseleave', hide);
+  }
 
-    if (requestAccount && requestAccount.href === 'https://forms.gle/') {
-      requestAccount.addEventListener('click', (e) => {
-        e.preventDefault();
-        alert('Formulario de solicitud no disponible todavía');
-      });
+  if (remember && username && password) {
+    const saved = localStorage.getItem('remember') === 'true';
+    if (saved) {
+      remember.checked = true;
+      username.value = localStorage.getItem('username') || '';
+      password.value = localStorage.getItem('password') || '';
     }
+  }
+
+  if (forgotBtn) {
+    addListener(forgotBtn, 'click', () => {
+      alert('Por favor contactá a un administrador info@spn.com.ar');
+    });
+  }
+
+  if (requestAccount && requestAccount.href === 'https://forms.gle/') {
+    addListener(requestAccount, 'click', (e) => {
+      e.preventDefault();
+      alert('Formulario de solicitud no disponible todavía');
+    });
+  }
 
   // Si ya hay token, ir al home
   if (api.getToken()) {
@@ -96,5 +104,13 @@ async function apiTryPost(path, body, opts){
         loginMsg.textContent = err.message || 'Error de login';
       }
     };
+    listeners.push(() => { loginForm.onsubmit = null; });
   }
-})();
+
+  cleanup = () => listeners.forEach((fn) => fn());
+}
+
+export function unmount() {
+  if (cleanup) cleanup();
+  cleanup = null;
+}

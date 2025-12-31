@@ -1,16 +1,14 @@
-window.appNavigate = window.appNavigate || function (path) { location.href = path; };
+indow.appNavigate = window.appNavigate || function (path) { location.href = path; };
 function navigateTo(path) { window.appNavigate(path); }
-
-renderMenu();;
 
 function qs(id){ return document.getElementById(id); }
 function esc(s){ return (s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
 
-const partialFilter = qs('partialFilter');
-const attemptFilter = qs('attemptFilter');
-const content = qs('content');
-const btnDownloadXls = qs('btnDownloadXls');
-const btnDownloadPdf = qs('btnDownloadPdf');
+let partialFilter = null;
+let attemptFilter = null;
+let content = null;
+let btnDownloadXls = null;
+let btnDownloadPdf = null;
 
 let COURSE_ID = null;
 let students = [];
@@ -47,7 +45,39 @@ async function apiPost(path, body) {
 
 function payload(res){ return (res && typeof res==='object' && 'data' in res) ? res.data : res; }
 
-(async function(){
+function loadScript(src, test) {
+  if (typeof test === 'function' && test()) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const existing = Array.from(document.querySelectorAll('script')).find(s => s.src === src);
+    if (existing) {
+      existing.addEventListener('load', () => resolve());
+      existing.addEventListener('error', () => reject(new Error(`No se pudo cargar ${src}`)));
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error(`No se pudo cargar ${src}`));
+    document.head.appendChild(script);
+  });
+}
+
+async function ensureExportLibs() {
+  await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js', () => window.jspdf);
+  await loadScript('https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.min.js', () => window.jspdf?.jsPDF?.API?.autoTable);
+  await loadScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js', () => window.XLSX);
+}
+
+export async function mount() {
+  renderMenu();
+  partialFilter = qs('partialFilter');
+  attemptFilter = qs('attemptFilter');
+  content = qs('content');
+  btnDownloadXls = qs('btnDownloadXls');
+  btnDownloadPdf = qs('btnDownloadPdf');
+
+  await ensureExportLibs();
+
   if (!api.getToken()) { navigateTo(BASE_APP + '/public/pages/home/'); return; }
   COURSE_ID = parseInt(await courseContext.require(), 10);
 
@@ -57,7 +87,19 @@ function payload(res){ return (res && typeof res==='object' && 'data' in res) ? 
   btnDownloadPdf.onclick = downloadPdf;
 
   await load();
-})();
+}
+
+export function unmount() {
+  if (partialFilter) partialFilter.onchange = null;
+  if (attemptFilter) attemptFilter.onchange = null;
+  if (btnDownloadXls) btnDownloadXls.onclick = null;
+  if (btnDownloadPdf) btnDownloadPdf.onclick = null;
+  partialFilter = null;
+  attemptFilter = null;
+  content = null;
+  btnDownloadXls = null;
+  btnDownloadPdf = null;
+}
 
 async function load(){
   const partial = parseInt(partialFilter.value,10);

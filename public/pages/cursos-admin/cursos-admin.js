@@ -1,8 +1,6 @@
 window.appNavigate = window.appNavigate || function (path) { location.href = path; };
 function navigateTo(path) { window.appNavigate(path); }
 
-renderMenu();;
-
 function qs(id){ return document.getElementById(id); }
 
 let COURSES = [];
@@ -162,7 +160,8 @@ async function loadAssigned(){
   renderAssignedList();
 }
 
-(async function init(){
+export async function mount(){
+  renderMenu();
   if (!api.getToken()) { navigateTo(BASE_APP + '/public/pages/home/'); return; }
   const me = await api.get('/me');
   if (!Array.isArray(me.roles) || !me.roles.includes('GURU')) {
@@ -274,7 +273,9 @@ async function loadAssigned(){
   qs('createModal').addEventListener('click', (event) => {
     if (event.target === qs('createModal')) closeCreateModal();
   });
-})();
+}
+
+export function unmount() {}
 
 function openCreateModal() {
   const modal = qs('createModal');

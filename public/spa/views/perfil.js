@@ -1,0 +1,98 @@
+import { mount as mountController, unmount as unmountController } from '../../pages/perfil/perfil.js';
+
+export const template = `<style>
+    .row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+    .profile-avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:1px solid var(--border)}
+    .profile-avatar--fallback{display:flex;align-items:center;justify-content:center;background:color-mix(in oklab,var(--surface) 80%, var(--bg));font-weight:700;font-size:1.2rem;color:color-mix(in oklab, var(--primary) 70%, var(--text))}
+    .pill{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .6rem;border-radius:999px;border:1px solid var(--border);font-size:.85rem}
+    .notice{border:1px solid color-mix(in oklab, var(--primary) 40%, var(--border));background:color-mix(in oklab, var(--primary) 10%, var(--surface));padding:.75rem 1rem;border-radius:var(--radius)}
+    .password-fields{display:flex;flex-direction:column;gap:.75rem;max-width:420px}
+    .password-field{position:relative}
+    .password-field .input{padding-right:3rem}
+    .password-toggle{position:absolute;right:.65rem;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--primary);cursor:pointer;font-size:.85rem;padding:.25rem}
+    .password-toggle:active{opacity:.7}
+  </style>
+<main class="container">
+    <section class="card">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <h1 style="margin:.2rem 0">Mi perfil</h1>
+          <div class="muted">Administración sencilla de tu cuenta.</div>
+        </div>
+        <div id="profileNotice" class="notice" style="display:none"></div>
+      </div>
+
+      <div class="row" style="margin-top:1rem">
+        <div id="profileAvatar" class="profile-avatar profile-avatar--fallback">?</div>
+        <div>
+          <div id="profileName" style="font-weight:700;font-size:1.1rem"></div>
+          <div class="muted" id="profileInstitutional"></div>
+          <div class="row" id="profileRoles" style="margin-top:.35rem"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:1rem">
+      <h2>Datos personales</h2>
+      <div class="grid cols-2">
+        <label class="label">Email personal
+          <input id="personalEmail" class="input" type="email" placeholder="nombre@correo.com" />
+        </label>
+        <label class="label">Legajo
+          <input id="legajo" class="input" type="text" placeholder="Legajo" />
+        </label>
+        <label class="label">Teléfono (opcional)
+          <input id="phone" class="input" type="text" placeholder="+54 11 ..." />
+        </label>
+        <label class="label">Foto de perfil
+          <input id="photoInput" class="input" type="file" accept="image/*" />
+          <small class="hint">Máximo 200KB. Se usa para identificarte rápidamente.</small>
+        </label>
+      </div>
+      <div class="row" style="margin-top:1rem;justify-content:flex-end">
+        <button id="btnRemovePhoto" class="btn btn-ghost">Quitar foto</button>
+        <button id="btnSaveProfile" class="btn btn-primary">Guardar cambios</button>
+      </div>
+      <div id="profileMsg" class="muted" style="margin-top:.5rem"></div>
+    </section>
+
+    <section class="card" style="margin-top:1rem">
+      <h2>Cambiar contraseña</h2>
+      <div class="password-fields">
+        <label class="label">Contraseña actual
+          <div class="password-field">
+            <input id="currentPassword" class="input" type="password" />
+            <button type="button" id="toggleCurrentPassword" class="password-toggle" aria-label="Mostrar contraseña actual">Ver</button>
+          </div>
+        </label>
+        <label class="label">Nueva contraseña
+          <div class="password-field">
+            <input id="newPassword" class="input" type="password" />
+            <button type="button" id="toggleNewPassword" class="password-toggle" aria-label="Mostrar nueva contraseña">Ver</button>
+          </div>
+        </label>
+        <label class="label">Confirmar nueva contraseña
+          <div class="password-field">
+            <input id="confirmPassword" class="input" type="password" />
+            <button type="button" id="toggleConfirmPassword" class="password-toggle" aria-label="Mostrar confirmación de contraseña">Ver</button>
+          </div>
+        </label>
+      </div>
+      <div class="row" style="margin-top:1rem;justify-content:flex-end">
+        <button id="btnSavePassword" class="btn btn-primary">Actualizar contraseña</button>
+      </div>
+      <div id="passwordMsg" class="muted" style="margin-top:.5rem"></div>
+    </section>
+  </main>`;
+
+export async function mount(ctx) {
+  if (typeof mountController === 'function') {
+    return mountController(ctx);
+  }
+}
+
+export function unmount(ctx) {
+  if (typeof unmountController === 'function') {
+    return unmountController(ctx);
+  }
+}

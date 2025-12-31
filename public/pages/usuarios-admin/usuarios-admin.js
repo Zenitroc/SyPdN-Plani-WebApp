@@ -1,7 +1,7 @@
 window.appNavigate = window.appNavigate || function (path) { location.href = path; };
 function navigateTo(path) { window.appNavigate(path); }
 
-renderMenu();;
+
 
 function isNotFound(val) {
   const s = String(val?.message || val?.error || val || '').toLowerCase();
@@ -39,7 +39,8 @@ function escapeHtml(s) {
   }[m]));
 }
 
-(async function init(){
+export async function mount(){
+  renderMenu();
   if (!api.getToken()) {
     navigateTo(BASE_APP + '/public/pages/login/');
     return;
@@ -392,4 +393,6 @@ function escapeHtml(s) {
   await loadUsers();
   renderRolesOptions();
   renderList(USERS);
-})();
+}
+
+export function unmount() {}

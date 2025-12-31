@@ -1,12 +1,10 @@
 window.appNavigate = window.appNavigate || function (path) { location.href = path; };
 function navigateTo(path) { window.appNavigate(path); }
 
-renderMenu();;
-
 let ALL = [];
 let FILTER = '';
 
-(function ensureGuru(){
+function ensureGuru(){
   // Guard: solo Gurú
   api.get('/me').then(me => {
     if (!me.roles.includes('GURU')) {
@@ -14,7 +12,7 @@ let FILTER = '';
       navigateTo(BASE_APP + '/public/pages/home/');
     }
   }).catch(()=>navigateTo(BASE_APP + '/public/pages/home/'));
-})();
+}
 
 function rowHTML(r){
   return `<tr>
@@ -73,7 +71,26 @@ async function load(){
   render();
 }
 
-document.getElementById('q').addEventListener('input', (e)=>{ FILTER=e.target.value; render(); });
-document.getElementById('refresh').addEventListener('click', load);
+let cleanup = null;
 
-load();
+export function mount() {
+  renderMenu();
+  ensureGuru();
+  const qInput = document.getElementById('q');
+  const refreshBtn = document.getElementById('refresh');
+  const listeners = [];
+  const addListener = (el, event, handler) => {
+    if (!el) return;
+    el.addEventListener(event, handler);
+    listeners.push(() => el.removeEventListener(event, handler));
+  };
+  addListener(qInput, 'input', (e)=>{ FILTER=e.target.value; render(); });
+  addListener(refreshBtn, 'click', load);
+  load();
+  cleanup = () => listeners.forEach((fn) => fn());
+}
+
+export function unmount() {
+  if (cleanup) cleanup();
+  cleanup = null;
+}

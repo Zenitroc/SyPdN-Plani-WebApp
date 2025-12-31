@@ -1,0 +1,53 @@
+import { mount as mountController, unmount as unmountController } from '../../pages/login/login.js';
+
+export const template = `<main class="login-hero">
+    <div class="login-hero-panel">
+      <div class="login-info">
+        <h1>Sistemas y Procesos de Negocios</h1>
+        <h2>"La plani" ahora es plataforma!</h2>
+        <p>Accedé con tu cuenta para continuar.</p>
+      </div>
+      <div class="login-form-wrap">
+        <section class="card login-card">
+          <h3>INGRESAR</h3>
+          <form id="loginForm">
+            <div class="field">
+              <span class="field-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </span>
+              <input id="username" class="input" required placeholder="Usuario">
+            </div>
+            <div class="field">
+              <span class="field-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input id="password" class="input" type="password" required placeholder="Contraseña">
+              <button type="button" id="showPass" class="show-btn" aria-label="Mostrar contraseña">Ver</button>
+            </div>
+            <div class="login-extra">
+              <label><input type="checkbox" id="remember"> Recordame</label>
+              <button type="button" id="forgotBtn" class="link-btn">Olvidé mi contraseña</button>
+            </div>
+            <div class="captcha">
+              <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%">Ingresar</button>
+            <p class="account-link">¿No tenés cuenta? <a id="requestAccount" href="https://forms.gle/" target="_blank" rel="noopener">Solicitar cuenta</a></p>
+          </form>
+          <div id="loginMsg" style="color:#c00;margin-top:.5rem"></div>
+        </section>
+      </div>
+    </div>
+  </main>`;
+
+export async function mount(ctx) {
+  if (typeof mountController === 'function') {
+    return mountController(ctx);
+  }
+}
+
+export function unmount(ctx) {
+  if (typeof unmountController === 'function') {
+    return unmountController(ctx);
+  }
+}

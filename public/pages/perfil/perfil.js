@@ -1,7 +1,7 @@
 window.appNavigate = window.appNavigate || function (path) { location.href = path; };
 function navigateTo(path) { window.appNavigate(path); }
 
-renderMenu();;
+
 
 function qs(id){ return document.getElementById(id); }
 
@@ -128,17 +128,33 @@ async function savePassword(){
   }
 }
 
-(async function init(){
+let cleanup = null;
+
+export async function mount(){
+  renderMenu();
+  const listeners = [];
+  const addListener = (el, event, handler, options) => {
+    if (!el) return;
+    el.addEventListener(event, handler, options);
+    listeners.push(() => el.removeEventListener(event, handler, options));
+  };
+
   await loadProfile();
   bindPhotoInput();
   bindPasswordToggle('currentPassword', 'toggleCurrentPassword');
   bindPasswordToggle('newPassword', 'toggleNewPassword');
   bindPasswordToggle('confirmPassword', 'toggleConfirmPassword');
-  qs('btnSaveProfile').addEventListener('click', saveProfile);
-  qs('btnSavePassword').addEventListener('click', savePassword);
-  qs('btnRemovePhoto').addEventListener('click', () => {
+  addListener(qs('btnSaveProfile'), 'click', saveProfile);
+  addListener(qs('btnSavePassword'), 'click', savePassword);
+  addListener(qs('btnRemovePhoto'), 'click', () => {
     currentPhotoData = null;
     qs('photoInput').value = '';
     setAvatar(null, qs('profileName').textContent, '');
   });
-})();
+  cleanup = () => listeners.forEach(fn => fn());
+}
+
+export function unmount() {
+  if (cleanup) cleanup();
+  cleanup = null;
+}

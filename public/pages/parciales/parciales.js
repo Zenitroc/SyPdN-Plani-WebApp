@@ -1,9 +1,11 @@
 window.appNavigate = window.appNavigate || function (path) { location.href = path; };
 function navigateTo(path) { window.appNavigate(path); }
 
-renderMenu();;
+let resizeHandler = null;
+let rAF = null;
 
-(function () {
+export function mount() {
+    renderMenu();
     const qs = (id) => document.getElementById(id);
     const payload = (r) => (r && typeof r === 'object' && 'data' in r) ? r.data : r;
 
@@ -224,11 +226,11 @@ renderMenu();;
     }
 
     // Solo si el usuario cambia el tamaño de la ventana, re-medimos
-    let rAF = null;
-    window.addEventListener('resize', () => {
+    resizeHandler = () => {
         cancelAnimationFrame(rAF);
         rAF = requestAnimationFrame(() => ensureLeftWidths(true));
-    });
+    };
+    window.addEventListener('resize', resizeHandler);
 
     // ====== Alturas sincronizadas entre tablas ======
     function syncRowHeights() {
@@ -250,4 +252,13 @@ renderMenu();;
     (function () { let t = null; qs('q').addEventListener('input', e => { clearTimeout(t); t = setTimeout(() => { QUERY = e.target.value.trim().toLowerCase(); renderTables(); syncRowHeights(); }, 160); }); })();
 
     load().catch(e => { qs('tbodyLeft').innerHTML = `<tr><td colspan="6" style="padding:1rem">Error: ${e.message || e}</td></tr>`; });
-})();
+}
+
+export function unmount() {
+    if (resizeHandler) {
+        window.removeEventListener('resize', resizeHandler);
+    }
+    resizeHandler = null;
+    if (rAF) cancelAnimationFrame(rAF);
+    rAF = null;
+}

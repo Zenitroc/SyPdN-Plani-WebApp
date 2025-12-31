@@ -1,7 +1,6 @@
 window.appNavigate = window.appNavigate || function (path) { location.href = path; };
 function navigateTo(path) { window.appNavigate(path); }
 
-renderMenu();;
 
 // Helpers API con fallback /api
 function isNotFound(val) {
@@ -36,7 +35,8 @@ async function apiTryPost(path, body, opts) {
 }
 function payload(res) { return (res && typeof res === 'object' && 'data' in res) ? res.data : res; }
 
-(async function init() {
+export async function mount() {
+  renderMenu();
   const mainEl = document.getElementById('main') || document.querySelector('main');
 
   const selectedCourseBox = document.getElementById('selectedCourse');
@@ -594,4 +594,6 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
     renderRolesOptions();
     renderList(USERS);
   }
-})();
+}
+
+export function unmount() {}

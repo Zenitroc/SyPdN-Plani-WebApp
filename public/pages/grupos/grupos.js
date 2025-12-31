@@ -1,7 +1,7 @@
 window.appNavigate = window.appNavigate || function (path) { location.href = path; };
 function navigateTo(path) { window.appNavigate(path); }
 
-renderMenu();;
+
 
 function option(v, t) { return `<option value="${v}">${t}</option>`; }
 function qs(id) { return document.getElementById(id); }
@@ -11,7 +11,8 @@ function modalHide(id) { qs(id).style.display = 'none'; }
 let COURSE_ID = null;
 let GROUPS = [];
 
-(async function () {
+export async function mount() {
+    renderMenu();
     if (!api.getToken()) { navigateTo(BASE_APP + '/public/pages/home/'); return; }
     COURSE_ID = await courseContext.require();
 
@@ -208,4 +209,6 @@ let GROUPS = [];
     // init
     await loadGroups();
     await loadNoGroup();
-})();
+}
+
+export function unmount() {}

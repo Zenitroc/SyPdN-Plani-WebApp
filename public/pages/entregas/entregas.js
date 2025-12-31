@@ -1,8 +1,6 @@
 window.appNavigate = window.appNavigate || function (path) { location.href = path; };
 function navigateTo(path) { window.appNavigate(path); }
 
-renderMenu();;
-
 function qs(id){ return document.getElementById(id); }
 function modalShow(id){ qs(id).style.display='flex'; }
 function modalHide(id){ qs(id).style.display='none'; }
@@ -49,34 +47,57 @@ async function apiPost(path, body) {
 }
 // ============================================================================
 
-const termFilter = qs('termFilter');
-const btnNew = qs('btnNew');
-const content = qs('content');
+let termFilter = null;
+let btnNew = null;
+let content = null;
 
 // Modal NUEVO
-const f_type = qs('f_type');
-const f_term = qs('f_term');
-const f_topic = qs('f_topic');
-const f_due  = qs('f_due');
-const f_name = qs('f_name');
-const btnCreate = qs('btnCreate');
-const nextNumberHint = qs('nextNumberHint');
+let f_type = null;
+let f_term = null;
+let f_topic = null;
+let f_due  = null;
+let f_name = null;
+let btnCreate = null;
+let nextNumberHint = null;
 
 // Modal EDITAR
-const modalEdit = qs('modalEdit');
-const e_topic = qs('e_topic');
-const e_due = qs('e_due');
-const e_name = qs('e_name');
-const btnEditSave = qs('btnEditSave');
+let modalEdit = null;
+let e_topic = null;
+let e_due = null;
+let e_name = null;
+let btnEditSave = null;
 
 // Modal ELIMINAR
-const modalDel = qs('modalDel');
-const d_confirm = qs('d_confirm');
-const btnDelConfirm = qs('btnDelConfirm');
+let modalDel = null;
+let d_confirm = null;
+let btnDelConfirm = null;
 
 let currentAssignmentId = null; // para editar/eliminar
 
-(async function () {
+export async function mount() {
+  renderMenu();
+  termFilter = qs('termFilter');
+  btnNew = qs('btnNew');
+  content = qs('content');
+
+  f_type = qs('f_type');
+  f_term = qs('f_term');
+  f_topic = qs('f_topic');
+  f_due  = qs('f_due');
+  f_name = qs('f_name');
+  btnCreate = qs('btnCreate');
+  nextNumberHint = qs('nextNumberHint');
+
+  modalEdit = qs('modalEdit');
+  e_topic = qs('e_topic');
+  e_due = qs('e_due');
+  e_name = qs('e_name');
+  btnEditSave = qs('btnEditSave');
+
+  modalDel = qs('modalDel');
+  d_confirm = qs('d_confirm');
+  btnDelConfirm = qs('btnDelConfirm');
+
   if (!api.getToken()) { navigateTo(BASE_APP + '/public/pages/home/'); return; }
   COURSE_ID = Number.parseInt(await courseContext.require(), 10);
 
@@ -109,7 +130,33 @@ let currentAssignmentId = null; // para editar/eliminar
   btnDelConfirm.onclick = doDelete;
 
   await load();
-})();
+}
+
+export function unmount() {
+  if (termFilter) termFilter.onchange = null;
+  if (btnNew) btnNew.onclick = null;
+  if (btnCreate) btnCreate.onclick = null;
+  if (btnEditSave) btnEditSave.onclick = null;
+  if (btnDelConfirm) btnDelConfirm.onclick = null;
+  termFilter = null;
+  btnNew = null;
+  content = null;
+  f_type = null;
+  f_term = null;
+  f_topic = null;
+  f_due = null;
+  f_name = null;
+  btnCreate = null;
+  nextNumberHint = null;
+  modalEdit = null;
+  e_topic = null;
+  e_due = null;
+  e_name = null;
+  btnEditSave = null;
+  modalDel = null;
+  d_confirm = null;
+  btnDelConfirm = null;
+}
 
 function payload(res){ return (res && typeof res==='object' && 'data' in res) ? res.data : res; }
 const FAIL = new Set(['A','N_E','NO_SAT','N_S']);
