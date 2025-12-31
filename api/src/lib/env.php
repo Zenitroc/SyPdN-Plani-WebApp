@@ -10,3 +10,13 @@ function load_env(string $path): void {
     putenv("$k=$v"); $_ENV[$k] = $v;
   }
 }
+function load_env_stack(string $rootPath): void {
+  // Orden: base -> perfil (sobrescribe)
+  load_env($rootPath);
+  $appEnv = getenv('APP_ENV') ?: ($_ENV['APP_ENV'] ?? '');
+  if ($appEnv !== '') {
+    $profilePath = $rootPath . '.' . $appEnv;
+    load_env($profilePath);
+  }
+}
+

@@ -20,6 +20,7 @@ async function apiTryPost(path, body, opts){
 }
 
 (async function init(){
+    const homeUrl = window.APP_ROUTES?.pages?.home || '../home/';
     const loginForm = document.getElementById('loginForm');
     const loginMsg = document.getElementById('loginMsg');
     const username = document.getElementById('username');
@@ -61,7 +62,7 @@ async function apiTryPost(path, body, opts){
 
   // Si ya hay token, ir al home
   if (api.getToken()) {
-    location.href = '../home/';
+    location.href = homeUrl;
     return;
   }
 
@@ -88,7 +89,7 @@ async function apiTryPost(path, body, opts){
           localStorage.removeItem('password');
         }
         api.setToken(tk);
-        location.href = '../home/';
+        location.href = homeUrl;
       } catch (err) {
         loginMsg.textContent = err.message || 'Error de login';
       }

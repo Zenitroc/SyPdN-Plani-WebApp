@@ -10,7 +10,9 @@
     return `<a href="${href}" class="${active ? 'active' : ''}">${label}</a>`;
   }
   window.renderMenu = async function (containerId = 'appMenu') {
+    const pages = window.APP_ROUTES?.pages;
     const base = BASE_APP + '/public/pages';
+    const page = (path) => pages?.[path] || `${base}/${path}/`;
     let isGuru = false;
     let me = null;
     if (api.getToken()) {
@@ -34,15 +36,15 @@
       </a>` : '';
     const html = `
       <div class="menu">
-        ${item(base + '/home/', 'Home')}
-        ${item(base + '/curso-dashboard/', 'Dashboard')}
-        ${item(base + '/planificacion/', 'Planificación')}
-        ${item(base + '/estudiantes/', 'Estudiantes')}
-        ${item(base + '/grupos/', 'Grupos')}
-        ${item(base + '/entregas/', 'Trabajos Prácticos')}
-        ${item(base + '/parciales/', 'Parciales')}
-        ${item(base + '/asistencia/', 'Asistencia')}
-        ${item(base + '/reportes/', 'Reportes')}
+        ${item(page('home'), 'Home')}
+        ${item(page('cursoDashboard'), 'Dashboard')}
+        ${item(page('planificacion'), 'Planificación')}
+        ${item(page('estudiantes'), 'Estudiantes')}
+        ${item(page('grupos'), 'Grupos')}
+        ${item(page('entregas'), 'Trabajos Prácticos')}
+        ${item(page('parciales'), 'Parciales')}
+        ${item(page('asistencia'), 'Asistencia')}
+        ${item(page('reportes'), 'Reportes')}
         
         <div class="spacer"></div>
         <button class="btn btn-ghost round" onclick="theme.toggle()">🌓 Modo</button>
@@ -53,7 +55,7 @@
     if (el) el.innerHTML = html;
 
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
-      api.clearToken(); courseContext.clear(); location.href = BASE_APP + '/public/pages/home/';
+      api.clearToken(); courseContext.clear(); location.href = page('home');
     });
   };
 })();
