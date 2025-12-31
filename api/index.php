@@ -13,6 +13,54 @@ require __DIR__ . '/src/middleware/course-guard.php';
 
 load_env(dirname(__DIR__) . '/.env');
 
+ini_set('display_errors', '0');
+ini_set('html_errors', '0');
+error_reporting(E_ALL);
+
+set_exception_handler(function (Throwable $e): void {
+  if (!headers_sent()) {
+    header('Content-Type: application/json; charset=utf-8');
+  }
+  json_error('Server error: ' . $e->getMessage(), 500);
+});
+
+set_error_handler(function (int $severity, string $message, string $file, int $line): bool {
+  if (!(error_reporting() & $severity)) {
+    return false;
+  }
+  if (!headers_sent()) {
+    header('Content-Type: application/json; charset=utf-8');
+  }
+  json_error('Server error: ' . $message, 500, [
+    'file' => basename($file),
+    'line' => $line,
+  ]);
+  return true;
+});
+
+register_shutdown_function(function (): void {
+  $error = error_get_last();
+  if (!$error) {
+    return;
+  }
+  $fatalTypes = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR];
+  if (!in_array($error['type'], $fatalTypes, true)) {
+    return;
+  }
+  if (!headers_sent()) {
+    header('Content-Type: application/json; charset=utf-8');
+  }
+  echo json_encode([
+    'error' => 'Server error',
+    'extra' => [
+      'message' => $error['message'],
+      'file' => basename($error['file']),
+      'line' => $error['line'],
+    ],
+  ], JSON_UNESCAPED_UNICODE);
+  exit;
+});
+
 // CORS
 $origins = getenv('CORS_ORIGINS') ?: '*';
 $origin  = $_SERVER['HTTP_ORIGIN'] ?? '*';
