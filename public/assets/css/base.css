@@ -19,7 +19,7 @@
 html,body{height:100%}
 body{
   margin:0;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-family: var(--font-ui);
   line-height:1.5;
   font-size:16px;
   background:radial-gradient(circle at top, #f8fafc 0%, var(--bg) 45%, #e7ecf4 100%);
@@ -28,8 +28,32 @@ body{
 
 /* ===== Tokens (tema claro por defecto) ===== */
 :root{
-  --radius:18px;
-  --shadow:0 18px 45px rgba(15, 23, 42, 0.12);
+  /* Tipografía */
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-head: var(--font-ui);
+
+  /* Espaciado */
+  --space-1:0.25rem;
+  --space-2:0.5rem;
+  --space-3:0.75rem;
+  --space-4:1rem;
+  --space-5:1.5rem;
+  --space-6:2rem;
+  --space-7:3rem;
+
+  /* Bordes */
+  --radius-sm:10px;
+  --radius-md:14px;
+  --radius-lg:20px;
+  --radius:var(--radius-lg);
+
+  /* Sombras */
+  --shadow-xs:0 1px 2px rgba(15, 23, 42, 0.08);
+  --shadow-sm:0 8px 20px rgba(15, 23, 42, 0.12);
+  --shadow-md:0 18px 45px rgba(15, 23, 42, 0.12);
+  --shadow-lg:0 28px 60px rgba(15, 23, 42, 0.16);
+  --shadow:var(--shadow-md);
+
   --transition:.22s ease;
   --content-max:1200px;
 
@@ -47,6 +71,8 @@ body{
   /* Derivados */
   --primary:var(--brand);
   --primary-contrast:#fff;
+  --border-subtle:color-mix(in oklab, var(--border) 72%, transparent);
+  --surface-muted:color-mix(in oklab, var(--surface) 85%, var(--bg));
 }
 
 /* ===== Tema oscuro (neutral/gris) ===== */
@@ -80,21 +106,25 @@ p{margin:0 0 1rem 0;color:var(--text)}
 small, .muted{color:var(--muted)}
 
 /* ===== Layout ===== */
-.container{max-width:var(--content-max);margin:2rem auto;padding:0 1.5rem; padding-bottom: 5rem;}
+.container{max-width:var(--content-max);margin:2rem auto;padding:0 var(--space-6); padding-bottom: 5rem;}
 .card{
   background:var(--surface);
-  border:1px solid color-mix(in oklab, var(--border) 80%, transparent);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:1.5rem;
-  
+  border:1px solid var(--border-subtle);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-sm);
+  padding:var(--space-5);
 }
+.card-header{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);margin-bottom:var(--space-4)}
+.card-body{display:grid;gap:var(--space-4)}
+.card-footer{display:flex;align-items:center;justify-content:flex-end;gap:var(--space-3);margin-top:var(--space-4)}
+.card.flat{box-shadow:none}
+.card.elevated{box-shadow:var(--shadow-md)}
 
 /* ===== Botones ===== */
 .btn{
   --bg:var(--surface); --fg:var(--text); --bd:var(--border);
   display:inline-flex;align-items:center;gap:.5rem;
-  padding:.75rem 1.1rem;border-radius:calc(var(--radius) - 6px);border:1px solid var(--bd);
+  padding:.75rem 1.1rem;border-radius:var(--radius-md);border:1px solid var(--bd);
   background:var(--bg);color:var(--fg);cursor:pointer;
   transition:transform var(--transition), box-shadow var(--transition), background var(--transition), border-color var(--transition), color var(--transition);
   will-change:transform;
@@ -134,7 +164,7 @@ small, .muted{color:var(--muted)}
 /* ===== Formularios ===== */
 .input, textarea{
   width:100%;padding:.75rem .9rem;border:1px solid var(--border);
-  border-radius:var(--radius);background:var(--surface);color:var(--text);
+  border-radius:var(--radius-md);background:var(--surface);color:var(--text);
   transition:border-color var(--transition), box-shadow var(--transition)
 }
 .input:focus,textarea:focus{
@@ -143,16 +173,19 @@ small, .muted{color:var(--muted)}
 }
 
 /* ===== Select nativo — estilo clean ===== */
-.field{margin:1rem 0}
-.label{display:block;font-weight:600;margin:0 0 .45rem 0}
-.hint{display:block;margin-top:.35rem;color:var(--muted);font-size:.9rem}
+.form{display:grid;gap:var(--space-4)}
+.form-row{display:grid;gap:var(--space-4);grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.form-actions{display:flex;flex-wrap:wrap;gap:var(--space-3);justify-content:flex-end;margin-top:var(--space-2)}
+.field{margin:0;display:grid;gap:var(--space-2)}
+.label{display:block;font-weight:600;margin:0}
+.hint{display:block;margin-top:.2rem;color:var(--muted);font-size:.9rem}
 .select-wrap{position:relative;display:block}
 .select{
   appearance:none; -webkit-appearance:none;
   width:100%;
   padding:.95rem 2.6rem .95rem 1rem;
   border:1px solid var(--border);
-  border-radius:var(--radius);
+  border-radius:var(--radius-md);
   background:var(--surface);
   color:var(--text);
   box-shadow: inset 0 1px 0 rgba(0,0,0,.02);
@@ -174,7 +207,8 @@ small, .muted{color:var(--muted)}
 }
 
 /* ===== Tabla ===== */
-.table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--radius);overflow:hidden}
+.table-wrap{width:100%;overflow:auto;border-radius:var(--radius-lg);border:1px solid var(--border-subtle);background:var(--surface)}
+.table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--radius-lg);overflow:hidden;min-width:600px}
 .table th,.table td{border:1px solid var(--border);padding:.75rem .85rem}
 .table th{
   background:color-mix(in oklab, var(--surface) 70%, var(--bg));
@@ -182,6 +216,43 @@ small, .muted{color:var(--muted)}
   font-weight:600;
 }
 .table tbody tr:nth-child(even){background:color-mix(in oklab, var(--surface) 92%, var(--bg))}
+
+/* ===== Modal ===== */
+.modal-root{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:var(--space-6);background:rgba(15,23,42,.45);opacity:0;pointer-events:none;transition:opacity var(--transition);z-index:100}
+.modal-root.is-open{opacity:1;pointer-events:auto}
+.modal{
+  width:min(560px,95vw);
+  background:var(--surface);
+  border-radius:var(--radius-lg);
+  border:1px solid var(--border-subtle);
+  box-shadow:var(--shadow-lg);
+  display:grid;
+  gap:var(--space-4);
+  padding:var(--space-5);
+}
+.modal-header{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3)}
+.modal-title{font-size:1.2rem;font-weight:700}
+.modal-body{color:var(--text)}
+.modal-footer{display:flex;justify-content:flex-end;gap:var(--space-3)}
+
+/* ===== Toast ===== */
+.toast-root{position:fixed;right:var(--space-5);top:var(--space-5);display:flex;flex-direction:column;gap:var(--space-3);z-index:200}
+.toast{
+  min-width:220px;
+  max-width:360px;
+  background:var(--surface);
+  border:1px solid var(--border-subtle);
+  border-radius:var(--radius-md);
+  padding:var(--space-3) var(--space-4);
+  box-shadow:var(--shadow-sm);
+  display:flex;
+  gap:var(--space-3);
+  align-items:flex-start;
+}
+.toast-title{font-weight:700;margin-bottom:var(--space-1)}
+.toast--success{border-left:4px solid var(--accent)}
+.toast--warning{border-left:4px solid #f59e0b}
+.toast--error{border-left:4px solid #ef4444}
 
 /* ===== Menú (con animación) ===== */
 .menu{
@@ -237,7 +308,7 @@ small, .muted{color:var(--muted)}
 .menu .spacer{flex:1}
 .menu a, .menu button{
   transition:transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
-  will-change:transform;
+will-change:transform;
 }
 .menu a:hover, .menu button:hover{ transform:scale(1.05) rotate(.6deg) }
 .menu a:active, .menu button:active{ transform:scale(.99) rotate(0) }
@@ -260,12 +331,6 @@ small, .muted{color:var(--muted)}
 /* ===== Reduce motion ===== */
 @media (prefers-reduced-motion: reduce){
   .fx-pop, .menu a, .menu button, .btn-primary{ animation:none; transition:none }
-}
-
-/* Tipografías por tema (tokens) */
-:root{
-  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --font-head: var(--font-ui);
 }
 
 /* Usar tokens en todo el UI */

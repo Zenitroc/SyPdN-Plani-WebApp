@@ -24,6 +24,8 @@ export function renderLayout() {
         </header>
         <div id="appView" class="spa-view" aria-live="polite"></div>
       </div>
+      <div id="modalRoot" class="modal-root" aria-hidden="true"></div>
+      <div id="toastRoot" class="toast-root" aria-live="polite"></div>
     </div>
   `;
 }
