@@ -51,7 +51,7 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
 
   // Redirigir a login si no hay token
   if (!api.getToken()) {
-    location.href = '../login/';
+    location.href = '/pages/login/';
     return;
   }
 
@@ -70,7 +70,7 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
     }
   } catch {
     api.clearToken();
-    location.href = '../login/';
+    location.href = '/pages/login/';
     return;
   }
 
