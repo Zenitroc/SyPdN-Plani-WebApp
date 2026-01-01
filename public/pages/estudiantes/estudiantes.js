@@ -84,7 +84,7 @@ function renderEditTable(rows){
 }
 
 (async function () {
-  if (!api.getToken()) { location.href = BASE_APP + '/public/pages/home/'; return; }
+  if (!api.getToken()) { location.href = BASE_APP + '/pages/home/'; return; }
   const me = await api.get('/me');
   IS_GURU = me.roles.includes('GURU');
   if (IS_GURU) qs('btnDelete').style.display = 'inline-flex';

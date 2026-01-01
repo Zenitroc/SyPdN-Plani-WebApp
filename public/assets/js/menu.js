@@ -11,7 +11,7 @@
   }
   window.renderMenu = async function (containerId = 'appMenu') {
     const pages = window.APP_ROUTES?.pages;
-    const base = BASE_APP + '/public/pages';
+    const base = BASE_APP + '/pages';
     const page = (path) => pages?.[path] || `${base}/${path}/`;
     let isGuru = false;
     let me = null;
