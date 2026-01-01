@@ -11,7 +11,7 @@ require __DIR__ . '/src/middleware/course-guard.php';
 
 
 
-load_env(dirname(__DIR__) . '/.env');
+load_env_stack(dirname(__DIR__) . '/.env');
 
 // CORS
 $origins = getenv('CORS_ORIGINS') ?: '*';

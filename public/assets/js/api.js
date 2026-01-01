@@ -5,6 +5,24 @@
   const API_BASE = BASE_APP + '/api';
   window.BASE_APP = BASE_APP;
   window.API_BASE = API_BASE;
+   window.APP_ROUTES = {
+    pages: {
+      home: BASE_APP + '/public/pages/home/',
+      login: BASE_APP + '/public/pages/login/',
+      perfil: BASE_APP + '/public/pages/perfil/',
+      cursoDashboard: BASE_APP + '/public/pages/curso-dashboard/',
+      planificacion: BASE_APP + '/public/pages/planificacion/',
+      estudiantes: BASE_APP + '/public/pages/estudiantes/',
+      grupos: BASE_APP + '/public/pages/grupos/',
+      entregas: BASE_APP + '/public/pages/entregas/',
+      parciales: BASE_APP + '/public/pages/parciales/',
+      asistencia: BASE_APP + '/public/pages/asistencia/',
+      reportes: BASE_APP + '/public/pages/reportes/',
+      cursosAdmin: BASE_APP + '/public/pages/cursos-admin/',
+      usuariosAdmin: BASE_APP + '/public/pages/usuarios-admin/',
+      alumnosGlobal: BASE_APP + '/public/pages/alumnos-global/',
+    },
+  };
 
   const api = {
     setToken(t) { localStorage.setItem('spn_token', t); },
