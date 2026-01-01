@@ -41,7 +41,7 @@ function bindPasswordToggle(inputId, buttonId){
 
 
 async function loadProfile(){
-  if (!api.getToken()) { location.href = BASE_APP + '/public/pages/login/'; return; }
+  if (!api.getToken()) { location.href = BASE_APP + '/pages/login/'; return; }
   const me = await api.get('/me');
   const fullName = `${me.name || ''}${me.last_name ? ' ' + me.last_name : ''}`.trim();
   qs('profileName').textContent = fullName || me.username || '';

@@ -65,7 +65,7 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
     isGuru = Array.isArray(me?.roles) && me.roles.includes('GURU');
     if (me?.must_change_password) {
       alert('Por seguridad, necesitás cambiar tu contraseña antes de continuar.');
-      location.href = BASE_APP + '/public/pages/perfil/?force=1';
+      location.href = BASE_APP + '/pages/perfil/?force=1';
       return;
     }
   } catch {
@@ -171,13 +171,13 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
       </div>`;
     if (isGuru) {
       document.getElementById('goAllStudents').onclick = () => {
-        location.href = BASE_APP + '/public/pages/alumnos-global/';
+        location.href = BASE_APP + '/pages/alumnos-global/';
       };
       document.getElementById('goCourseAdmin').onclick = () => {
-        location.href = BASE_APP + '/public/pages/cursos-admin/';
+        location.href = BASE_APP + '/pages/cursos-admin/';
       };
       document.getElementById('goUserAdmin').onclick = () => {
-        location.href = BASE_APP + '/public/pages/usuarios-admin/';
+        location.href = BASE_APP + '/pages/usuarios-admin/';
       };
     }
 
@@ -210,8 +210,8 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
           <div class="muted">${subtitle || '&nbsp;'}</div>
         </div>
         <div class="row" style="gap:.5rem">
-          <button class="btn" onclick="location.href='${BASE_APP}/public/pages/entregas/'">Ir a Entregas</button>
-          <button class="btn btn-tonal" onclick="location.href='${BASE_APP}/public/pages/estudiantes/'">Ver Estudiantes</button>
+          <button class="btn" onclick="location.href='${BASE_APP}/pages/entregas/'">Ir a Entregas</button>
+          <button class="btn btn-tonal" onclick="location.href='${BASE_APP}/pages/estudiantes/'">Ver Estudiantes</button>
         </div>
       </div>
     `;
