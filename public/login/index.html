@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content="0; url=/pages/login/" />
+    <title>Redirigiendo…</title>
+    <style>
+      body { font-family: system-ui, sans-serif; padding: 2rem; }
+    </style>
+  </head>
+  <body>
+    <p>Redirigiendo a la página de login…</p>
+    <script>
+      (function () {
+        const parts = location.pathname.split('/').filter(Boolean);
+        const i = parts.indexOf('login');
+        const base = i > 0 ? '/' + parts.slice(0, i).join('/') : '';
+        location.replace(base + '/pages/login/');
+      })();
+    </script>
+  </body>
+</html>

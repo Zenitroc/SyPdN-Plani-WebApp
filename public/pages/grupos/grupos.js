@@ -9,7 +9,7 @@ let COURSE_ID = null;
 let GROUPS = [];
 
 (async function () {
-    if (!api.getToken()) { location.href = BASE_APP + '/pages/home/'; return; }
+    if (!api.getToken()) { location.href = window.getPageRoute ? window.getPageRoute('home') : (BASE_APP + '/pages/home/'); return; }
     COURSE_ID = await courseContext.require();
 
     // Helpers de UI

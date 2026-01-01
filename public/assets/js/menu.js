@@ -10,9 +10,7 @@
     return `<a href="${href}" class="${active ? 'active' : ''}">${label}</a>`;
   }
   window.renderMenu = async function (containerId = 'appMenu') {
-    const pages = window.APP_ROUTES?.pages;
-    const base = BASE_APP + '/pages';
-    const page = (path) => pages?.[path] || `${base}/${path}/`;
+    const page = (path) => window.getPageRoute ? window.getPageRoute(path) : (BASE_APP + `/pages/${path}/`);
     let isGuru = false;
     let me = null;
     if (api.getToken()) {
@@ -28,7 +26,7 @@
       ? displayName.split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase() || '').join('')
       : (me?.username ? me.username.slice(0, 2).toUpperCase() : '');
     const profile = me ? `
-      <a class="menu-profile" href="${base}/perfil/" title="Mi perfil">
+      <a class="menu-profile" href="${page('perfil')}" title="Mi perfil">
         ${me.photo_url
           ? `<img class="menu-avatar" src="${me.photo_url}" alt="Foto de ${escapeHtml(displayName)}">`
           : `<span class="menu-avatar menu-avatar--fallback">${escapeHtml(initials)}</span>`}

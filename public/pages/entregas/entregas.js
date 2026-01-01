@@ -74,7 +74,7 @@ const btnDelConfirm = qs('btnDelConfirm');
 let currentAssignmentId = null; // para editar/eliminar
 
 (async function () {
-  if (!api.getToken()) { location.href = BASE_APP + '/pages/home/'; return; }
+  if (!api.getToken()) { location.href = window.getPageRoute ? window.getPageRoute('home') : (BASE_APP + '/pages/home/'); return; }
   COURSE_ID = Number.parseInt(await courseContext.require(), 10);
 
   termFilter.onchange = load;

@@ -1,27 +1,52 @@
 (function () {
-  const parts = location.pathname.split('/').filter(Boolean);
-  const i = parts.indexOf('public');
-  const BASE_APP = i > 0 ? '/' + parts.slice(0, i).join('/') : '';
-  const API_BASE = BASE_APP + '/api';
+  function detectBaseApp() {
+    const parts = location.pathname.split('/').filter(Boolean);
+    const knownRoots = ['pages', 'assets', 'api', 'login'];
+    const index = parts.findIndex(part => knownRoots.includes(part));
+    return index > 0 ? '/' + parts.slice(0, index).join('/') : '';
+  }
+
+  function normalizePath(base, path) {
+    if (!path) return base;
+    if (/^https?:\/\//i.test(path)) return path;
+    if (path.startsWith('/')) return base + path;
+    return `${base}/${path}`;
+  }
+
+  function loadRoutesConfig(base) {
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', `${base}/assets/routes.json`, false);
+      xhr.send(null);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        return JSON.parse(xhr.responseText);
+      }
+    } catch (e) {
+      console.warn('[routes] No se pudo cargar routes.json', e);
+    }
+    return {};
+  }
+
+  const BASE_APP = detectBaseApp();
+  const routesConfig = loadRoutesConfig(BASE_APP);
+  const pagesConfig = routesConfig.pages || {};
+  const pages = Object.keys(pagesConfig).reduce((acc, key) => {
+    acc[key] = normalizePath(BASE_APP, pagesConfig[key]);
+    return acc;
+  }, {});
+
+  const APP_ROUTES = {
+    apiBase: normalizePath(BASE_APP, routesConfig.apiBase || '/api'),
+    assetsBase: normalizePath(BASE_APP, routesConfig.assetsBase || '/assets'),
+    serviceWorker: normalizePath(BASE_APP, routesConfig.serviceWorker || '/sw.js'),
+    pages,
+  };
+
   window.BASE_APP = BASE_APP;
-  window.API_BASE = API_BASE;
-   window.APP_ROUTES = {
-    pages: {
-      home: BASE_APP + '/pages/home/',
-      login: BASE_APP + '/pages/login/',
-      perfil: BASE_APP + '/pages/perfil/',
-      cursoDashboard: BASE_APP + '/pages/curso-dashboard/',
-      planificacion: BASE_APP + '/pages/planificacion/',
-      estudiantes: BASE_APP + '/pages/estudiantes/',
-      grupos: BASE_APP + '/pages/grupos/',
-      entregas: BASE_APP + '/pages/entregas/',
-      parciales: BASE_APP + '/pages/parciales/',
-      asistencia: BASE_APP + '/pages/asistencia/',
-      reportes: BASE_APP + '/pages/reportes/',
-      cursosAdmin: BASE_APP + '/pages/cursos-admin/',
-      usuariosAdmin: BASE_APP + '/pages/usuarios-admin/',
-      alumnosGlobal: BASE_APP + '/pages/alumnos-global/',
-    },
+  window.API_BASE = APP_ROUTES.apiBase;
+  window.APP_ROUTES = APP_ROUTES;
+  window.getPageRoute = function (key) {
+    return APP_ROUTES.pages?.[key] || normalizePath(BASE_APP, `/pages/${key}/`);
   };
 
   const api = {
@@ -39,7 +64,7 @@
         headers['Content-Type'] = 'application/json';
         opts.body = JSON.stringify(body);
       }
-      const res = await fetch(API_BASE + url, opts);
+      const res = await fetch(window.API_BASE + url, opts);
       if (res.status === 204) return null;
       const text = await res.text();
       let data = text ? JSON.parse(text) : null;

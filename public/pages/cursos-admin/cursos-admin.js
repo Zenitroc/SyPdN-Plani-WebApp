@@ -160,7 +160,7 @@ async function loadAssigned(){
 }
 
 (async function init(){
-  if (!api.getToken()) { location.href = BASE_APP + '/pages/home/'; return; }
+  if (!api.getToken()) { location.href = window.getPageRoute ? window.getPageRoute('home') : (BASE_APP + '/pages/home/'); return; }
   const me = await api.get('/me');
   if (!Array.isArray(me.roles) || !me.roles.includes('GURU')) {
     qs('accessMsg').style.display = 'block';

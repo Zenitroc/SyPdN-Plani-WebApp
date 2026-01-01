@@ -45,7 +45,7 @@ async function apiPost(path, body) {
 function payload(res){ return (res && typeof res==='object' && 'data' in res) ? res.data : res; }
 
 (async function(){
-  if (!api.getToken()) { location.href = BASE_APP + '/pages/home/'; return; }
+  if (!api.getToken()) { location.href = window.getPageRoute ? window.getPageRoute('home') : (BASE_APP + '/pages/home/'); return; }
   COURSE_ID = parseInt(await courseContext.require(), 10);
 
   partialFilter.onchange = load;

@@ -6,7 +6,7 @@
     async require() {
       const id = this.get();
       if (!id) {
-        location.href = BASE_APP + '/pages/home/';
+        location.href = window.getPageRoute ? window.getPageRoute('home') : (BASE_APP + '/pages/home/');
         throw new Error('No hay curso seleccionado');
       }
       return id;

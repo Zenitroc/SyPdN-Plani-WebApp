@@ -38,14 +38,14 @@ function escapeHtml(s) {
 
 (async function init(){
   if (!api.getToken()) {
-    location.href = BASE_APP + '/pages/login/';
+    location.href = window.getPageRoute ? window.getPageRoute('login') : (BASE_APP + '/pages/login/');
     return;
   }
 
   const me = payload(await apiTryGet('/me'));
   if (!Array.isArray(me.roles) || !me.roles.includes('GURU')) {
     alert('Solo el rol GURÚ puede administrar usuarios.');
-    location.href = BASE_APP + '/pages/home/';
+    location.href = window.getPageRoute ? window.getPageRoute('home') : (BASE_APP + '/pages/home/');
     return;
   }
 

@@ -51,7 +51,7 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
 
   // Redirigir a login si no hay token
   if (!api.getToken()) {
-    location.href = '/pages/login/';
+    location.href = window.getPageRoute ? window.getPageRoute('login') : '/pages/login/';
     return;
   }
 
@@ -65,12 +65,13 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
     isGuru = Array.isArray(me?.roles) && me.roles.includes('GURU');
     if (me?.must_change_password) {
       alert('Por seguridad, necesitás cambiar tu contraseña antes de continuar.');
-      location.href = BASE_APP + '/pages/perfil/?force=1';
+      const profileRoute = window.getPageRoute ? window.getPageRoute('perfil') : (BASE_APP + '/pages/perfil/');
+      location.href = `${profileRoute}?force=1`;
       return;
     }
   } catch {
     api.clearToken();
-    location.href = '/pages/login/';
+    location.href = window.getPageRoute ? window.getPageRoute('login') : '/pages/login/';
     return;
   }
 
@@ -171,13 +172,13 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
       </div>`;
     if (isGuru) {
       document.getElementById('goAllStudents').onclick = () => {
-        location.href = BASE_APP + '/pages/alumnos-global/';
+        location.href = window.getPageRoute ? window.getPageRoute('alumnosGlobal') : (BASE_APP + '/pages/alumnos-global/');
       };
       document.getElementById('goCourseAdmin').onclick = () => {
-        location.href = BASE_APP + '/pages/cursos-admin/';
+        location.href = window.getPageRoute ? window.getPageRoute('cursosAdmin') : (BASE_APP + '/pages/cursos-admin/');
       };
       document.getElementById('goUserAdmin').onclick = () => {
-        location.href = BASE_APP + '/pages/usuarios-admin/';
+        location.href = window.getPageRoute ? window.getPageRoute('usuariosAdmin') : (BASE_APP + '/pages/usuarios-admin/');
       };
     }
 
@@ -210,8 +211,8 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
           <div class="muted">${subtitle || '&nbsp;'}</div>
         </div>
         <div class="row" style="gap:.5rem">
-          <button class="btn" onclick="location.href='${BASE_APP}/pages/entregas/'">Ir a Entregas</button>
-          <button class="btn btn-tonal" onclick="location.href='${BASE_APP}/pages/estudiantes/'">Ver Estudiantes</button>
+          <button class="btn" onclick="location.href='${window.getPageRoute ? window.getPageRoute('entregas') : (BASE_APP + '/pages/entregas/')}'>Ir a Entregas</button>
+          <button class="btn btn-tonal" onclick="location.href='${window.getPageRoute ? window.getPageRoute('estudiantes') : (BASE_APP + '/pages/estudiantes/')}'>Ver Estudiantes</button>
         </div>
       </div>
     `;

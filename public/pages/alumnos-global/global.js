@@ -8,9 +8,9 @@ let FILTER = '';
   api.get('/me').then(me => {
     if (!me.roles.includes('GURU')) {
       alert('Solo disponible para Gurú');
-      location.href = BASE_APP + '/pages/home/';
+      location.href = window.getPageRoute ? window.getPageRoute('home') : (BASE_APP + '/pages/home/');
     }
-  }).catch(()=>location.href = BASE_APP + '/pages/home/');
+  }).catch(() => location.href = window.getPageRoute ? window.getPageRoute('home') : (BASE_APP + '/pages/home/'));
 })();
 
 function rowHTML(r){

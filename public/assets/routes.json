@@ -1,0 +1,21 @@
+{
+  "apiBase": "/api",
+  "assetsBase": "/assets",
+  "serviceWorker": "/sw.js",
+  "pages": {
+    "home": "/pages/home/",
+    "login": "/pages/login/",
+    "perfil": "/pages/perfil/",
+    "cursoDashboard": "/pages/curso-dashboard/",
+    "planificacion": "/pages/planificacion/",
+    "estudiantes": "/pages/estudiantes/",
+    "grupos": "/pages/grupos/",
+    "entregas": "/pages/entregas/",
+    "parciales": "/pages/parciales/",
+    "asistencia": "/pages/asistencia/",
+    "reportes": "/pages/reportes/",
+    "cursosAdmin": "/pages/cursos-admin/",
+    "usuariosAdmin": "/pages/usuarios-admin/",
+    "alumnosGlobal": "/pages/alumnos-global/"
+  }
+}
