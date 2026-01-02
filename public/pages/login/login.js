@@ -55,15 +55,19 @@ async function apiTryPost(path, body, opts){
       });
     }
 
-   const openRequestModal = () => {
+    const openRequestModal = () => {
       if (!requestModal) return;
+      requestModal.style.display = 'flex';
       requestModal.classList.add('active');
       requestModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
     };
     const closeModal = () => {
       if (!requestModal) return;
       requestModal.classList.remove('active');
       requestModal.setAttribute('aria-hidden', 'true');
+      requestModal.style.display = 'none';
+      document.body.style.overflow = '';
     };
 
     if (requestAccount) {
