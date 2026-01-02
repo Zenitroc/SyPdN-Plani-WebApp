@@ -47,13 +47,35 @@
               <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%">Ingresar</button>
-            <p class="account-link">¿No tenés cuenta? <a id="requestAccount" href="https://forms.gle/" target="_blank" rel="noopener">Solicitar cuenta</a></p>
+            <p class="account-link">¿No tenés cuenta? <a id="requestAccount" href="#">Solicitar cuenta</a></p>
           </form>
           <div id="loginMsg" style="color:#c00;margin-top:.5rem"></div>
         </section>
       </div>
     </div>
   </main>
+
+  <div id="requestModal" class="dialog-back" role="dialog" aria-modal="true" aria-labelledby="requestTitle">
+    <div class="dialog-card fx-pop">
+      <h3 id="requestTitle">Solicitud de cuenta</h3>
+      <p>Para solicitar tu cuenta, enviá un correo a <strong>fcortinez@avantek.com.ar</strong>. Te dejamos una plantilla con los datos necesarios para agilizar el alta.</p>
+      <div class="dialog-template">
+        <div><strong>Asunto:</strong> Solicitud de cuenta SyPdN</div>
+        <div><strong>Nombre:</strong> [Nombre]</div>
+        <div><strong>Apellido:</strong> [Apellido]</div>
+        <div><strong>DNI:</strong> [DNI]</div>
+        <div><strong>Email institucional:</strong> [Email]</div>
+        <div><strong>Rol solicitado:</strong> [Docente/Ayudante/Gurú]</div>
+        <div><strong>Curso y comisión:</strong> [Materia - Comisión]</div>
+        <div><strong>Observaciones:</strong> [Opcional]</div>
+      </div>
+      <p class="muted">Nuestro equipo responderá a la brevedad con los pasos a seguir.</p>
+      <div class="dialog-actions">
+        <a class="btn btn-tonal" href="mailto:fcortinez@avantek.com.ar?subject=Solicitud%20de%20cuenta%20SyPdN">Abrir correo</a>
+        <button type="button" id="closeRequestModal" class="btn btn-neutral">Cerrar</button>
+      </div>
+    </div>
+  </div>
 
   <script src="/assets/js/api.js"></script>
   <script src="/assets/js/theme.js"></script>
@@ -62,4 +84,3 @@
 </body>
 
 </html>
-

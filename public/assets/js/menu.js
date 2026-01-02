@@ -6,7 +6,8 @@
   }
   function item(href, label) {
     const here = location.pathname.replace(/\/index\.html?$/,'/').toLowerCase();
-    const active = here.startsWith(href.toLowerCase());
+    const normalizedHref = href.replace(/\/index\.html?$/i, '/').toLowerCase();
+    const active = here.startsWith(normalizedHref);
     return `<a href="${href}" class="${active ? 'active' : ''}">${label}</a>`;
   }
   window.renderMenu = async function (containerId = 'appMenu') {

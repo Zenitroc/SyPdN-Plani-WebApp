@@ -29,6 +29,8 @@ async function apiTryPost(path, body, opts){
     const remember = document.getElementById('remember');
     const forgotBtn = document.getElementById('forgotBtn');
     const requestAccount = document.getElementById('requestAccount');
+    const requestModal = document.getElementById('requestModal');
+    const closeRequestModal = document.getElementById('closeRequestModal');
 
     // Mostrar contraseña mientras se mantiene presionado
     if (password && toggle) {
@@ -53,10 +55,32 @@ async function apiTryPost(path, body, opts){
       });
     }
 
-    if (requestAccount && requestAccount.href === 'https://forms.gle/') {
+     const openRequestModal = () => {
+      if (!requestModal) return;
+      requestModal.classList.add('active');
+      requestModal.setAttribute('aria-hidden', 'false');
+    };
+    const closeModal = () => {
+      if (!requestModal) return;
+      requestModal.classList.remove('active');
+      requestModal.setAttribute('aria-hidden', 'true');
+    };
+
+    if (requestAccount) {
       requestAccount.addEventListener('click', (e) => {
         e.preventDefault();
-        alert('Formulario de solicitud no disponible todavía');
+        openRequestModal();
+      });
+    }
+    if (closeRequestModal) {
+      closeRequestModal.addEventListener('click', closeModal);
+    }
+    if (requestModal) {
+      requestModal.addEventListener('click', (e) => {
+        if (e.target === requestModal) closeModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
       });
     }
 

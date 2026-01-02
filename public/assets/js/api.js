@@ -75,4 +75,41 @@
     post(url, body, opt) { return this.request('POST', url, body, opt); },
   };
   window.api = api;
+
+  
+  function createLoader() {
+    if (window.pageLoader) return window.pageLoader;
+    if (!document.body) return null;
+    const overlay = document.createElement('div');
+    overlay.className = 'loading-overlay is-visible';
+    overlay.innerHTML = `
+      <div class="loading-card" role="status" aria-live="polite">
+        <span class="loading-chick" aria-hidden="true">🐥</span>
+        <div class="loading-text" data-loader-text>Preparando la vista...</div>
+        <div class="loading-dots" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    const show = (message) => {
+      if (message) {
+        const text = overlay.querySelector('[data-loader-text]');
+        if (text) text.textContent = message;
+      }
+      overlay.classList.add('is-visible');
+    };
+    const hide = () => overlay.classList.remove('is-visible');
+
+    window.pageLoader = { show, hide, element: overlay };
+    window.addEventListener('beforeunload', () => show('Redirigiendo...'));
+    window.addEventListener('load', hide, { once: true });
+    return window.pageLoader;
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', createLoader);
+  } else {
+    createLoader();
+  }
 })();

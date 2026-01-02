@@ -3,19 +3,19 @@
   "assetsBase": "/assets",
   "serviceWorker": "/sw.js",
   "pages": {
-    "home": "/pages/home/",
-    "login": "/pages/login/",
-    "perfil": "/pages/perfil/",
-    "cursoDashboard": "/pages/curso-dashboard/",
-    "planificacion": "/pages/planificacion/",
-    "estudiantes": "/pages/estudiantes/",
-    "grupos": "/pages/grupos/",
-    "entregas": "/pages/entregas/",
-    "parciales": "/pages/parciales/",
-    "asistencia": "/pages/asistencia/",
-    "reportes": "/pages/reportes/",
-    "cursosAdmin": "/pages/cursos-admin/",
-    "usuariosAdmin": "/pages/usuarios-admin/",
-    "alumnosGlobal": "/pages/alumnos-global/"
+    "home": "/pages/home/index.html",
+    "login": "/pages/login/index.html",
+    "perfil": "/pages/perfil/index.html",
+    "cursoDashboard": "/pages/curso-dashboard/index.html",
+    "planificacion": "/pages/planificacion/index.html",
+    "estudiantes": "/pages/estudiantes/index.html",
+    "grupos": "/pages/grupos/index.html",
+    "entregas": "/pages/entregas/index.html",
+    "parciales": "/pages/parciales/index.html",
+    "asistencia": "/pages/asistencia/index.html",
+    "reportes": "/pages/reportes/index.html",
+    "cursosAdmin": "/pages/cursos-admin/index.html",
+    "usuariosAdmin": "/pages/usuarios-admin/index.html",
+    "alumnosGlobal": "/pages/alumnos-global/index.html"
   }
 }

@@ -239,6 +239,66 @@ small, .muted{color:var(--muted)}
   transition:transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
   will-change:transform;
 }
+
+/* ===== Loader global ===== */
+.loading-overlay{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:color-mix(in oklab, var(--bg) 82%, transparent);
+  backdrop-filter:blur(6px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s ease;
+  z-index:9999;
+}
+.loading-overlay.is-visible{
+  opacity:1;
+  pointer-events:all;
+}
+.loading-card{
+  background:var(--surface);
+  border:1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  border-radius:24px;
+  padding:1.6rem 2rem;
+  box-shadow:var(--shadow);
+  text-align:center;
+  min-width:240px;
+}
+.loading-chick{
+  font-size:3rem;
+  display:block;
+  filter:drop-shadow(0 10px 18px rgba(0,0,0,.15));
+  animation:chick-bounce 1.05s ease-in-out infinite;
+}
+.loading-text{
+  margin:.6rem 0 .3rem 0;
+  font-weight:600;
+}
+.loading-dots{
+  display:inline-flex;
+  gap:.3rem;
+}
+.loading-dots span{
+  width:.45rem;
+  height:.45rem;
+  border-radius:50%;
+  background:color-mix(in oklab, var(--primary) 70%, var(--text));
+  animation:dot-pulse 1s ease-in-out infinite;
+}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+
+@keyframes chick-bounce{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+}
+@keyframes dot-pulse{
+  0%,100%{transform:scale(.6);opacity:.6}
+  50%{transform:scale(1);opacity:1}
+}
 .menu a:hover, .menu button:hover{ transform:scale(1.05) rotate(.6deg) }
 .menu a:active, .menu button:active{ transform:scale(.99) rotate(0) }
 
