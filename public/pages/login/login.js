@@ -55,7 +55,7 @@ async function apiTryPost(path, body, opts){
       });
     }
 
-     const openRequestModal = () => {
+   const openRequestModal = () => {
       if (!requestModal) return;
       requestModal.classList.add('active');
       requestModal.setAttribute('aria-hidden', 'false');

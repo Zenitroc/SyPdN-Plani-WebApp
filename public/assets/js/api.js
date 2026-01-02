@@ -76,7 +76,6 @@
   };
   window.api = api;
 
-  
   function createLoader() {
     if (window.pageLoader) return window.pageLoader;
     if (!document.body) return null;
@@ -104,6 +103,7 @@
     window.pageLoader = { show, hide, element: overlay };
     window.addEventListener('beforeunload', () => show('Redirigiendo...'));
     window.addEventListener('load', hide, { once: true });
+    if (document.readyState === 'complete') hide();
     return window.pageLoader;
   }
 
