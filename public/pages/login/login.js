@@ -1,6 +1,5 @@
-if (typeof renderMenu === 'function') {
-  renderMenu();
-}
+renderMenu();
+
 
 // Helpers API con fallback /api
 function isNotFound(val){
