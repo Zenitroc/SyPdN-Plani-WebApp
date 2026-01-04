@@ -45,6 +45,7 @@ function register_group_routes(): void {
     $courseId = (int)($in['course_id'] ?? 0);
     if ($courseId <= 0) json_error('course_id requerido', 422);
     ensure_course_access($courseId);
+    require_role(current_user(), ['GURU','SENIOR']);
 
     $count = isset($in['count']) ? max(1,(int)$in['count']) : 1;
     $name  = isset($in['name']) ? trim((string)$in['name']) : null;
@@ -77,6 +78,17 @@ function register_group_routes(): void {
     $conf   = array_key_exists('conformity_submitted',$in) ? ( (int)$in['conformity_submitted']?1:0 ) : '__NOCHANGE__';
     $confUrl= array_key_exists('conformity_url',$in) ? ( $in['conformity_url']!==null ? trim((string)$in['conformity_url']) : null ) : '__NOCHANGE__';
 
+    $me = current_user();
+    if (user_has_role($me, 'GURU') || user_has_role($me, 'SENIOR')) {
+      // full access
+    } elseif (user_has_role($me, 'AYUDANTE')) {
+      if ($name !== '__NOCHANGE__' || $confUrl !== '__NOCHANGE__') {
+        json_error('Forbidden (role)', 403);
+      }
+    } else {
+      json_error('Forbidden (role)', 403);
+    }
+
     $pdo = db();
     $gid = group_id_by_number($pdo, $courseId, $number);
     if (!$gid) json_error('Grupo no existe', 404);
@@ -100,6 +112,7 @@ function register_group_routes(): void {
     $ids = $in['enrollment_ids'] ?? [];
     if ($courseId<=0 || !is_array($ids) || count($ids)===0) json_error('course_id y enrollment_ids requeridos', 422);
     ensure_course_access($courseId);
+    require_role(current_user(), ['GURU','SENIOR']);
 
     $pdo = db();
     $gid = null;
@@ -129,6 +142,7 @@ function register_group_routes(): void {
     $number   = (int)($in['group_number'] ?? 0);
     if ($courseId<=0 || $number<=0) json_error('course_id y group_number requeridos', 422);
     ensure_course_access($courseId);
+    require_role(current_user(), ['GURU','SENIOR']);
 
     $pdo = db();
     $gid = group_id_by_number($pdo, $courseId, $number);

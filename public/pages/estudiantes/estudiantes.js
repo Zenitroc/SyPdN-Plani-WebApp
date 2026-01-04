@@ -7,6 +7,9 @@ function modalHide(id){ qs(id).style.display='none'; }
 let DATA = [];
 let STATUS_FILTER = 'ALL';
 let IS_GURU = false;
+let IS_SENIOR = false;
+let IS_AYUDANTE = false;
+let CAN_EDIT = false;
 
 function filteredRows(){
   if (STATUS_FILTER === 'ALTA') return DATA.filter(x=>x.status==='ALTA');
@@ -86,8 +89,23 @@ function renderEditTable(rows){
 (async function () {
   if (!api.getToken()) { location.href = window.getPageRoute ? window.getPageRoute('home') : (BASE_APP + '/pages/home/'); return; }
   const me = await api.get('/me');
-  IS_GURU = me.roles.includes('GURU');
-  if (IS_GURU) qs('btnDelete').style.display = 'inline-flex';
+  const roles = Array.isArray(me.roles) ? me.roles : [];
+  IS_GURU = roles.includes('GURU');
+  IS_SENIOR = roles.includes('SENIOR');
+  IS_AYUDANTE = roles.includes('AYUDANTE');
+  CAN_EDIT = IS_GURU || IS_SENIOR;
+
+  if (IS_GURU) {
+    qs('btnDelete').style.display = 'inline-flex';
+  } else {
+    qs('btnDelete').style.display = 'none';
+  }
+  if (!CAN_EDIT) {
+    ['btnNew','btnEdit','btnBulk','btnReid'].forEach(id => {
+      const btn = qs(id);
+      if (btn) btn.style.display = 'none';
+    });
+  }
 
   const courseId = await courseContext.require();
 
@@ -124,12 +142,14 @@ function renderEditTable(rows){
 
   // Nuevo
   qs('btnNew').onclick = () => {
+    if (!CAN_EDIT) { alert('Sin permisos para crear estudiantes.'); return; }
     ['n_last','n_first','n_email','n_legajo','n_group','n_obs'].forEach(id=>qs(id).value='');
     qs('n_msg').textContent='';
     modalShow('modalNew');
   };
   Array.from(document.querySelectorAll('#modalNew [data-close]')).forEach(b => b.onclick = ()=>modalHide('modalNew'));
   qs('n_save').onclick = async () => {
+    if (!CAN_EDIT) { qs('n_msg').textContent='Sin permisos para crear.'; return; }
     qs('n_msg').textContent='';
     try {
       const payload = {
@@ -149,9 +169,13 @@ function renderEditTable(rows){
   };
 
   // CSV
-  qs('btnBulk').onclick = () => { qs('b_file').value=''; qs('b_dry').checked=true; qs('b_msg').textContent=''; modalShow('modalBulk'); };
+qs('btnBulk').onclick = () => {
+    if (!CAN_EDIT) { alert('Sin permisos para carga masiva.'); return; }
+    qs('b_file').value=''; qs('b_dry').checked=true; qs('b_msg').textContent=''; modalShow('modalBulk');
+  };
   Array.from(document.querySelectorAll('#modalBulk [data-close]')).forEach(b => b.onclick = ()=>modalHide('modalBulk'));
   qs('b_upload').onclick = async () => {
+    if (!CAN_EDIT) { qs('b_msg').textContent='Sin permisos para carga masiva.'; return; }
     const f = qs('b_file').files[0];
     const dry = qs('b_dry').checked ? 1 : 0;
     if (!f) { qs('b_msg').textContent = 'Seleccioná un CSV.'; return; }
@@ -169,15 +193,20 @@ function renderEditTable(rows){
 
   // Reasignar IDs
   qs('btnReid').onclick = async () => {
+    if (!CAN_EDIT) { alert('Sin permisos para reasignar IDs.'); return; }
     if (!confirm('Reasignar IDs por Apellido,Nombre (solo ALTA). ¿Continuar?')) return;
     try { await api.post('/estudiantes/reasignar-ids', { course_id: Number(courseId), scope:'ALTA' }); await load(); alert('Reasignado.'); }
     catch (e) { alert(e.message || 'Error al reasignar'); }
   };
 
   // Editar (masivo)
-  qs('btnEdit').onclick = () => { renderEditTable(DATA); qs('e_msg').textContent=''; modalShow('modalEdit'); };
+  qs('btnEdit').onclick = () => {
+    if (!CAN_EDIT) { alert('Sin permisos para editar.'); return; }
+    renderEditTable(DATA); qs('e_msg').textContent=''; modalShow('modalEdit');
+  };
   Array.from(document.querySelectorAll('#modalEdit [data-close]')).forEach(b => b.onclick = ()=>modalHide('modalEdit'));
   qs('e_save').onclick = async () => {
+    if (!CAN_EDIT) { qs('e_msg').textContent='Sin permisos para editar.'; return; }
     qs('e_msg').textContent = 'Guardando cambios...';
     const rows = Array.from(document.querySelectorAll('#editTable tr[data-enr]')).map(tr => {
       const id = Number(tr.dataset.enr);

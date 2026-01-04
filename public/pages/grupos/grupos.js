@@ -7,9 +7,24 @@ function modalHide(id) { qs(id).style.display = 'none'; }
 
 let COURSE_ID = null;
 let GROUPS = [];
+let CAN_EDIT = false;
+let CAN_EDIT_CONFORMITY = false;
 
 (async function () {
     if (!api.getToken()) { location.href = window.getPageRoute ? window.getPageRoute('home') : (BASE_APP + '/pages/home/'); return; }
+    const me = await api.get('/me');
+    const roles = Array.isArray(me.roles) ? me.roles : [];
+    const isGuru = roles.includes('GURU');
+    const isSenior = roles.includes('SENIOR');
+    const isAyudante = roles.includes('AYUDANTE');
+    CAN_EDIT = isGuru || isSenior;
+    CAN_EDIT_CONFORMITY = CAN_EDIT || isAyudante;
+    if (!CAN_EDIT) {
+        const moveField = qs('gm_move_to')?.closest('.field');
+        if (moveField) moveField.style.display = 'none';
+        if (qs('gm_move')) qs('gm_move').style.display = 'none';
+        if (qs('gm_remove')) qs('gm_remove').style.display = 'none';
+    }
     COURSE_ID = await courseContext.require();
 
     // Helpers de UI
@@ -61,8 +76,8 @@ let GROUPS = [];
       </div>
       <div style="display:flex;gap:.4rem;margin-top:.6rem;flex-wrap:wrap">
         <button class="btn btn-soft" data-view="${g.number}">Ver miembros</button>
-        <button class="btn btn-neutral" data-edit="${g.number}">Editar</button>
-        <button class="btn btn-danger" data-del="${g.number}">Eliminar</button>
+        ${CAN_EDIT_CONFORMITY ? `<button class="btn btn-neutral" data-edit="${g.number}">Editar</button>` : ''}
+        ${CAN_EDIT ? `<button class="btn btn-danger" data-del="${g.number}">Eliminar</button>` : ''}
       </div>
       ${memberChips}
     </div>`;
@@ -85,10 +100,14 @@ let GROUPS = [];
         const free = list.filter(x => !x.group_no);
         const c = qs('noGroup');
         if (!free.length) { c.innerHTML = '<div class="small">Todos los alumnos tienen grupo.</div>'; return; }
+         const pickCell = (r) => CAN_EDIT
+            ? `<input type="checkbox" class="pick-free" data-enrid="${r.id}">`
+            : '';
         c.innerHTML = `
       <table class="tbl">
         <tr><th></th><th>ID</th><th>Apellido</th><th>Nombre</th><th>Legajo</th></tr>
         ${free.map(r => `<tr>
+             <td>${pickCell(r)}</td>
             <td><input type="checkbox" class="pick-free" data-enrid="${r.id}"></td>
             <td>${r.course_id_seq}</td><td>${r.apellido}</td><td>${r.nombre}</td><td>${r.legajo ?? ''}</td>
           </tr>`).join('')}
@@ -96,10 +115,18 @@ let GROUPS = [];
         qs('ga_list').innerHTML = `${free.length} alumno(s) sin grupo.`;
     }
 
-    // ==== Crear grupo ====
-    qs('g_new').onclick = () => { qs('gn_name').value = ''; qs('gn_msg').textContent = ''; modalShow('modalGNew'); };
+      // ==== Crear grupo ====
+    if (!CAN_EDIT) {
+        qs('g_new').style.display = 'none';
+        qs('g_assign_open').style.display = 'none';
+    }
+    qs('g_new').onclick = () => {
+        if (!CAN_EDIT) { alert('Sin permisos para crear grupos.'); return; }
+        qs('gn_name').value = ''; qs('gn_msg').textContent = ''; modalShow('modalGNew');
+    };
     Array.from(document.querySelectorAll('#modalGNew [data-close]')).forEach(b => b.onclick = () => modalHide('modalGNew'));
     qs('gn_save').onclick = async () => {
+        if (!CAN_EDIT) { qs('gn_msg').textContent = 'Sin permisos para crear.'; return; }
         try {
             const name = qs('gn_name').value.trim() || null;
             await api.post('/grupos/crear', { course_id: Number(COURSE_ID), name });
@@ -109,9 +136,13 @@ let GROUPS = [];
     };
 
     // ==== Asignar alumnos (desde sin grupo) ====
-    qs('g_assign_open').onclick = () => { qs('ga_msg').textContent = ''; modalShow('modalGAssign'); };
+    qs('g_assign_open').onclick = () => {
+        if (!CAN_EDIT) { alert('Sin permisos para asignar miembros.'); return; }
+        qs('ga_msg').textContent = ''; modalShow('modalGAssign');
+    };
     Array.from(document.querySelectorAll('#modalGAssign [data-close]')).forEach(b => b.onclick = () => modalHide('modalGAssign'));
     qs('ga_apply').onclick = async () => {
+        if (!CAN_EDIT) { qs('ga_msg').textContent = 'Sin permisos para asignar.'; return; }
         const groupNumber = Number(qs('ga_target').value);
         const ids = Array.from(document.querySelectorAll('.pick-free:checked')).map(x => Number(x.dataset.enrid));
         if (!groupNumber || ids.length === 0) { qs('ga_msg').textContent = 'Elegí un grupo y marcá alumnos.'; return; }
@@ -133,7 +164,7 @@ let GROUPS = [];
             ? `<table class="tbl">
           <tr><th></th><th>ID</th><th>Apellido</th><th>Nombre</th><th>Legajo</th></tr>
           ${rows.map(r => `<tr>
-              <td><input type="checkbox" class="pick-mem" data-enrid="${r.enrollment_id}"></td>
+              <td>${CAN_EDIT ? `<input type="checkbox" class="pick-mem" data-enrid="${r.enrollment_id}">` : ''}</td>
               <td>${r.id_en_curso}</td><td>${r.apellido}</td><td>${r.nombre}</td><td>${r.legajo ?? ''}</td>
             </tr>`).join('')}
         </table>`
@@ -143,6 +174,7 @@ let GROUPS = [];
     }
     Array.from(document.querySelectorAll('#modalMembers [data-close]')).forEach(b => b.onclick = () => modalHide('modalMembers'));
     qs('gm_move').onclick = async () => {
+        if (!CAN_EDIT) { qs('gm_msg').textContent = 'Sin permisos para mover.'; return; }
         const from = Number(qs('modalMembers').dataset.groupNumber);
         const to = Number(qs('gm_move_to').value);
         const ids = Array.from(document.querySelectorAll('.pick-mem:checked')).map(x => Number(x.dataset.enrid));
@@ -154,6 +186,7 @@ let GROUPS = [];
         } catch (e) { qs('gm_msg').textContent = e.message || 'Error al mover'; }
     };
     qs('gm_remove').onclick = async () => {
+        if (!CAN_EDIT) { qs('gm_msg').textContent = 'Sin permisos para quitar.'; return; }
         const from = Number(qs('modalMembers').dataset.groupNumber);
         const ids = Array.from(document.querySelectorAll('.pick-mem:checked')).map(x => Number(x.dataset.enrid));
         if (ids.length === 0) { qs('gm_msg').textContent = 'Marcá alumnos.'; return; }
@@ -172,23 +205,40 @@ let GROUPS = [];
         qs('ge_conf').checked = !!g?.conformity_submitted;
         qs('ge_msg').textContent = '';
         qs('modalGEdit').dataset.groupNumber = String(number);
+        if (!CAN_EDIT) {
+            qs('ge_name').disabled = true;
+            qs('ge_delete').style.display = 'none';
+        } else {
+            qs('ge_name').disabled = false;
+            qs('ge_delete').style.display = 'inline-flex';
+        }
+        if (!CAN_EDIT_CONFORMITY) {
+            qs('ge_conf').disabled = true;
+        } else {
+            qs('ge_conf').disabled = false;
+        }
         modalShow('modalGEdit');
     }
     Array.from(document.querySelectorAll('#modalGEdit [data-close]')).forEach(b => b.onclick = () => modalHide('modalGEdit'));
     qs('ge_save').onclick = async () => {
+        if (!CAN_EDIT_CONFORMITY) { qs('ge_msg').textContent = 'Sin permisos para guardar.'; return; }
         const number = Number(qs('modalGEdit').dataset.groupNumber);
         try {
-            await api.post('/grupos/editar', {
+            const payload = {
                 course_id: Number(COURSE_ID),
                 group_number: number,
-                name: qs('ge_name').value.trim() || null,
                 conformity_submitted: qs('ge_conf').checked ? 1 : 0
-            });
+            };
+            if (CAN_EDIT) {
+                payload.name = qs('ge_name').value.trim() || null;
+            }
+            await api.post('/grupos/editar', payload);
             await loadGroups();
             modalHide('modalGEdit');
         } catch (e) { qs('ge_msg').textContent = e.message || 'Error al guardar'; }
     };
     async function deleteGroup(number) {
+        if (!CAN_EDIT) { alert('Sin permisos para eliminar.'); return; }
         if (!confirm(`Eliminar grupo #${number}? Sus miembros quedarán sin grupo.`)) return;
         try { await api.post('/grupos/eliminar', { course_id: Number(COURSE_ID), group_number: number }); await loadGroups(); await loadNoGroup(); }
         catch (e) { alert(e.message || 'Error al eliminar'); }

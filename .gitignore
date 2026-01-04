@@ -1,0 +1,4 @@
+# --- Env / Dotenv (config local, NO subir) ---
+.env
+.env.*
+!.env.example
