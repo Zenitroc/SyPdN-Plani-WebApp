@@ -1,68 +1,307 @@
-/* Login centering and animation overrides */
-.center-screen{min-height:calc(100vh - 68px);display:flex;align-items:center;justify-content:center;padding:2rem}
-.fx-pop{animation:pop-in .8s cubic-bezier(.2,.7,.3,1) both;transform-origin:center}
-@keyframes pop-in{0%{opacity:0;transform:scale(.9)}100%{opacity:1;transform:scale(1)}}
-.login-card h2{margin:0 0 .5rem 0;text-align:center;font-size:1.4rem}
-.login-card h3{margin:.25rem 0 1rem 0;text-align:center}
-.login-card .input{margin-top:.25rem}
-.login-actions{display:flex;gap:.6rem;justify-content:flex-end;margin-top:1rem}
+/* =========================
+   Login — Refinado (simple, pro, dinámico)
+   Depende de tokens de base.css
+   ========================= */
 
-/* Login hero panel */
-.login-hero{display:flex;align-items:center;justify-content:center;padding:2rem;min-height:calc(100vh - 68px)}
-.login-hero-panel{width:100%;max-width:1100px;display:flex;border-radius:40px;overflow:hidden;position:relative;box-shadow:var(--shadow);background:linear-gradient(135deg,#f7c16f,#f79b108c)}
-.login-hero-panel::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 25% 30%,rgba(255,255,255,.2)0,transparent 55%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.15)0,transparent 50%)}
-.login-info{flex:1;padding:3rem 2.5rem;color:#fff;display:flex;flex-direction:column;justify-content:center}
-.login-info h1{margin:0 0 .5rem 0;font-size:2rem}
-.login-info h2{margin:0 0 1rem 0;font-weight:400;font-size:1.25rem}
-.login-info p{margin:0;font-size:1rem;max-width:28ch}
-.login-form-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:3rem 2.5rem}
-.login-card{width:100%;max-width:360px;padding:2rem}
+/* Entrada suave (sin glass pesado) */
+.fx-in{ animation: login-in .34s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes login-in{
+  from{ opacity:0; transform: translateY(10px) scale(.99); }
+  to  { opacity:1; transform: translateY(0) scale(1); }
+}
 
-/* Inputs con ícono y botón mostrar */
-.field{position:relative;margin-top:1rem}
-.field:first-of-type{margin-top:0}
-.field-icon{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
-.field input{padding-left:2.5rem;padding-right:3rem}
-.show-btn{position:absolute;right:.5rem;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--primary);cursor:pointer;font-size:.85rem;padding:.25rem}
-.show-btn:active{opacity:.7}
+.login-hero{
+  position:relative;
+  overflow:hidden;
+}
 
-/* Extras del login */
-.login-extra{display:flex;justify-content:space-between;align-items:center;margin:.75rem 0 1rem;font-size:.9rem}
-.login-extra label{display:flex;align-items:center;gap:.35rem}
-.link-btn{background:none;border:none;padding:0;color:var(--primary);text-decoration:underline;cursor:pointer;font:inherit}
-.link-btn:active{opacity:.7}
-.captcha{margin:.75rem 0}
-.account-link{margin-top:1rem;text-align:center;font-size:.9rem}
+/* Fondo con “auroras” MUY sutiles usando tokens (se adapta a light/dark) */
+.login-hero::before,
+.login-hero::after{
+  content:"";
+  position:absolute;
+  width: 720px;
+  height: 720px;
+  border-radius: 999px;
+  filter: blur(70px);
+  opacity: .22;
+  pointer-events:none;
+  z-index:0;
+}
+.login-hero::before{
+  left:-260px;
+  top:-320px;
+  background: color-mix(in oklab, var(--primary) 55%, transparent);
+}
+.login-hero::after{
+  right:-320px;
+  bottom:-360px;
+  background: color-mix(in oklab, var(--accent) 55%, transparent);
+}
+:root[data-theme="dark"] .login-hero::before,
+:root[data-theme="dark"] .login-hero::after{
+  opacity:.14;
+}
+
+/* Panel: ahora usa surface/border de tu tema, sin gradiente naranja fijo */
+.login-hero-panel{
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:1100px;
+  display:flex;
+  border-radius: 32px;
+  overflow:hidden;
+
+  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  box-shadow: var(--shadow);
+}
+
+/* línea superior “brand” súper discreta */
+.login-hero-panel::before{
+  content:"";
+  position:absolute;
+  left:0; right:0; top:0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    color-mix(in oklab, var(--primary) 85%, white),
+    color-mix(in oklab, var(--accent) 75%, white)
+  );
+  opacity:.95;
+}
+
+/* Reflejos internos muy suaves */
+.login-hero-panel::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(700px 420px at 12% 22%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 60%),
+    radial-gradient(740px 520px at 88% 78%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 58%);
+  opacity:.9;
+}
+
+/* Lado info: ahora elegante, sin “cartel” */
+.login-info{
+  flex:1;
+  padding: 3rem 2.75rem;
+  color: var(--text);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.login-info h1{
+  margin: .2rem 0 .5rem 0;
+  font-size: 2.05rem;
+  letter-spacing:-0.02em;
+}
+
+.login-info h2{
+  margin: 0 0 1rem 0;
+  font-weight: 500;
+  font-size: 1.15rem;
+  color: color-mix(in oklab, var(--text) 75%, var(--muted));
+}
+
+.login-info p{
+  margin:0;
+  font-size: 1rem;
+  color: var(--muted);
+  max-width: 44ch;
+}
+
+/* Meta (badge + v1). Si no lo agregás al HTML, no pasa nada */
+.login-meta{
+  display:flex;
+  align-items:center;
+  gap:.55rem;
+  margin-bottom:.75rem;
+}
+.login-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:.28rem .65rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--primary) 22%, var(--border));
+  background: color-mix(in oklab, var(--primary) 10%, var(--surface));
+  color: color-mix(in oklab, var(--primary) 80%, var(--text));
+  font-weight:800;
+  font-size:.85rem;
+}
+.login-chip{
+  display:inline-flex;
+  align-items:center;
+  padding:.22rem .55rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  background: color-mix(in oklab, var(--surface) 70%, var(--bg));
+  color: var(--muted);
+  font-weight:700;
+  font-size:.8rem;
+}
+
+/* Lado form */
+.login-form-wrap{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 3rem 2.75rem;
+  /* separador sutil */
+  border-left: 1px solid color-mix(in oklab, var(--border) 75%, transparent);
+}
+:root[data-theme="dark"] .login-form-wrap{
+  border-left: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+}
+
+.login-card{
+  width:100%;
+  max-width: 380px;
+  padding: 1.9rem;
+  border-radius: calc(var(--radius) + 6px);
+  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  box-shadow: 0 18px 50px color-mix(in oklab, #000 18%, transparent);
+}
+
+/* Title */
+.login-card h3{
+  margin: .2rem 0 1.1rem 0;
+  text-align:left;
+  letter-spacing:-0.01em;
+}
+
+/* Fields con icono */
+.field{
+  position:relative;
+  margin-top: 1rem;
+}
+.field:first-of-type{ margin-top:0; }
+
+.field-icon{
+  position:absolute;
+  left:.85rem;
+  top:50%;
+  transform: translateY(-50%);
+  width:18px;
+  height:18px;
+  color: var(--muted);
+  opacity:.9;
+}
+.field input.input{
+  padding-left: 2.6rem;
+  padding-right: 3.2rem;
+}
+
+/* Botón "Ver" más pro y discreto */
+.show-btn{
+  position:absolute;
+  right:.55rem;
+  top:50%;
+  transform: translateY(-50%);
+  border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  background: color-mix(in oklab, var(--surface) 75%, var(--bg));
+  color: color-mix(in oklab, var(--primary) 75%, var(--text));
+  border-radius: 999px;
+  padding: .28rem .65rem;
+  cursor:pointer;
+  font-size:.82rem;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.show-btn:hover{
+  transform: translateY(-50%) scale(1.03);
+  box-shadow: 0 8px 18px rgba(0,0,0,.08);
+}
+.show-btn:active{ transform: translateY(-50%) scale(.99); }
+
+/* extras */
+.login-extra{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:.8rem;
+  margin: .9rem 0 1.05rem;
+  font-size:.92rem;
+  color: var(--muted);
+}
+.login-extra label{ display:flex; align-items:center; gap:.4rem; }
+
+/* Link estilo pro */
+.link-btn{
+  background:none;
+  border:none;
+  padding:0;
+  color: var(--primary);
+  cursor:pointer;
+  font:inherit;
+}
+.link-btn:hover{ text-decoration: underline; }
+.link-btn:active{ opacity:.75; }
+
+/* BOTÓN INGRESAR: ahora sí se percibe */
+.login-card .btn.btn-primary{
+  width:100%;
+  justify-content:center;
+  padding: .95rem 1.1rem;
+  border-radius: calc(var(--radius) - 4px);
+  font-weight: 800;
+  letter-spacing: .01em;
+  box-shadow:
+    0 14px 30px color-mix(in oklab, var(--primary) 28%, transparent);
+}
+.login-card .btn.btn-primary:hover{
+  transform: translateY(-2px) scale(1.01);
+  box-shadow:
+    0 18px 42px color-mix(in oklab, var(--primary) 36%, transparent),
+    0 0 0 2px color-mix(in oklab, var(--primary) 22%, transparent) inset;
+}
+.login-card .btn.btn-primary:active{
+  transform: translateY(0) scale(1);
+}
+
+/* Mensaje de error */
+#loginMsg{
+  color: rgb(212, 142, 142);
+  margin-top: .7rem;
+  min-height: 1.15rem;
+}
+
+/* ===== Modal: reaprovecha tu base, solo lo hace más elegante ===== */
 .dialog-back{
   position:fixed;
   inset:0;
-  background:rgba(15,23,42,.45);
+  background: color-mix(in oklab, var(--bg) 55%, rgba(0,0,0,.45));
   display:none;
   align-items:center;
   justify-content:center;
   padding:1rem;
   z-index:10000;
+  backdrop-filter: blur(6px);
 }
-.dialog-back.active{display:flex}
+.dialog-back.active{ display:flex; }
+
 .dialog-card{
-  width:min(640px, 96vw);
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:24px;
-  box-shadow:var(--shadow);
-  padding:1.5rem;
+  width:min(660px, 96vw);
+  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 1.45rem;
 }
-.dialog-card h3{margin-top:0}
-.dialog-card ul{padding-left:1.1rem;margin:.5rem 0 0 0}
+
 .dialog-template{
-  background:color-mix(in oklab, var(--surface) 85%, var(--bg));
-  border:1px dashed color-mix(in oklab, var(--primary) 40%, var(--border));
-  border-radius:16px;
-  padding:.85rem 1rem;
-  font-family:"Sansation", Inter, system-ui, sans-serif;
-  font-size:.9rem;
-  margin:.75rem 0;
+  background: color-mix(in oklab, var(--surface) 80%, var(--bg));
+  border: 1px dashed color-mix(in oklab, var(--primary) 35%, var(--border));
+  border-radius: 16px;
+  padding: .9rem 1rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: .9rem;
+  margin: .75rem 0;
 }
+
 .dialog-actions{
   display:flex;
   justify-content:flex-end;
@@ -70,13 +309,21 @@
   margin-top:1rem;
 }
 
+/* Responsive */
 @media(max-width:760px){
-  .login-hero-panel{flex-direction:column}
-  .login-info{text-align:center}
-  .login-info p{margin-left:auto;margin-right:auto}
-  .login-form-wrap{padding-top:0}
+  .login-hero-panel{ flex-direction:column; }
+  .login-form-wrap{
+    border-left:none;
+    border-top: 1px solid color-mix(in oklab, var(--border) 75%, transparent);
+    padding-top: 0;
+  }
+  .login-info{ text-align:center; }
+  .login-info p{ margin-left:auto; margin-right:auto; }
+  .login-meta{ justify-content:center; }
 }
 
+/* Reduce motion */
 @media (prefers-reduced-motion: reduce){
-  .fx-pop{animation:none;transition:none}
+  .fx-in{ animation:none; }
+  .show-btn, .btn, .input{ transition:none; }
 }

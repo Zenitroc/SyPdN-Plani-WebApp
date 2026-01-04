@@ -1,64 +1,97 @@
 <!doctype html>
 <html lang="es">
-
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Login — SyPdN</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="/assets/css/base.css">
   <link rel="stylesheet" href="./login.css">
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
 <body>
+  <!-- Menú: se renderiza por /assets/js/menu.js (NO tocamos nada acá) -->
   <nav id="appMenu"></nav>
 
-  <main class="login-hero">
-    <div class="login-hero-panel">
+  <main class="login-hero center-screen">
+    <div class="login-hero-panel fx-in">
+      <!-- Lado info / branding -->
       <div class="login-info">
+        <div class="login-meta">
+          <span class="login-badge">UTN.BA</span>
+          <span class="login-chip">v1.0</span>
+        </div>
+
         <h1>Sistemas y Procesos de Negocios</h1>
         <h2>"La plani" ahora es plataforma!</h2>
         <p>Accedé con tu cuenta para continuar.</p>
       </div>
+
+      <!-- Lado form -->
       <div class="login-form-wrap">
-        <section class="card login-card">
+        <section class="card login-card" aria-label="Formulario de ingreso">
           <h3>INGRESAR</h3>
+
           <form id="loginForm">
-            <div class="field">
-              <span class="field-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <div class="field field-inline">
+              <span class="field-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
               </span>
-              <input id="username" class="input" required placeholder="Usuario">
+              <input id="username" class="input" required placeholder="Usuario" autocomplete="username">
             </div>
-            <div class="field">
-              <span class="field-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+
+            <div class="field field-inline">
+              <span class="field-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
               </span>
-              <input id="password" class="input" type="password" required placeholder="Contraseña">
+              <input id="password" class="input" type="password" required placeholder="Contraseña" autocomplete="current-password">
               <button type="button" id="showPass" class="show-btn" aria-label="Mostrar contraseña">Ver</button>
             </div>
+
             <div class="login-extra">
-              <label><input type="checkbox" id="remember"> Recordame</label>
+              <label>
+                <input type="checkbox" id="remember">
+                Recordame
+              </label>
+
               <button type="button" id="forgotBtn" class="link-btn">Olvidé mi contraseña</button>
             </div>
-            <div class="captcha">
-              <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
-            </div>
+
             <button type="submit" class="btn btn-primary" style="width:100%">Ingresar</button>
-            <p class="account-link">¿No tenés cuenta? <button id="requestAccount" type="button" class="link-btn">Solicitar cuenta</button></p>
+
+            <p class="account-link">
+              ¿No tenés cuenta?
+              <button id="requestAccount" type="button" class="link-btn">Solicitar cuenta</button>
+            </p>
           </form>
-          <div id="loginMsg" style="color:rgb(212, 142, 142);margin-top:.5rem"></div>
+
+          <div id="loginMsg" style="color:rgb(212, 142, 142);margin-top:.5rem" aria-live="polite"></div>
         </section>
       </div>
     </div>
   </main>
 
-  <div id="requestModal" class="dialog-back" role="dialog" aria-modal="true" aria-labelledby="requestTitle">
+  <!-- Modal: Solicitud de cuenta -->
+  <div id="requestModal" class="dialog-back" role="dialog" aria-modal="true" aria-labelledby="requestTitle" aria-hidden="true">
     <div class="dialog-card fx-pop">
       <h3 id="requestTitle">Solicitud de cuenta</h3>
-      <p>Para solicitar tu cuenta, enviá un correo a <strong>fcortinez@avantek.com.ar</strong>. Te dejamos una plantilla con los datos necesarios para agilizar el alta.</p>
+      <p class="muted">
+        Para solicitar tu cuenta, enviá un correo a <strong>fcortinez@avantek.com.ar</strong>.
+        Te dejamos una plantilla con los datos necesarios para agilizar el alta.
+      </p>
+
       <div class="dialog-template">
         <div><strong>Asunto:</strong> Solicitud de cuenta SyPdN</div>
         <div><strong>Nombre:</strong> [Nombre]</div>
@@ -68,10 +101,35 @@
         <div><strong>Curso y comisión:</strong> [Día - Comisión]</div>
         <div><strong>Observaciones:</strong> [Opcional]</div>
       </div>
+
       <p class="muted">Nuestro equipo responderá a la brevedad con los pasos a seguir.</p>
+
       <div class="dialog-actions">
         <a class="btn btn-tonal" href="mailto:fcortinez@avantek.com.ar?subject=Solicitud%20de%20cuenta%20SyPdN">Abrir correo</a>
         <button type="button" id="closeRequestModal" class="btn btn-neutral">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Olvidé mi contraseña -->
+  <div id="forgotModal" class="dialog-back" role="dialog" aria-modal="true" aria-labelledby="forgotTitle" aria-hidden="true">
+    <div class="dialog-card fx-pop">
+      <h3 id="forgotTitle">Recuperación de acceso</h3>
+      <p class="muted">
+        Para recuperar tu acceso, escribinos a <strong>fcortinez@avantek.com.ar</strong> con estos datos:
+      </p>
+
+      <div class="dialog-template">
+        <div><strong>Asunto:</strong> Recuperar acceso SyPdN</div>
+        <div><strong>Usuario:</strong> [Tu usuario]</div>
+        <div><strong>Nombre y apellido:</strong> [Nombre Apellido]</div>
+        <div><strong>DNI:</strong> [DNI]</div>
+        <div><strong>Curso y comisión:</strong> [Día - Comisión]</div>
+      </div>
+
+      <div class="dialog-actions">
+        <a class="btn btn-tonal" href="mailto:fcortinez@avantek.com.ar?subject=Recuperar%20acceso%20SyPdN">Abrir correo</a>
+        <button type="button" id="closeForgotModal" class="btn btn-neutral">Cerrar</button>
       </div>
     </div>
   </div>
@@ -81,5 +139,4 @@
   <script src="/assets/js/menu.js"></script>
   <script src="/pages/login/login.js"></script>
 </body>
-
 </html>
