@@ -129,6 +129,7 @@ function register_parciales_routes() {
   // Body: { course_id, enrollment_id, partial:1|2, topic, attempt:'PA'|'1R'|'2R', grade_code|null }
   route('POST', '/api/parciales/guardar', function() use ($ensure_schema) {
     auth_require();
+    require_role(current_user(), ['GURU','SENIOR']);
     $in = read_json();
     $courseId = (int) ($in['course_id'] ?? 0);
     $enrollId = (int) ($in['enrollment_id'] ?? 0);

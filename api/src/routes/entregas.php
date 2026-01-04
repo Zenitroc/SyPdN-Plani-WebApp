@@ -255,7 +255,7 @@ function register_entregas_routes() {
     $ensure_schema($pdo);
 
     auth_require();
-    require_role(current_user(), ['GURU','SENIOR']);
+    require_role(current_user(), ['GURU','SENIOR','AYUDANTE']);
 
     $input = json_decode(file_get_contents('php://input'), true) ?: [];
     $err = $validate($input, [
@@ -297,7 +297,7 @@ function register_entregas_routes() {
     $ensure_schema($pdo);
 
     auth_require();
-    require_role(current_user(), ['GURU','SENIOR']);
+    require_role(current_user(), ['GURU','SENIOR','AYUDANTE']);
 
     $input = json_decode(file_get_contents('php://input'), true) ?: [];
     if (!isset($input['course_id'], $input['assignment_id'])) return json_error('Parámetros requeridos', 400);
@@ -403,7 +403,7 @@ function register_entregas_routes() {
     $ensure_schema($pdo);
 
     auth_require();
-    require_role(current_user(), ['GURU']);
+    require_role(current_user(), ['GURU','SENIOR','AYUDANTE']);
     $input = json_decode(file_get_contents('php://input'), true) ?: [];
     $courseId = (int)($input['course_id'] ?? 0);
     $aid = (int)($input['assignment_id'] ?? 0);

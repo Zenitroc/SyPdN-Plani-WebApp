@@ -12,6 +12,8 @@ renderMenu();
     const apiPost = async (p, b) => { try { const r = await api.post(API_BASES[apiBaseIdx] + p, b); if (r?.error && nf(r)) throw 0; return r; } catch { apiBaseIdx = 1; return api.post(API_BASES[1] + p, b); } };
 
     let COURSE_ID = null, DATA = { students: [], grade_options: [] };
+    let CAN_EDIT = false;
+    let PERMISSIONS_READY = false;
     let STATUS_FILTER = 'ALL', SHOW = 'ALL', ATT = 'ALL', QUERY = '';
 
     // Coloreo
@@ -45,8 +47,27 @@ renderMenu();
         return [ATT];
     }
 
+     async function ensurePermissions() {
+        if (PERMISSIONS_READY) return;
+        const me = await api.get('/me');
+        const roles = Array.isArray(me.roles) ? me.roles : [];
+        CAN_EDIT = roles.includes('GURU') || roles.includes('SENIOR');
+        PERMISSIONS_READY = true;
+    }
+
     async function load() {
-        COURSE_ID = await courseContext.require();
+        await ensurePermissions();
+
+        if (!api.getToken()) {
+            location.href = window.getPageRoute ? window.getPageRoute('home') : (BASE_APP + '/pages/home/');
+            return;
+        }
+
+        COURSE_ID = Number(await courseContext.require());
+        if (!Number.isFinite(COURSE_ID) || COURSE_ID <= 0) {
+            throw new Error('No hay curso seleccionado');
+        }
+
         const keepX = qs('rightWrap').scrollLeft;
         const res = payload(await apiGet(`?course_id=${COURSE_ID}`));
         DATA = res || DATA;
@@ -55,6 +76,7 @@ renderMenu();
         ensureLeftWidths();   // << calcula 1 sola vez
         syncRowHeights();
     }
+
 
     // =================== Render Tablas ===================
     const ATT_LABEL = { PA: 'PARC', '1R': '1R', '2R': '2R' };
@@ -136,6 +158,10 @@ renderMenu();
 
         // Guardar sin “recalcular anchos”
         qs('tbodyRight').querySelectorAll('select.score').forEach(s => {
+            if (!CAN_EDIT) {
+                s.disabled = true;
+                return;
+            }
             s.addEventListener('change', async (ev) => {
                 const t = ev.currentTarget, keepX = qs('rightWrap').scrollLeft;
                 const enrollment_id = parseInt(t.getAttribute('data-enroll'), 10);

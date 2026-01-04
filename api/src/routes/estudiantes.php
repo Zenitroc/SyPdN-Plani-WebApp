@@ -10,6 +10,7 @@ function register_student_routes(): void
     if ($courseId <= 0)
       json_error('course_id requerido', 422);
     ensure_course_access($courseId);
+    //require_role(current_user(), ['GURU','SENIOR']);
 
 
     $pdo = db();
@@ -67,6 +68,7 @@ function register_student_routes(): void
     if ($courseId <= 0)
       json_error('course_id requerido', 422);
     ensure_course_access($courseId);
+    require_role(current_user(), ['GURU','SENIOR']);
 
     $last = trim((string) ($in['last_name'] ?? ''));
     $first = trim((string) ($in['first_name'] ?? ''));
@@ -132,6 +134,7 @@ function register_student_routes(): void
     if ($courseId <= 0 || $enrollId <= 0)
       json_error('course_id y enrollment_id requeridos', 422);
     ensure_course_access($courseId);
+    require_role(current_user(), ['GURU','SENIOR']);
 
     $pdo = db();
     $row = db_one($pdo, "SELECT e.id, e.person_id, e.status FROM enrollments e WHERE e.id=? AND e.course_id=?", [$enrollId, $courseId]);
@@ -231,6 +234,7 @@ function register_student_routes(): void
     if ($courseId <= 0)
       json_error('course_id requerido', 422);
     ensure_course_access($courseId);
+    require_role(current_user(), ['GURU','SENIOR']);
     $scope = strtoupper((string) ($in['scope'] ?? 'ALTA')); // 'ALTA' | 'ALL'
 
     $pdo = db();
@@ -305,6 +309,7 @@ function register_student_routes(): void
     if ($courseId <= 0)
       json_error('course_id requerido', 422);
     ensure_course_access($courseId);
+    require_role(current_user(), ['GURU','SENIOR']);
     $dry = (int) ($_GET['dry_run'] ?? 0) === 1;
 
     $rows = [];
