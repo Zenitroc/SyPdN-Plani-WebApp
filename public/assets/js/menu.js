@@ -43,7 +43,7 @@
         ${item(page('entregas'), 'Trabajos Prácticos')}
         ${item(page('parciales'), 'Parciales')}
         ${item(page('asistencia'), 'Asistencia')}
-        ${item(page('reportes'), 'Noveadades y Reportes')}
+        ${item(page('reportes'), 'Novedades/Reportes')}
         
         <div class="spacer"></div>
         <button class="btn btn-ghost round" onclick="theme.toggle()">🌓 Modo</button>
