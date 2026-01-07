@@ -35,8 +35,8 @@
     .news-body img{width:100%;border-radius:12px;max-height:180px;object-fit:cover;border:1px solid var(--border);margin-top:.5rem}
     .news-item.is-open .news-body{display:grid}
     .news-item.is-open .news-toggle{color:var(--text)}
-    .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:999}
-    .modal{width:min(520px,96vw);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem}
+    .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-start;justify-content:center;z-index:999;padding:1rem;overflow:auto}
+    .modal{width:min(520px,96vw);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem;max-height:calc(100vh - 2rem);overflow:auto}
     .modal h3{margin:.2rem 0 1rem 0}
     .modal .actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem}
     .section-header{display:flex;justify-content:space-between;align-items:center;gap:1rem}
