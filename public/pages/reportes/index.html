@@ -9,19 +9,76 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/base.css">
   <style>
+    .reportes-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);gap:1.5rem;align-items:start}
+    .reportes-main{display:grid;gap:1.5rem}
+    .reportes-sidebar{position:sticky;top:1rem;display:grid;gap:1rem}
+    .resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:1rem}
+    .resource-item{display:flex;gap:.75rem;align-items:flex-start;padding:.9rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);transition:transform .15s ease,box-shadow .15s ease}
+    .resource-item:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+    .resource-link{color:inherit;text-decoration:none;display:flex;gap:.75rem;align-items:flex-start;width:100%;flex:1}
+    .resource-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:var(--surface-2);font-size:1.2rem;flex:0 0 36px;overflow:hidden}
+    .resource-icon img{width:100%;height:100%;object-fit:cover}
+    .resource-title{font-weight:600;margin-bottom:.15rem}
+    .resource-desc{font-size:.9rem;color:var(--muted)}
+    .resource-meta{display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+    .item-actions{display:flex;gap:.35rem}
+    .item-actions button{border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:999px;width:28px;height:28px;display:grid;place-items:center;cursor:pointer}
+    .item-actions button:hover{background:var(--surface)}
+    .news-list{display:grid;gap:.75rem;margin-top:1rem}
+    .news-item{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+    .news-header{width:100%;border:0;background:transparent;padding:.75rem .9rem;display:flex;justify-content:space-between;align-items:center;gap:.75rem;text-align:left;cursor:pointer}
+    .news-title{font-weight:600;color:var(--text)}
+    .news-preview{font-size:.85rem;color:var(--muted)}
+    .news-toggle{font-weight:700;color:var(--muted)}
+    .news-body{display:none;padding:0 .9rem .9rem .9rem;gap:.75rem;color:var(--text)}
+    .news-body p{margin:.5rem 0 0 0}
+    .news-body img{width:100%;border-radius:12px;max-height:180px;object-fit:cover;border:1px solid var(--border);margin-top:.5rem}
+    .news-item.is-open .news-body{display:grid}
+    .news-item.is-open .news-toggle{color:var(--text)}
     .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:999}
     .modal{width:min(520px,96vw);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem}
     .modal h3{margin:.2rem 0 1rem 0}
     .modal .actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem}
+    .section-header{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+    .is-hidden{display:none !important}
+    .icon-button{width:36px;height:36px;border-radius:999px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);display:grid;place-items:center;font-weight:700;cursor:pointer}
+    .icon-button:hover{background:var(--surface)}
+    .modal .field + .field{margin-top:.75rem}
+    @media (max-width: 960px){
+      .reportes-layout{grid-template-columns:1fr}
+      .reportes-sidebar{position:static}
+    }
   </style>
 </head>
 <body>
   <nav id="appMenu"></nav>
   <main class="container">
-    <div class="card">
-      <h1>Centro de reportes y novedades</h1>
-      <p>Acá se publicarán actualizaciones, comentarios y links importantes de la cátedra.</p>
-      <button id="btnReport" class="btn btn-primary">Enviar reporte</button>
+    <div class="reportes-layout">
+      <section class="reportes-main">
+        <div class="card">
+          <h1>Centro de reportes y novedades</h1>
+          <p>Acá se publicarán actualizaciones, comentarios y links importantes de la cátedra.</p>
+          <button id="btnReport" class="btn btn-primary">Enviar reporte</button>
+        </div>
+        <div class="card">
+          <div class="section-header">
+            <h2>Recursos generales</h2>
+            <button id="btnAddResource" class="icon-button is-hidden" type="button" aria-label="Cargar recurso">+</button>
+          </div>
+          <p>Links y materiales comunes para todos los cursos. Solo lectura para estudiantes y ayudantes.</p>
+          <div id="resourcesGrid" class="resource-grid"></div>
+        </div>
+      </section>
+      <aside class="reportes-sidebar">
+        <div class="card">
+          <div class="section-header">
+            <h2>Novedades generales</h2>
+            <button id="btnAddNews" class="icon-button is-hidden" type="button" aria-label="Cargar novedad">+</button>
+          </div>
+          <p>Noticias del Gurú para toda la comunidad.</p>
+          <div id="newsList" class="news-list"></div>
+        </div>
+      </aside>
     </div>
   </main>
 
@@ -52,6 +109,80 @@
       <div class="actions">
         <button class="btn btn-neutral" id="r_cancel">Cancelar</button>
         <button class="btn btn-primary" id="r_send">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-back" id="resourceModal">
+    <div class="modal">
+      <h3>Nuevo recurso general</h3>
+      <div class="field">
+        <label class="label" for="res_title">Nombre del recurso</label>
+        <input id="res_title" class="input" placeholder="Ej: Guía de cursada" />
+      </div>
+      <div class="field">
+        <label class="label" for="res_desc">Descripción</label>
+        <input id="res_desc" class="input" placeholder="Breve descripción" />
+      </div>
+      <div class="field">
+        <label class="label" for="res_url">URL</label>
+        <input id="res_url" class="input" placeholder="https://..." />
+      </div>
+      <div class="field">
+        <label class="label" for="res_emoji">Emoji (opcional)</label>
+        <input id="res_emoji" class="input" placeholder="📘" />
+      </div>
+      <div class="field">
+        <label class="label" for="res_image">Imagen (URL opcional)</label>
+        <input id="res_image" class="input" placeholder="https://..." />
+      </div>
+      <div class="field">
+        <label class="label" for="res_image_file">Subir imagen (opcional)</label>
+        <input id="res_image_file" type="file" accept="image/*" class="input" />
+        <small class="muted">Máximo 200 KB. Si subís imagen, se usará en lugar de la URL.</small>
+      </div>
+      <div class="actions">
+        <button class="btn btn-neutral" id="res_cancel">Cancelar</button>
+        <button class="btn btn-primary" id="res_save">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-back" id="newsModal">
+    <div class="modal">
+      <h3>Nueva novedad general</h3>
+      <div class="field">
+        <label class="label" for="news_title">Título</label>
+        <input id="news_title" class="input" placeholder="Ej: Entrega de TP1" />
+      </div>
+      <div class="field">
+        <label class="label" for="news_preview">Resumen</label>
+        <input id="news_preview" class="input" placeholder="Breve resumen" />
+      </div>
+      <div class="field">
+        <label class="label" for="news_body">Detalle</label>
+        <textarea id="news_body" class="input" rows="4" placeholder="Texto completo..."></textarea>
+      </div>
+      <div class="field">
+        <label class="label" for="news_link">Link (opcional)</label>
+        <input id="news_link" class="input" placeholder="https://..." />
+      </div>
+      <div class="field">
+        <label class="label" for="news_link_label">Texto del link (opcional)</label>
+        <input id="news_link_label" class="input" placeholder="Ver detalle" />
+      </div>
+      <div class="field">
+        <label class="label" for="news_image">Imagen (URL opcional)</label>
+        <input id="news_image" class="input" placeholder="https://..." />
+      </div>
+      <div class="field">
+        <label class="label" for="news_image_file">Subir imagen (opcional)</label>
+        <input id="news_image_file" type="file" accept="image/*" class="input" />
+        <small class="muted">Máximo 200 KB. Si subís imagen, se usará en lugar de la URL.</small>
+      </div>
+      <div class="actions">
+        <button class="btn btn-neutral" id="news_cancel">Cancelar</button>
+        <button class="btn btn-primary" id="news_save">Guardar</button>
       </div>
     </div>
   </div>

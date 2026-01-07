@@ -1,0 +1,32 @@
+{
+  "resources": [
+    {
+      "title": "Guía de cursada",
+      "description": "Programa y calendario general.",
+      "url": "https://example.com/guia",
+      "icon_emoji": "📘"
+    },
+    {
+      "title": "Biblioteca digital",
+      "description": "Materiales compartidos por el Gurú.",
+      "url": "https://example.com/biblioteca",
+      "icon_image": "https://placehold.co/64x64/png"
+    }
+  ],
+  "news": [
+    {
+      "title": "Bienvenida al cuatrimestre",
+      "preview": "Recuerden revisar los recursos generales.",
+      "body": "Durante esta semana vamos a compartir novedades y links útiles para todos los cursos.",
+      "link": "https://example.com/novedades",
+      "link_label": "Ver detalle",
+      "image": "https://placehold.co/640x320/png"
+    },
+    {
+      "title": "Entrega de TP1",
+      "preview": "Fecha límite: viernes 20/09.",
+      "body": "Revisen la guía y la rúbrica antes de enviar.",
+      "link": ""
+    }
+  ]
+}
