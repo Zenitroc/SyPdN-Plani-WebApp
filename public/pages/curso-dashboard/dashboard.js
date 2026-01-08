@@ -22,15 +22,30 @@
     courseId: null,
     permissions: { can_edit: false, can_delete: false, can_publish: false, can_draft: false },
     filters: { term: '', topic: '' },
+    analytics: {},
     schedules: [],
     keyDates: [],
     announcements: [],
   };
 
+  const moduleConfig = [
+    { id: 'performance', label: 'Rendimiento del curso', description: 'Gráficos de aprobación y notas.' },
+    { id: 'history', label: 'Analítica histórica', description: 'Evolución por cuatrimestre.' },
+    { id: 'operations', label: 'Seguimiento operativo', description: 'Alumnos en riesgo y TPs.' },
+    { id: 'support', label: 'Consultas y soporte', description: 'Inbox con asignaciones.' },
+    { id: 'quick-access', label: 'Accesos rápidos', description: 'Links a acciones clave.' },
+    { id: 'calendar', label: 'Fechas clave', description: 'Horarios y agenda.' },
+    { id: 'team', label: 'Equipo del curso', description: 'Roles y contactos.' },
+    { id: 'announcements', label: 'Anuncios', description: 'Avisos y alertas.' },
+  ];
+
+  const MODULE_STORAGE_KEY = 'curso-dashboard-modules';
+
   const els = {
     filterTerm: document.getElementById('filterTerm'),
     filterTopic: document.getElementById('filterTopic'),
     summaryGrid: document.getElementById('summaryGrid'),
+    moduleToggles: document.getElementById('moduleToggles'),
     scheduleList: document.getElementById('scheduleList'),
     keyDateList: document.getElementById('keyDateList'),
     teamList: document.getElementById('teamList'),
@@ -39,6 +54,17 @@
     addScheduleBtn: document.getElementById('addScheduleBtn'),
     addKeyDateBtn: document.getElementById('addKeyDateBtn'),
     addAnnouncementBtn: document.getElementById('addAnnouncementBtn'),
+    clearTopicFilter: document.getElementById('clearTopicFilter'),
+    approvalBreakdown: document.getElementById('approvalBreakdown'),
+    approvalLegend: document.getElementById('approvalLegend'),
+    topicApprovalList: document.getElementById('topicApprovalList'),
+    gradeHistogram: document.getElementById('gradeHistogram'),
+    historyTrends: document.getElementById('historyTrends'),
+    historyTableBody: document.getElementById('historyTableBody'),
+    riskList: document.getElementById('riskList'),
+    tpTracking: document.getElementById('tpTracking'),
+    supportInbox: document.getElementById('supportInbox'),
+    quickAccessList: document.getElementById('quickAccessList'),
     scheduleModal: document.getElementById('scheduleModal'),
     keyDateModal: document.getElementById('keyDateModal'),
     announcementModal: document.getElementById('announcementModal'),
@@ -63,6 +89,7 @@
     save: document.getElementById('scheduleSave'),
     cancel: document.getElementById('scheduleCancel'),
   };
+
 
   const keyDateForm = {
     id: null,
@@ -119,6 +146,100 @@
     return value.replace(' ', 'T').slice(0, 16);
   }
 
+  function getDefaultAnalytics() {
+    return {
+      approval_breakdown: { approved: 68, failed: 22, absent: 10 },
+      approval_by_topic: [
+        { topic: 'Intro', approval_rate: 78, total: 42 },
+        { topic: 'Modelado', approval_rate: 64, total: 35 },
+        { topic: 'Optimización', approval_rate: 72, total: 28 },
+        { topic: 'Simulación', approval_rate: 58, total: 24 },
+      ],
+      grade_distribution: [
+        { range: '0-2', count: 4 },
+        { range: '2-4', count: 9 },
+        { range: '4-6', count: 18 },
+        { range: '6-8', count: 22 },
+        { range: '8-10', count: 15 },
+      ],
+      historical_terms: [
+        { term: '2023 · 1C', approval_rate: 62, average_grade: 6.1, enrolled: 118, took_exam: 96, absent: 22 },
+        { term: '2023 · 2C', approval_rate: 67, average_grade: 6.4, enrolled: 121, took_exam: 102, absent: 19 },
+        { term: '2024 · 1C', approval_rate: 70, average_grade: 6.8, enrolled: 125, took_exam: 110, absent: 15 },
+        { term: '2024 · 2C', approval_rate: 74, average_grade: 7.1, enrolled: 132, took_exam: 119, absent: 13 },
+      ],
+      risk_students: [
+        { name: 'Camila Ruiz', reasons: ['Faltas reiteradas', '2 entregas pendientes'], status: 'Seguimiento' },
+        { name: 'Lucas Vidal', reasons: ['Nota parcial baja'], status: 'Reforzar' },
+        { name: 'Marta Pérez', reasons: ['Sin rendir parcial', 'Faltas'], status: 'Contactar' },
+      ],
+      tp_tracking: {
+        pending: [
+          { title: 'TP2 · Algoritmos', owner: 'S. Morales', due: 'Mañana' },
+          { title: 'TP3 · Simulación', owner: 'P. Díaz', due: 'Vie 18' },
+        ],
+        assigned: [
+          { title: 'TP1 · Modelado', owner: 'N. López', due: 'En revisión' },
+        ],
+        reviewing: [
+          { title: 'TP4 · Optimización', owner: 'Equipo senior', due: 'Corrección' },
+        ],
+      },
+      support_inbox: [
+        { subject: 'Consulta sobre parcial 2', status: 'Nueva', assignee: 'Sin asignar', requester: 'A. Gomez', updated_at: '2024-08-12 10:45' },
+        { subject: 'Revisión nota TP1', status: 'En proceso', assignee: 'L. Salvatierra', requester: 'M. Pereyra', updated_at: '2024-08-11 15:20' },
+        { subject: 'Certificado de cursada', status: 'Resuelta', assignee: 'G. Font', requester: 'F. Ortiz', updated_at: '2024-08-10 09:05' },
+      ],
+      quick_access: [
+        { label: 'Plan de clases y temario', href: '#plan', roles: 'Gurú/Senior' },
+        { label: 'Materiales del curso', href: '#materiales', roles: 'Gurú/Senior/Ayudante' },
+        { label: 'Carga de resultados', href: '#resultados', roles: 'Gurú/Senior' },
+        { label: 'Exportar CSV', href: '#exportar', roles: 'Gurú/Senior' },
+        { label: 'Gestión de comisión', href: '#comision', roles: 'Gurú' },
+      ],
+    };
+  }
+
+  function loadModulePreferences() {
+    try {
+      const raw = window.localStorage.getItem(MODULE_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (err) {
+      console.warn('No se pudieron cargar las preferencias de módulos.', err);
+      return {};
+    }
+  }
+
+  function saveModulePreferences(prefs) {
+    window.localStorage.setItem(MODULE_STORAGE_KEY, JSON.stringify(prefs));
+  }
+
+  function applyModuleVisibility(prefs) {
+    moduleConfig.forEach(module => {
+      const section = document.querySelector(`[data-module="${module.id}"]`);
+      if (!section) return;
+      const visible = prefs[module.id] !== false;
+      section.classList.toggle('is-hidden', !visible);
+    });
+  }
+
+  function renderModuleToggles() {
+    const prefs = loadModulePreferences();
+    els.moduleToggles.innerHTML = moduleConfig.map(module => {
+      const checked = prefs[module.id] !== false;
+      return `
+        <label class="module-toggle">
+          <input type="checkbox" data-module-toggle="${module.id}" ${checked ? 'checked' : ''} />
+          <div>
+            <h4>${module.label}</h4>
+            <p>${module.description}</p>
+          </div>
+        </label>
+      `;
+    }).join('');
+    applyModuleVisibility(prefs);
+  }
+
   async function loadDashboard() {
     const query = new URLSearchParams({
       course_id: state.courseId,
@@ -131,8 +252,10 @@
       state.schedules = data.schedules || [];
       state.keyDates = data.key_dates || [];
       state.announcements = data.announcements || [];
+      state.analytics = data.analytics || getDefaultAnalytics();
       renderFilters(data.filters || {});
       renderSummary(data.summary || {});
+      renderAnalytics();
       renderSchedules();
       renderKeyDates();
       renderTeam(data.team || []);
@@ -140,6 +263,8 @@
       toggleActions();
     } catch (err) {
       renderSummary({});
+      state.analytics = getDefaultAnalytics();
+      renderAnalytics();
       renderSchedules(true);
       renderKeyDates(true);
       renderTeam([]);
@@ -221,6 +346,144 @@
       </div>
     `).join('');
   }
+
+  function renderAnalytics() {
+    const analytics = state.analytics || getDefaultAnalytics();
+    const approval = analytics.approval_breakdown || { approved: 0, failed: 0, absent: 0 };
+    const approvalTotal = (approval.approved || 0) + (approval.failed || 0) + (approval.absent || 0);
+    const calcPercent = value => approvalTotal ? Math.round((value / approvalTotal) * 100) : 0;
+    const approvedPct = calcPercent(approval.approved || 0);
+    const failedPct = calcPercent(approval.failed || 0);
+    const absentPct = calcPercent(approval.absent || 0);
+
+    els.approvalBreakdown.innerHTML = `
+      <span class="approved" style="width:${approvedPct}%"></span>
+      <span class="failed" style="width:${failedPct}%"></span>
+      <span class="absent" style="width:${absentPct}%"></span>
+    `;
+    els.approvalLegend.innerHTML = `
+      <span><i style="background:color-mix(in oklab, #16a34a 75%, var(--surface))"></i>Aprobados ${approvedPct}%</span>
+      <span><i style="background:color-mix(in oklab, #f97316 75%, var(--surface))"></i>Desaprobados ${failedPct}%</span>
+      <span><i style="background:color-mix(in oklab, #e11d48 75%, var(--surface))"></i>Ausentes ${absentPct}%</span>
+    `;
+
+    const topics = analytics.approval_by_topic || [];
+    if (topics.length === 0) {
+      els.topicApprovalList.innerHTML = '<div class="muted-block">No hay datos por tema todavía.</div>';
+    } else {
+      els.topicApprovalList.innerHTML = topics.map(topic => `
+        <button class="topic-bar" data-topic="${topic.topic}">
+          <div class="topic-label">${topic.topic}</div>
+          <div class="bar"><span style="width:${topic.approval_rate}%"></span></div>
+          <div class="topic-meta">${topic.approval_rate}% · ${topic.total} rindieron</div>
+        </button>
+      `).join('');
+    }
+
+    const grades = analytics.grade_distribution || [];
+    if (grades.length === 0) {
+      els.gradeHistogram.innerHTML = '<div class="muted-block">Sin distribución disponible.</div>';
+    } else {
+      const maxCount = Math.max(...grades.map(item => item.count || 0), 1);
+      els.gradeHistogram.innerHTML = grades.map(item => `
+        <div class="histogram-row">
+          <div>${item.range}</div>
+          <div class="bar"><span style="width:${Math.round(((item.count || 0) / maxCount) * 100)}%"></span></div>
+          <div class="topic-meta">${item.count}</div>
+        </div>
+      `).join('');
+    }
+
+    const historical = analytics.historical_terms || [];
+    if (historical.length === 0) {
+      els.historyTrends.innerHTML = '<div class="muted-block">Sin histórico disponible.</div>';
+      els.historyTableBody.innerHTML = '<tr><td colspan="4" class="muted-block">No hay datos registrados.</td></tr>';
+    } else {
+      els.historyTrends.innerHTML = historical.map(term => `
+        <div class="trend-card">
+          <strong>${term.term}</strong>
+          <div class="mini-bar"><span style="width:${term.approval_rate}%"></span></div>
+          <div class="trend-metrics">
+            <span>Aprobación ${term.approval_rate}%</span>
+            <span>Promedio ${term.average_grade}</span>
+            <span>Deserción ${Math.max(0, term.enrolled - term.took_exam)} estudiantes</span>
+          </div>
+        </div>
+      `).join('');
+      els.historyTableBody.innerHTML = historical.map(term => `
+        <tr>
+          <td>${term.term}</td>
+          <td>${term.approval_rate}%</td>
+          <td>${term.average_grade}</td>
+          <td>${term.absent}</td>
+        </tr>
+      `).join('');
+    }
+
+    const risk = analytics.risk_students || [];
+    els.riskList.innerHTML = risk.length
+      ? risk.map(student => `
+          <div class="item-row">
+            <div class="item-meta">
+              <div class="item-title">${student.name}</div>
+              <div class="risk-reasons">
+                ${(student.reasons || []).map(reason => `<span class="badge">${reason}</span>`).join('')}
+              </div>
+            </div>
+            <span class="pill">${student.status}</span>
+          </div>
+        `).join('')
+      : '<div class="muted-block">No hay alumnos en riesgo detectados.</div>';
+
+    const tp = analytics.tp_tracking || {};
+    const renderTpColumn = (title, items) => `
+      <div class="kanban-column">
+        <h4>${title}</h4>
+        ${(items || []).map(item => `
+          <div class="kanban-card">
+            <strong>${item.title}</strong>
+            <span class="topic-meta">Asignado: ${item.owner}</span>
+            <span class="topic-meta">${item.due}</span>
+          </div>
+        `).join('') || '<div class="muted-block">Sin elementos</div>'}
+      </div>
+    `;
+    els.tpTracking.innerHTML = `
+      ${renderTpColumn('Mis pendientes', tp.pending)}
+      ${renderTpColumn('Asignados', tp.assigned)}
+      ${renderTpColumn('En corrección', tp.reviewing)}
+    `;
+
+    const inbox = analytics.support_inbox || [];
+    els.supportInbox.innerHTML = inbox.length
+      ? inbox.map(item => {
+          const statusClass = item.status === 'Nueva'
+            ? 'badge primary'
+            : item.status === 'En proceso'
+              ? 'badge'
+              : 'badge';
+          return `
+            <div class="item-row">
+              <div class="item-meta">
+                <div class="item-title">${item.subject}</div>
+                <div class="muted-block">${item.requester} · Actualizado ${formatDateTime(item.updated_at)}</div>
+                <div class="muted-block">Asignado a: ${item.assignee}</div>
+              </div>
+              <span class="${statusClass}">${item.status}</span>
+            </div>
+          `;
+        }).join('')
+      : '<div class="muted-block">No hay consultas en la bandeja.</div>';
+
+    const quick = analytics.quick_access || [];
+    els.quickAccessList.innerHTML = quick.map(item => `
+      <a href="${item.href}">
+        <span>${item.label}</span>
+        <span class="pill">${item.roles}</span>
+      </a>
+    `).join('');
+  }
+
 
   function renderSchedules(isEmpty = false) {
     if (isEmpty || state.schedules.length === 0) {
@@ -490,6 +753,11 @@
       loadDashboard();
     });
     els.refreshBtn.addEventListener('click', loadDashboard);
+    els.clearTopicFilter.addEventListener('click', () => {
+      state.filters.topic = '';
+      els.filterTopic.value = '';
+      loadDashboard();
+    });
 
     els.addScheduleBtn.addEventListener('click', () => {
       setScheduleForm({});
@@ -519,6 +787,22 @@
     els.scheduleList.addEventListener('click', handleListClick);
     els.keyDateList.addEventListener('click', handleListClick);
     els.announcementList.addEventListener('click', handleListClick);
+    els.moduleToggles.addEventListener('change', event => {
+      const input = event.target.closest('input[data-module-toggle]');
+      if (!input) return;
+      const prefs = loadModulePreferences();
+      prefs[input.dataset.moduleToggle] = input.checked;
+      saveModulePreferences(prefs);
+      applyModuleVisibility(prefs);
+    });
+    els.topicApprovalList.addEventListener('click', event => {
+      const button = event.target.closest('button[data-topic]');
+      if (!button) return;
+      const topic = button.dataset.topic;
+      state.filters.topic = topic;
+      els.filterTopic.value = topic;
+      loadDashboard();
+    });
   }
 
   async function init() {
@@ -527,6 +811,7 @@
       renderMenu();
     }
     initEvents();
+    renderModuleToggles();
     await loadDashboard();
   }
 

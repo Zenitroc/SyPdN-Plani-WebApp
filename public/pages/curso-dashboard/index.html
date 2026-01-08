@@ -52,6 +52,54 @@
     .is-hidden{display:none !important}
     .field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
     .history-list{display:grid;gap:.75rem}
+
+     .module-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.85rem;margin-top:1rem}
+    .module-toggle{display:flex;align-items:flex-start;gap:.65rem;padding:.75rem;border-radius:14px;border:1px solid var(--border);background:var(--surface);cursor:pointer}
+    .module-toggle input{margin-top:.15rem}
+    .module-toggle h4{margin:0;font-size:1rem}
+    .module-toggle p{margin:.15rem 0 0 0;color:var(--muted);font-size:.85rem}
+    .chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
+    .chart-card{border:1px solid var(--border);border-radius:16px;padding:1rem;background:var(--surface-2)}
+    .chart-card h3{margin-top:0}
+    .stacked-bar{display:flex;height:12px;border-radius:999px;overflow:hidden;background:var(--surface);border:1px solid var(--border)}
+    .stacked-bar span{display:block;height:100%}
+    .stacked-bar .approved{background:color-mix(in oklab, #16a34a 75%, var(--surface))}
+    .stacked-bar .failed{background:color-mix(in oklab, #f97316 75%, var(--surface))}
+    .stacked-bar .absent{background:color-mix(in oklab, #e11d48 75%, var(--surface))}
+    .legend{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.75rem;font-size:.85rem}
+    .legend span{display:inline-flex;align-items:center;gap:.35rem}
+    .legend i{width:10px;height:10px;border-radius:50%}
+    .topic-bar{display:grid;grid-template-columns:90px 1fr auto;gap:.6rem;align-items:center;padding:.45rem;border-radius:12px;border:1px solid transparent;background:transparent;text-align:left;width:100%;cursor:pointer}
+    .topic-bar:hover{border-color:var(--border);background:var(--surface)}
+    .topic-bar .bar{height:8px;border-radius:999px;background:var(--surface);border:1px solid var(--border);overflow:hidden}
+    .topic-bar .bar span{display:block;height:100%;background:color-mix(in oklab, var(--primary) 65%, var(--surface))}
+    .topic-meta{font-size:.8rem;color:var(--muted)}
+    .histogram{display:grid;gap:.4rem}
+    .histogram-row{display:grid;grid-template-columns:80px 1fr auto;gap:.5rem;align-items:center}
+    .histogram-row .bar{height:8px;border-radius:999px;background:var(--surface);border:1px solid var(--border);overflow:hidden}
+    .histogram-row .bar span{display:block;height:100%;background:color-mix(in oklab, #0ea5e9 65%, var(--surface))}
+    .trend-list{display:grid;gap:.6rem}
+    .trend-card{display:grid;gap:.25rem;padding:.65rem;border-radius:12px;border:1px solid var(--border);background:var(--surface)}
+    .trend-card .trend-metrics{display:flex;gap:1rem;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+    .mini-bar{height:6px;border-radius:999px;background:var(--surface);border:1px solid var(--border);overflow:hidden}
+    .mini-bar span{display:block;height:100%;background:color-mix(in oklab, #7c3aed 65%, var(--surface))}
+    .table{width:100%;border-collapse:separate;border-spacing:0 .5rem}
+    .table th{font-size:.8rem;color:var(--muted);text-align:left;padding:.35rem .75rem}
+    .table td{background:var(--surface);padding:.65rem .75rem;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .table td:first-child{border-left:1px solid var(--border);border-top-left-radius:12px;border-bottom-left-radius:12px}
+    .table td:last-child{border-right:1px solid var(--border);border-top-right-radius:12px;border-bottom-right-radius:12px}
+    .risk-list{display:grid;gap:.75rem}
+    .risk-reasons{display:flex;flex-wrap:wrap;gap:.35rem}
+    .risk-reasons .badge{font-size:.7rem}
+    .kanban{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+    .kanban-column{border:1px solid var(--border);border-radius:16px;padding:.75rem;background:var(--surface-2)}
+    .kanban-column h4{margin:.2rem 0 .75rem 0}
+    .kanban-card{padding:.55rem;border-radius:12px;border:1px solid var(--border);background:var(--surface);display:grid;gap:.2rem}
+    .quick-access{display:grid;gap:.6rem}
+    .quick-access a{display:flex;justify-content:space-between;align-items:center;padding:.65rem .85rem;border-radius:12px;border:1px solid var(--border);text-decoration:none;color:inherit;background:var(--surface)}
+    .quick-access a:hover{background:var(--surface-2)}
+    .pill{display:inline-flex;align-items:center;gap:.3rem;padding:.15rem .55rem;border-radius:999px;font-size:.7rem;border:1px solid var(--border);background:var(--surface-2);color:var(--muted)}
+
     @media (max-width: 960px){
       .filters-bar{grid-template-columns:1fr}
       .field-grid{grid-template-columns:1fr}
@@ -94,7 +142,113 @@
 
     <section class="summary-grid" id="summaryGrid"></section>
 
+    <section class="card">
+      <div class="section-header">
+        <div>
+          <h2>Módulos visibles</h2>
+          <p class="muted">Elegí qué bloques querés ver en el dashboard. Podés cambiarlo en cualquier momento.</p>
+        </div>
+      </div>
+      <div class="module-grid" id="moduleToggles"></div>
+    </section>
+
     <section class="dashboard-sections">
+      <div class="card list-card" data-module="performance">
+        <div class="section-header">
+          <div>
+            <h2>Rendimiento del curso</h2>
+            <p class="muted">Gráficos de aprobación y desempeño por tema. Principalmente para Gurú/Senior (Ayudante: lectura simplificada).</p>
+          </div>
+          <div class="inline-actions">
+            <button id="clearTopicFilter" class="btn btn-neutral" type="button">Ver todos los temas</button>
+          </div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <h3>% de aprobación</h3>
+            <div id="approvalBreakdown" class="stacked-bar"></div>
+            <div id="approvalLegend" class="legend"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Aprobación por tema</h3>
+            <div id="topicApprovalList" class="list-card"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Distribución de notas</h3>
+            <div id="gradeHistogram" class="histogram"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card list-card" data-module="history">
+        <div class="section-header">
+          <div>
+            <h2>Analítica histórica por cuatrimestre</h2>
+            <p class="muted">Evolución de aprobación, promedio y deserción. Principalmente para Gurú (Senior: lectura).</p>
+          </div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <h3>Evolución</h3>
+            <div id="historyTrends" class="trend-list"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Resumen por cuatrimestre</h3>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Cuatrimestre</th>
+                  <th>Aprobación</th>
+                  <th>Promedio</th>
+                  <th>Ausentes</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card list-card" data-module="operations">
+        <div class="section-header">
+          <div>
+            <h2>Seguimiento operativo</h2>
+            <p class="muted">Alumnos en riesgo y entregas/correcciones de TPs.</p>
+          </div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <h3>Alumnos en riesgo</h3>
+            <div id="riskList" class="risk-list"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Entregas y correcciones de TPs</h3>
+            <div id="tpTracking" class="kanban"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card list-card" data-module="support">
+        <div class="section-header">
+          <div>
+            <h2>Consultas y soporte</h2>
+            <p class="muted">Inbox con estado y asignación. Ayudantes responden las consultas asignadas.</p>
+          </div>
+        </div>
+        <div id="supportInbox" class="list-card"></div>
+      </div>
+
+      <div class="card list-card" data-module="quick-access">
+        <div class="section-header">
+          <div>
+            <h2>Accesos rápidos</h2>
+            <p class="muted">Atajos a planes, materiales, carga de resultados y gestión de comisión.</p>
+          </div>
+        </div>
+        <div id="quickAccessList" class="quick-access"></div>
+      </div>
+
+      <div class="card list-card" data-module="calendar">
       <div class="card list-card">
         <div class="section-header">
           <div>
@@ -116,7 +270,7 @@
         </div>
       </div>
 
-      <div class="card list-card">
+      <div class="card list-card" data-module="team">
         <div class="section-header">
           <div>
             <h2>Equipo del curso</h2>
@@ -126,7 +280,7 @@
         <div id="teamList" class="team-list"></div>
       </div>
 
-      <div class="card list-card">
+      <div class="card list-card" data-module="announcements">
         <div class="section-header">
           <div>
             <h2>Anuncios y alertas</h2>
