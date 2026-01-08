@@ -253,6 +253,159 @@ CREATE TABLE IF NOT EXISTS `reportes_news` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+/* Dashboard por curso */
+CREATE TABLE IF NOT EXISTS `course_schedules` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `course_id` bigint(20) unsigned NOT NULL,
+  `day_of_week` enum('LUN','MAR','MIE','JUE','VIE','SAB','DOM') NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `modality` enum('PRESENCIAL','VIRTUAL','HIBRIDA') NOT NULL DEFAULT 'PRESENCIAL',
+  `location` varchar(190) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `is_published` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) unsigned DEFAULT NULL,
+  `updated_by` bigint(20) unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_course_schedules_course` (`course_id`),
+  KEY `ix_course_schedules_day` (`course_id`,`day_of_week`),
+  KEY `fk_course_schedules_created_by` (`created_by`),
+  KEY `fk_course_schedules_updated_by` (`updated_by`),
+  CONSTRAINT `fk_course_schedules_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_course_schedules_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_course_schedules_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `course_schedule_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `schedule_id` bigint(20) unsigned DEFAULT NULL,
+  `course_id` bigint(20) unsigned NOT NULL,
+  `action` enum('CREATED','UPDATED','DELETED') NOT NULL,
+  `day_of_week` enum('LUN','MAR','MIE','JUE','VIE','SAB','DOM') DEFAULT NULL,
+  `start_time` time DEFAULT NULL,
+  `end_time` time DEFAULT NULL,
+  `modality` enum('PRESENCIAL','VIRTUAL','HIBRIDA') DEFAULT NULL,
+  `location` varchar(190) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `is_published` tinyint(1) DEFAULT NULL,
+  `changed_by` bigint(20) unsigned DEFAULT NULL,
+  `changed_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_course_schedule_history_course` (`course_id`),
+  KEY `ix_course_schedule_history_schedule` (`schedule_id`),
+  KEY `fk_course_schedule_history_changed_by` (`changed_by`),
+  CONSTRAINT `fk_course_schedule_history_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_course_schedule_history_schedule` FOREIGN KEY (`schedule_id`) REFERENCES `course_schedules` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_course_schedule_history_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `course_key_dates` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `course_id` bigint(20) unsigned NOT NULL,
+  `term` tinyint(4) DEFAULT NULL,
+  `topic` varchar(32) DEFAULT NULL,
+  `kind` enum('PARCIAL','RECUPERATORIO','TP','TP_PRORROGA','CIERRE_NOTAS','PUBLICACION_NOTAS','OTRO') NOT NULL,
+  `title` varchar(180) NOT NULL,
+  `date` date NOT NULL,
+  `time` time DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `is_published` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) unsigned DEFAULT NULL,
+  `updated_by` bigint(20) unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_course_key_dates_course` (`course_id`),
+  KEY `ix_course_key_dates_date` (`course_id`,`date`),
+  KEY `ix_course_key_dates_kind` (`course_id`,`kind`),
+  KEY `fk_course_key_dates_created_by` (`created_by`),
+  KEY `fk_course_key_dates_updated_by` (`updated_by`),
+  CONSTRAINT `fk_course_key_dates_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_course_key_dates_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_course_key_dates_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `course_key_date_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `key_date_id` bigint(20) unsigned DEFAULT NULL,
+  `course_id` bigint(20) unsigned NOT NULL,
+  `action` enum('CREATED','UPDATED','DELETED') NOT NULL,
+  `term` tinyint(4) DEFAULT NULL,
+  `topic` varchar(32) DEFAULT NULL,
+  `kind` enum('PARCIAL','RECUPERATORIO','TP','TP_PRORROGA','CIERRE_NOTAS','PUBLICACION_NOTAS','OTRO') DEFAULT NULL,
+  `title` varchar(180) DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  `time` time DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `is_published` tinyint(1) DEFAULT NULL,
+  `changed_by` bigint(20) unsigned DEFAULT NULL,
+  `changed_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_course_key_date_history_course` (`course_id`),
+  KEY `ix_course_key_date_history_key_date` (`key_date_id`),
+  KEY `fk_course_key_date_history_changed_by` (`changed_by`),
+  CONSTRAINT `fk_course_key_date_history_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_course_key_date_history_key_date` FOREIGN KEY (`key_date_id`) REFERENCES `course_key_dates` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_course_key_date_history_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `course_announcements` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `course_id` bigint(20) unsigned NOT NULL,
+  `title` varchar(180) NOT NULL,
+  `body` text DEFAULT NULL,
+  `is_pinned` tinyint(1) NOT NULL DEFAULT 0,
+  `reminder_at` datetime DEFAULT NULL,
+  `starts_at` datetime DEFAULT NULL,
+  `ends_at` datetime DEFAULT NULL,
+  `status` enum('DRAFT','PUBLISHED') NOT NULL DEFAULT 'PUBLISHED',
+  `created_by` bigint(20) unsigned DEFAULT NULL,
+  `updated_by` bigint(20) unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_course_announcements_course` (`course_id`),
+  KEY `ix_course_announcements_status` (`course_id`,`status`),
+  KEY `ix_course_announcements_pinned` (`course_id`,`is_pinned`),
+  KEY `fk_course_announcements_created_by` (`created_by`),
+  KEY `fk_course_announcements_updated_by` (`updated_by`),
+  CONSTRAINT `fk_course_announcements_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_course_announcements_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_course_announcements_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `course_topics` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `course_id` bigint(20) unsigned NOT NULL,
+  `topic` varchar(32) NOT NULL,
+  `term` tinyint(4) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `ux_course_topics` (`course_id`,`topic`),
+  KEY `ix_course_topics_term` (`course_id`,`term`),
+  CONSTRAINT `fk_course_topics_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `course_inquiries` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `course_id` bigint(20) unsigned NOT NULL,
+  `title` varchar(180) NOT NULL,
+  `body` text DEFAULT NULL,
+  `status` enum('PENDING','ANSWERED','CLOSED') NOT NULL DEFAULT 'PENDING',
+  `created_by` bigint(20) unsigned DEFAULT NULL,
+  `updated_by` bigint(20) unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_course_inquiries_course` (`course_id`),
+  KEY `ix_course_inquiries_status` (`course_id`,`status`),
+  CONSTRAINT `fk_course_inquiries_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_course_inquiries_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_course_inquiries_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /* ============================================================
    TRIGGERS (solo si NO existen)

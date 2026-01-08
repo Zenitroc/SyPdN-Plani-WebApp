@@ -64,6 +64,7 @@ require __DIR__ . '/src/routes/asistencia.php';
 require __DIR__ . '/src/routes/planificacion.php';
 require __DIR__ . '/src/routes/course_admin.php';
 require __DIR__ . '/src/routes/user_admin.php';
+require __DIR__ . '/src/routes/curso_dashboard.php';
 
 require_once __DIR__ . '/src/routes/course_color.php';
 register_course_color_routes();
@@ -79,5 +80,6 @@ register_entregas_routes();
 register_parciales_routes();
 register_report_routes();
 register_asistencia_routes();
+register_curso_dashboard_routes();
 
 dispatch();

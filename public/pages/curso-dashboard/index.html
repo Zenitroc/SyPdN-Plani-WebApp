@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard del curso — SyPdN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <style>
+    .dashboard-header{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+    .dashboard-header p{max-width:720px}
+    .filters-bar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-top:1.5rem}
+    .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:1.5rem}
+    .summary-card{display:flex;flex-direction:column;gap:.55rem}
+    .summary-value{font-size:1.45rem;font-weight:700}
+    .summary-label{color:var(--muted);font-size:.95rem}
+    .dashboard-sections{display:grid;grid-template-columns:minmax(0,1fr);gap:1.5rem;margin-top:1.5rem}
+    .section-header{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .section-header h2{margin:0}
+    .inline-actions{display:flex;gap:.5rem;flex-wrap:wrap}
+    .list-card{display:grid;gap:1rem}
+    .schedule-list,.keydate-list,.announcement-list,.team-list{display:grid;gap:.75rem}
+    .item-row{border:1px solid var(--border);border-radius:14px;padding:.85rem;background:var(--surface);display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}
+    .item-meta{display:flex;flex-direction:column;gap:.25rem}
+    .item-title{font-weight:600}
+    .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.15rem .6rem;border-radius:999px;font-size:.75rem;background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
+    .badge.primary{background:color-mix(in oklab, var(--primary) 20%, var(--surface));color:color-mix(in oklab, var(--primary) 70%, var(--text))}
+    .item-actions{display:flex;gap:.4rem;flex-wrap:wrap}
+    .item-actions button{border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:999px;padding:.35rem .7rem;cursor:pointer;font-size:.85rem}
+    .item-actions button:hover{background:var(--surface)}
+    .muted-block{color:var(--muted);font-size:.9rem}
+    .team-list{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+    .team-card{flex-direction:column;align-items:center;text-align:center;padding:1rem}
+    .team-avatar{width:64px;height:64px;border-radius:999px;background:color-mix(in oklab, var(--primary) 15%, var(--surface));display:grid;place-items:center;font-weight:700;color:var(--primary);overflow:hidden}
+    .team-avatar img{width:100%;height:100%;object-fit:cover}
+    .team-role{font-size:.85rem;color:var(--muted)}
+    .role-pill{display:inline-flex;align-items:center;justify-content:center;padding:.15rem .6rem;border-radius:999px;font-size:.75rem;font-weight:600;border:1px solid transparent}
+    .role-pill--guru{background:color-mix(in oklab, #7c3aed 20%, var(--surface));color:color-mix(in oklab, #7c3aed 80%, var(--text));border-color:color-mix(in oklab, #7c3aed 35%, var(--border))}
+    .role-pill--senior{background:color-mix(in oklab, #2563eb 20%, var(--surface));color:color-mix(in oklab, #2563eb 80%, var(--text));border-color:color-mix(in oklab, #2563eb 35%, var(--border))}
+    .role-pill--ayudante{background:color-mix(in oklab, #16a34a 20%, var(--surface));color:color-mix(in oklab, #16a34a 80%, var(--text));border-color:color-mix(in oklab, #16a34a 35%, var(--border))}
+    .team-email{font-size:.85rem;color:var(--muted)}
+    .announcement-body{margin-top:.35rem;white-space:pre-line}
+    .status-pill{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .55rem;border-radius:999px;font-size:.7rem;border:1px solid var(--border)}
+    .status-pill.published{background:color-mix(in oklab, var(--accent) 20%, var(--surface));color:color-mix(in oklab, var(--accent) 70%, var(--text))}
+    .status-pill.draft{background:color-mix(in oklab, #f59e0b 20%, var(--surface));color:color-mix(in oklab, #f59e0b 70%, var(--text))}
+    .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-start;justify-content:center;z-index:999;padding:1rem;overflow:auto}
+    .modal{width:min(640px,96vw);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem;max-height:calc(100vh - 2rem);overflow:auto}
+    .modal h3{margin:.2rem 0 1rem 0}
+    .modal .actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem}
+    .is-hidden{display:none !important}
+    .field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+    .history-list{display:grid;gap:.75rem}
+    @media (max-width: 960px){
+      .filters-bar{grid-template-columns:1fr}
+      .field-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <nav id="appMenu"></nav>
+  <main class="container">
+    <section class="card dashboard-header">
+      <div>
+        <h1>Dashboard del curso</h1>
+        <p>Usá los filtros para ajustar gráficos, listados y métricas del curso. Todo lo editable queda registrado con historial de cambios.</p>
+      </div>
+      <div class="inline-actions">
+        <button id="refreshBtn" class="btn btn-neutral" type="button">Actualizar</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <h2>Filtros globales</h2>
+        <small class="muted">Afectan todos los módulos</small>
+      </div>
+      <div class="filters-bar">
+        <div class="field">
+          <label class="label" for="filterTerm">Cuatrimestre</label>
+          <div class="select-wrap">
+            <select id="filterTerm" class="select"></select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="filterTopic">Tema</label>
+          <div class="select-wrap">
+            <select id="filterTopic" class="select"></select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="summary-grid" id="summaryGrid"></section>
+
+    <section class="dashboard-sections">
+      <div class="card list-card">
+        <div class="section-header">
+          <div>
+            <h2>Fechas clave y días/horarios</h2>
+            <p class="muted">Horario regular y agenda de parciales, TPs, recuperatorios y cierres.</p>
+          </div>
+          <div class="inline-actions">
+            <button id="addScheduleBtn" class="btn btn-soft is-hidden" type="button">Agregar horario</button>
+            <button id="addKeyDateBtn" class="btn btn-soft is-hidden" type="button">Agregar fecha</button>
+          </div>
+        </div>
+        <div>
+          <h3>Horario regular</h3>
+          <div id="scheduleList" class="schedule-list"></div>
+        </div>
+        <div>
+          <h3>Fechas clave</h3>
+          <div id="keyDateList" class="keydate-list"></div>
+        </div>
+      </div>
+
+      <div class="card list-card">
+        <div class="section-header">
+          <div>
+            <h2>Equipo del curso</h2>
+            <p class="muted">Docentes y ayudantes asociados a la comisión.</p>
+          </div>
+        </div>
+        <div id="teamList" class="team-list"></div>
+      </div>
+
+      <div class="card list-card">
+        <div class="section-header">
+          <div>
+            <h2>Anuncios y alertas</h2>
+            <p class="muted">Avisos fijados, recordatorios y comunicados del equipo.</p>
+          </div>
+          <div class="inline-actions">
+            <button id="addAnnouncementBtn" class="btn btn-soft is-hidden" type="button">Nuevo aviso</button>
+          </div>
+        </div>
+        <div id="announcementList" class="announcement-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-back" id="scheduleModal">
+    <div class="modal">
+      <h3 id="scheduleModalTitle">Horario regular</h3>
+      <div class="field-grid">
+        <div class="field">
+          <label class="label" for="scheduleDay">Día</label>
+          <div class="select-wrap">
+            <select id="scheduleDay" class="select">
+              <option value="LUN">Lunes</option>
+              <option value="MAR">Martes</option>
+              <option value="MIE">Miércoles</option>
+              <option value="JUE">Jueves</option>
+              <option value="VIE">Viernes</option>
+              <option value="SAB">Sábado</option>
+              <option value="DOM">Domingo</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="scheduleModality">Modalidad</label>
+          <div class="select-wrap">
+            <select id="scheduleModality" class="select">
+              <option value="PRESENCIAL">Presencial</option>
+              <option value="VIRTUAL">Virtual</option>
+              <option value="HIBRIDA">Híbrida</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label class="label" for="scheduleStart">Hora inicio</label>
+          <input id="scheduleStart" class="input" type="time" />
+        </div>
+        <div class="field">
+          <label class="label" for="scheduleEnd">Hora fin</label>
+          <input id="scheduleEnd" class="input" type="time" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label" for="scheduleLocation">Aula o link</label>
+        <input id="scheduleLocation" class="input" placeholder="Ej: Aula 301 / meet.google.com/..." />
+      </div>
+      <div class="field">
+        <label class="label" for="scheduleNotes">Notas</label>
+        <textarea id="scheduleNotes" class="input" rows="3" placeholder="Observaciones adicionales..."></textarea>
+      </div>
+      <div class="field" id="schedulePublishField">
+        <label class="label" for="schedulePublish">Publicar cambios</label>
+        <label><input id="schedulePublish" type="checkbox" /> Visible para el curso</label>
+      </div>
+      <div class="actions">
+        <button class="btn btn-neutral" id="scheduleCancel">Cancelar</button>
+        <button class="btn btn-primary" id="scheduleSave">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-back" id="keyDateModal">
+    <div class="modal">
+      <h3 id="keyDateModalTitle">Fecha clave</h3>
+      <div class="field-grid">
+        <div class="field">
+          <label class="label" for="keyDateKind">Tipo</label>
+          <div class="select-wrap">
+            <select id="keyDateKind" class="select">
+              <option value="PARCIAL">Parcial</option>
+              <option value="RECUPERATORIO">Recuperatorio</option>
+              <option value="TP">Entrega TP</option>
+              <option value="TP_PRORROGA">Prórroga TP</option>
+              <option value="CIERRE_NOTAS">Cierre de notas</option>
+              <option value="PUBLICACION_NOTAS">Publicación de notas</option>
+              <option value="OTRO">Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="keyDateTitle">Título</label>
+          <input id="keyDateTitle" class="input" placeholder="Ej: Parcial 1" />
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label class="label" for="keyDateDate">Fecha</label>
+          <input id="keyDateDate" class="input" type="date" />
+        </div>
+        <div class="field">
+          <label class="label" for="keyDateTime">Hora (opcional)</label>
+          <input id="keyDateTime" class="input" type="time" />
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label class="label" for="keyDateTerm">Cuatrimestre (opcional)</label>
+          <input id="keyDateTerm" class="input" type="number" min="1" max="4" placeholder="1 o 2" />
+        </div>
+        <div class="field">
+          <label class="label" for="keyDateTopic">Tema (opcional)</label>
+          <input id="keyDateTopic" class="input" placeholder="Ej: ORG" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label" for="keyDateNotes">Notas</label>
+        <textarea id="keyDateNotes" class="input" rows="3" placeholder="Observaciones adicionales..."></textarea>
+      </div>
+      <div class="field" id="keyDatePublishField">
+        <label class="label" for="keyDatePublish">Publicar cambios</label>
+        <label><input id="keyDatePublish" type="checkbox" /> Visible para el curso</label>
+      </div>
+      <div class="actions">
+        <button class="btn btn-neutral" id="keyDateCancel">Cancelar</button>
+        <button class="btn btn-primary" id="keyDateSave">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-back" id="announcementModal">
+    <div class="modal">
+      <h3 id="announcementModalTitle">Aviso del curso</h3>
+      <div class="field">
+        <label class="label" for="announcementTitle">Título</label>
+        <input id="announcementTitle" class="input" placeholder="Ej: Recordatorio TP1" />
+      </div>
+      <div class="field">
+        <label class="label" for="announcementBody">Contenido</label>
+        <textarea id="announcementBody" class="input" rows="4" placeholder="Mensaje del aviso..."></textarea>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label class="label" for="announcementReminder">Recordatorio (opcional)</label>
+          <input id="announcementReminder" class="input" type="datetime-local" />
+        </div>
+        <div class="field">
+          <label class="label" for="announcementStatus">Estado</label>
+          <div class="select-wrap">
+            <select id="announcementStatus" class="select">
+              <option value="PUBLISHED">Publicado</option>
+              <option value="DRAFT">Borrador</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label class="label" for="announcementStart">Visible desde</label>
+          <input id="announcementStart" class="input" type="datetime-local" />
+        </div>
+        <div class="field">
+          <label class="label" for="announcementEnd">Visible hasta</label>
+          <input id="announcementEnd" class="input" type="datetime-local" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label" for="announcementPinned">Fijar aviso</label>
+        <label><input id="announcementPinned" type="checkbox" /> Mostrar como destacado</label>
+      </div>
+      <div class="actions">
+        <button class="btn btn-neutral" id="announcementCancel">Cancelar</button>
+        <button class="btn btn-primary" id="announcementSave">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-back" id="historyModal">
+    <div class="modal">
+      <h3 id="historyModalTitle">Historial de cambios</h3>
+      <div id="historyList" class="history-list"></div>
+      <div class="actions">
+        <button class="btn btn-neutral" id="historyClose">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/course-context.js"></script>
+  <script src="/assets/js/menu.js"></script>
+  <script src="/pages/curso-dashboard/dashboard.js"></script>
+</body>
+</html>
