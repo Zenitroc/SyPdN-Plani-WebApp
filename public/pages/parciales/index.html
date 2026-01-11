@@ -195,6 +195,10 @@
             background: color-mix(in oklab, var(--ok) 22%, var(--surface))
         }
 
+        .td-topic-pass {
+            background: color-mix(in oklab, var(--ok) 14%, var(--surface))
+        }
+        
         /* La grilla da a la izquierda el ancho de su contenido (no más) */
         .twin-inner {
             display: grid;
@@ -289,7 +293,10 @@
                     <option value="P1">Sólo 1° Parcial</option>
                     <option value="P2">Sólo 2° Parcial</option>
                 </select>
-                <label class="muted">Intento:</label>
+                <label class="muted">Tema:</label>
+                <select id="topicFilter" class="input" style="width:auto">
+                    <option value="ALL">Todos</option>
+                </select>
                 <select id="attemptFilter" class="input" style="width:auto">
                     <option value="ALL">Todos</option>
                     <option value="PA">Parcial</option>

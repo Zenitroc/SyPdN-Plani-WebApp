@@ -11,10 +11,10 @@ renderMenu();
     const apiGet = async (p) => { try { const r = await api.get(API_BASES[apiBaseIdx] + p); if (r?.error && nf(r)) throw 0; return r; } catch { apiBaseIdx = 1; return api.get(API_BASES[1] + p); } };
     const apiPost = async (p, b) => { try { const r = await api.post(API_BASES[apiBaseIdx] + p, b); if (r?.error && nf(r)) throw 0; return r; } catch { apiBaseIdx = 1; return api.post(API_BASES[1] + p, b); } };
 
-    let COURSE_ID = null, DATA = { students: [], grade_options: [] };
+    let COURSE_ID = null, DATA = { students: [], grade_options: [], topics: null };
     let CAN_EDIT = false;
     let PERMISSIONS_READY = false;
-    let STATUS_FILTER = 'ALL', SHOW = 'ALL', ATT = 'ALL', QUERY = '';
+    let STATUS_FILTER = 'ALL', SHOW = 'ALL', ATT = 'ALL', QUERY = '', TOPIC_FILTER = 'ALL';
 
     // Coloreo
     const FAIL = new Set(['A', 'N_E', 'NO_SAT', 'N_S']);
@@ -33,6 +33,24 @@ renderMenu();
     const OPTS = () => [''].concat(DATA.grade_options || []);
     const optHTML = (v) => OPTS().map(x => `<option value="${x}"${x === v ? ' selected' : ''}>${x}</option>`).join('');
     const matchQ = (r) => !QUERY || (String(r.apellido || '').toLowerCase().includes(QUERY) || String(r.nombre || '').toLowerCase().includes(QUERY));
+    const DEFAULT_TOPICS = { p1: ['ORG', 'MET', 'TEO1'], p2: ['PLS', 'CUR', 'TEO2'] };
+    const topicData = () => (DATA.topics && typeof DATA.topics === 'object') ? DATA.topics : DEFAULT_TOPICS;
+    const allTopics = () => {
+        const topics = topicData();
+        return Array.from(new Set([...(topics.p1 || []), ...(topics.p2 || [])]));
+    };
+
+    function topicsForShow() {
+        const topics = topicData();
+        if (TOPIC_FILTER !== 'ALL') {
+            if ((topics.p1 || []).includes(TOPIC_FILTER)) return { p1: [TOPIC_FILTER], p2: [] };
+            if ((topics.p2 || []).includes(TOPIC_FILTER)) return { p1: [], p2: [TOPIC_FILTER] };
+            return { p1: [TOPIC_FILTER], p2: [] };
+        }
+        if (SHOW === 'P1') return { p1: topics.p1 || [], p2: [] };
+        if (SHOW === 'P2') return { p1: [], p2: topics.p2 || [] };
+        return { p1: topics.p1 || [], p2: topics.p2 || [] };
+    }
 
     function filtered() {
         let list = DATA.students;
@@ -71,6 +89,7 @@ renderMenu();
         const keepX = qs('rightWrap').scrollLeft;
         const res = payload(await apiGet(`?course_id=${COURSE_ID}`));
         DATA = res || DATA;
+        renderTopicOptions();
         renderTables();
         qs('rightWrap').scrollLeft = keepX;
         ensureLeftWidths();   // << calcula 1 sola vez
@@ -78,34 +97,35 @@ renderMenu();
     }
 
 
-    // =================== Render Tablas ===================
+     // =================== Render Tablas ===================
     const ATT_LABEL = { PA: 'PARC', '1R': '1R', '2R': '2R' };
+    const ALL_ATTEMPTS = ['PA', '1R', '2R'];
+    const TONE_CLASS = { ORG: 'tone-org', MET: 'tone-met', TEO1: 'tone-teo', PLS: 'tone-pls', CUR: 'tone-cur', TEO2: 'tone-teo2' };
+
+    function renderTopicOptions() {
+        const select = qs('topicFilter');
+        if (!select) return;
+        const topics = allTopics();
+        if (TOPIC_FILTER !== 'ALL' && !topics.includes(TOPIC_FILTER)) {
+            TOPIC_FILTER = 'ALL';
+        }
+        select.innerHTML = ['<option value="ALL">Todos</option>']
+            .concat(topics.map(t => `<option value="${t}"${t === TOPIC_FILTER ? ' selected' : ''}>${t}</option>`))
+            .join('');
+    }
 
     function headRight() {
         const atts = attemptsShown();
-        if (SHOW === 'P1') {
-            return `<tr>${atts.map(a => `
-      <th class="tone-org">ORG_${ATT_LABEL[a]}</th>
-      <th class="tone-met">MET_${ATT_LABEL[a]}</th>
-      <th class="tone-teo">TEO1_${ATT_LABEL[a]}</th>`).join('')}</tr>`;
-        }
-        if (SHOW === 'P2') {
-            return `<tr>${atts.map(a => `
-      <th class="tone-pls">PLS_${ATT_LABEL[a]}</th>
-      <th class="tone-cur">CUR_${ATT_LABEL[a]}</th>
-      <th class="tone-teo2">TEO2_${ATT_LABEL[a]}</th>`).join('')}</tr>`;
-        }
-        // ALL
-        return `<tr>
-    ${atts.map(a => `
-      <th class="tone-org">ORG_${ATT_LABEL[a]}</th>
-      <th class="tone-met">MET_${ATT_LABEL[a]}</th>
-      <th class="tone-teo">TEO1_${ATT_LABEL[a]}</th>`).join('')}
-    ${atts.map(a => `
-      <th class="tone-pls">PLS_${ATT_LABEL[a]}</th>
-      <th class="tone-cur">CUR_${ATT_LABEL[a]}</th>
-      <th class="tone-teo2">TEO2_${ATT_LABEL[a]}</th>`).join('')}
-  </tr>`;
+        const { p1, p2 } = topicsForShow();
+        const cells = [];
+        const addTopic = (topic, attempt) => {
+            const tone = TONE_CLASS[topic] || '';
+            const toneClass = tone ? ` class="${tone}"` : '';
+            cells.push(`<th${toneClass}>${topic}_${ATT_LABEL[attempt]}</th>`);
+        };
+        p1.forEach(topic => atts.forEach(a => addTopic(topic, a)));
+        p2.forEach(topic => atts.forEach(a => addTopic(topic, a)));
+        return `<tr>${cells.join('')}</tr>`;
     }
 
     function rowLeft(r) {
@@ -128,26 +148,25 @@ renderMenu();
 
     function rowRight(r) {
         const atts = attemptsShown();
+        const { p1, p2 } = topicsForShow();
         const p1AP = !r.adeuda_p1 || r.adeuda_p1.length === 0;
         const p2AP = !r.adeuda_p2 || r.adeuda_p2.length === 0;
 
+        const hasAnyPass = (p, t) => ALL_ATTEMPTS.some(a => pass(r[p]?.[t]?.[a]));
+
         const sel = (p, t, a) => {
-            const v = (r[p][t][a] || '');
+            const v = (r[p]?.[t]?.[a] || '');
             const gClass = cellClassFromGrade(v);
             const apClass = (p === 'p1' && p1AP) || (p === 'p2' && p2AP) ? 'td-partial-ap' : '';
+            const topicPassClass = !gClass && hasAnyPass(p, t) ? 'td-topic-pass' : '';
             const sClass = gClass === 'td-fail' ? 'fail' : (gClass === 'td-pass' ? 'pass' : '');
-            return `<td class="${apClass || gClass}"><select class="score ${sClass}" data-enroll="${r.enrollment_id}" data-partial="${p === 'p1' ? 1 : 2}" data-topic="${t}" data-attempt="${a}">${optHTML(v)}</select></td>`;
+            const tdClass = gClass || apClass || topicPassClass;
+            return `<td class="${tdClass}"><select class="score ${sClass}" data-enroll="${r.enrollment_id}" data-partial="${p === 'p1' ? 1 : 2}" data-topic="${t}" data-attempt="${a}">${optHTML(v)}</select></td>`;
         };
-
-        if (SHOW === 'P1') {
-            return `<tr data-row>${atts.map(a => sel('p1', 'ORG', a) + sel('p1', 'MET', a) + sel('p1', 'TEO1', a)).join('')}</tr>`;
-        }
-        if (SHOW === 'P2') {
-            return `<tr data-row>${atts.map(a => sel('p2', 'PLS', a) + sel('p2', 'CUR', a) + sel('p2', 'TEO2', a)).join('')}</tr>`;
-        }
-        return `<tr data-row>${atts.map(a => sel('p1', 'ORG', a) + sel('p1', 'MET', a) + sel('p1', 'TEO1', a)).join('') +
-            atts.map(a => sel('p2', 'PLS', a) + sel('p2', 'CUR', a) + sel('p2', 'TEO2', a)).join('')
-            }</tr>`;
+        const cells = [];
+        p1.forEach(topic => atts.forEach(a => cells.push(sel('p1', topic, a))));
+        p2.forEach(topic => atts.forEach(a => cells.push(sel('p2', topic, a))));
+        return `<tr data-row>${cells.join('')}</tr>`;
     }
 
     function renderTables() {
@@ -194,6 +213,7 @@ renderMenu();
         const keepX = qs('rightWrap').scrollLeft;
         const res = payload(await apiGet(`?course_id=${COURSE_ID}`));
         DATA = res || DATA;
+        renderTopicOptions();
         renderTables();
         qs('rightWrap').scrollLeft = keepX;
         syncRowHeights();
@@ -270,6 +290,7 @@ renderMenu();
     qs('statusFilter').addEventListener('change', e => { STATUS_FILTER = e.target.value; renderTables(); syncRowHeights(); });
     qs('showCols').addEventListener('change', e => { SHOW = e.target.value; renderTables(); syncRowHeights(); });
     qs('attemptFilter').addEventListener('change', e => { ATT = e.target.value; renderTables(); syncRowHeights(); });
+    qs('topicFilter').addEventListener('change', e => { TOPIC_FILTER = e.target.value; renderTables(); syncRowHeights(); });
     (function () { let t = null; qs('q').addEventListener('input', e => { clearTimeout(t); t = setTimeout(() => { QUERY = e.target.value.trim().toLowerCase(); renderTables(); syncRowHeights(); }, 160); }); })();
 
     load().catch(e => { qs('tbodyLeft').innerHTML = `<tr><td colspan="6" style="padding:1rem">Error: ${e.message || e}</td></tr>`; });
