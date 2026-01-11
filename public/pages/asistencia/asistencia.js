@@ -65,7 +65,7 @@ async function load(){
   currentTopics = data.topics || [];
 
   let html = '<table class="tbl"><thead><tr>'+
-    '<th><input type="checkbox" id="selAll"></th>'+
+    '<th><input type="checkbox" id="selAll" class="check-btn"></th>'+
     '<th>ID</th><th>Apellido</th><th>Nombre</th><th>Presente</th>';
   currentTopics.forEach(t => { html += `<th>${t}</th>`; });
   html += '</tr></thead><tbody>';
@@ -73,16 +73,18 @@ async function load(){
   students.forEach(s => {
     const rowCls = s.present ? 'row-present' : '';
     html += `<tr data-enroll="${s.enrollment_id}" class="${rowCls}">`+
-      '<td><input type="checkbox" class="sel"></td>'+
+      '<td><input type="checkbox" class="sel check-btn"></td>'+
       `<td>${s.course_id_seq}</td>`+
       `<td>${esc(s.apellido)}</td>`+
       `<td>${esc(s.nombre)}</td>`+
-      `<td><input type="checkbox" class="present"${s.present?' checked':''}></td>`;
+      `<td><input type="checkbox" class="present check-btn"${s.present?' checked':''}></td>`;
     currentTopics.forEach(t => {
+      const approved = s.approved_topics && s.approved_topics[t];
       const checked = s.topics[t] ? ' checked' : '';
       const dis = s.present ? '' : ' disabled';
-      const cls = s.topics[t] ? 'topic-delivered' : 'topic-missing';
-      html += `<td class="${cls}"><input type="checkbox" class="topic" data-topic="${t}"${checked}${dis}></td>`;
+      const cls = approved ? 'topic-approved' : (s.topics[t] ? 'topic-delivered' : 'topic-missing');
+      const approvedAttr = approved ? ' data-approved="1"' : '';
+      html += `<td class="${cls}"><input type="checkbox" class="topic check-btn" data-topic="${t}"${approvedAttr}${checked}${dis}></td>`;
     });
     html += '</tr>';
   });
@@ -97,7 +99,10 @@ async function load(){
       const tr = ev.target.closest('tr');
       const en = parseInt(tr.getAttribute('data-enroll'),10);
       const present = ev.target.checked;
-      tr.querySelectorAll('.topic').forEach(tcb => { tcb.disabled = !present; if(!present) tcb.checked = false; });
+      tr.querySelectorAll('.topic').forEach(tcb => {
+        tcb.disabled = !present;
+        if (!present) tcb.checked = false;
+      });
       updateRowStyles(tr);
       await save(en);
     };
@@ -134,7 +139,11 @@ function updateRowStyles(tr){
   tr.classList.toggle('row-present', present);
   tr.querySelectorAll('.topic').forEach(cb => {
     const td = cb.parentElement;
-    td.classList.remove('topic-delivered','topic-missing');
+    td.classList.remove('topic-delivered','topic-missing','topic-approved');
+    if (cb.dataset.approved === '1') {
+      td.classList.add('topic-approved');
+      return;
+    }
     td.classList.add(cb.checked ? 'topic-delivered' : 'topic-missing');
   });
 }

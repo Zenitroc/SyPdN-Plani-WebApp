@@ -61,6 +61,22 @@ function register_asistencia_routes() {
       $idx[(int)$r['enrollment_id']] = $r;
     }
 
+    $approvedGrades = [];
+    $FAIL = ['A','N_E','NO_SAT','N_S'];
+    $pass = function(?string $code) use ($FAIL) {
+      if ($code===null || $code==='') return false;
+      return !in_array($code, $FAIL, true);
+    };
+    $st3 = $pdo->prepare("SELECT enrollment_id, topic, attempt, grade_code
+                          FROM partial_grades
+                          WHERE course_id=? AND partial_no=?");
+    $st3->execute([$courseId, $partial]);
+    $approvedRows = $st3->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($approvedRows as $r) {
+      $e = (int)$r['enrollment_id'];
+      $t = strtoupper((string)$r['topic']);
+      $approvedGrades[$e][$t][$r['attempt']] = $r['grade_code'];
+    }
     $topics = ($partial === 1) ? ['ORG','MET','TEO1'] : ['PLS','CUR','TEO2'];
 
     $out = [];
@@ -72,11 +88,15 @@ function register_asistencia_routes() {
         'apellido' => $s['apellido'],
         'nombre' => $s['nombre'],
         'present' => isset($idx[$e]) ? (int)$idx[$e]['present'] === 1 : 0,
-        'topics' => []
+        'topics' => [],
+        'approved_topics' => []
       ];
       foreach ($topics as $t) {
         $col = strtolower($t);
         $row['topics'][$t] = isset($idx[$e]) ? (int)$idx[$e][$col] === 1 : 0;
+        $best = $approvedGrades[$e][$t]['PA'] ?? null;
+        foreach (['1R','2R'] as $a) if (!$pass($best)) $best = $approvedGrades[$e][$t][$a] ?? $best;
+        $row['approved_topics'][$t] = $pass($best) ? 1 : 0;
       }
       $out[] = $row;
     }

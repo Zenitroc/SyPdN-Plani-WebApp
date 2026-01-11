@@ -43,6 +43,47 @@
         .topic-missing {
             background: color-mix(in oklab, #ef4444 18%, var(--surface))
         }
+
+        .topic-approved {
+            background: color-mix(in oklab, #22c55e 22%, var(--surface))
+        }
+
+        .check-btn {
+            appearance: none;
+            width: 1.2rem;
+            height: 1.2rem;
+            border-radius: .35rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            display: inline-grid;
+            place-content: center;
+            cursor: pointer;
+            transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
+        }
+
+        .check-btn::after {
+            content: '';
+            width: .45rem;
+            height: .25rem;
+            border-right: 2px solid transparent;
+            border-bottom: 2px solid transparent;
+            transform: rotate(45deg);
+        }
+
+        .check-btn:checked {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 20%, transparent);
+        }
+
+        .check-btn:checked::after {
+            border-color: #fff;
+        }
+
+        .check-btn:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
