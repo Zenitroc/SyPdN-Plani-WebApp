@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Notas finales — SyPdN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <style>
+        :root {
+            --ok: #16a34a;
+            --bad: #ef4444;
+            --warn: #facc15;
+            --info: #38bdf8;
+            --neutral: #94a3b8;
+            --row-siu: color-mix(in oklab, #fde68a 35%, var(--surface));
+        }
+
+        body.notas-finales main.container {
+            max-width: 100%;
+            padding: 0 1rem 3rem;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: .75rem;
+            align-items: center;
+            justify-content: space-between;
+            margin: .75rem 0;
+            flex-wrap: wrap;
+        }
+
+        .toolbar .left,
+        .toolbar .right {
+            display: flex;
+            gap: .5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .table-wrap {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: auto;
+            background: var(--surface);
+        }
+
+        .tbl {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 980px;
+        }
+
+        .tbl th,
+        .tbl td {
+            border-bottom: 1px solid var(--border);
+            padding: .5rem .6rem;
+            white-space: nowrap;
+            font-size: .92rem;
+            text-align: left;
+        }
+
+        .tbl th {
+            position: sticky;
+            top: 0;
+            background: var(--surface);
+            z-index: 2;
+            font-weight: 700;
+        }
+
+        .tbl td.center,
+        .tbl th.center {
+            text-align: center;
+        }
+
+        .tbl td.right,
+        .tbl th.right {
+            text-align: right;
+        }
+
+        .txt-ok {
+            color: var(--ok);
+            font-weight: 700;
+        }
+
+        .txt-bad {
+            color: var(--bad);
+            font-weight: 700;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: .1rem .45rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: .78rem;
+            letter-spacing: .02em;
+            text-transform: uppercase;
+        }
+
+        .badge.deserto {
+            background: color-mix(in oklab, var(--neutral) 20%, var(--surface));
+            color: var(--neutral);
+        }
+
+        .badge.recursa {
+            background: color-mix(in oklab, var(--bad) 18%, var(--surface));
+            color: var(--bad);
+        }
+
+        .badge.firma {
+            background: color-mix(in oklab, var(--ok) 18%, var(--surface));
+            color: var(--ok);
+        }
+
+        .badge.promociona {
+            background: color-mix(in oklab, var(--info) 22%, var(--surface));
+            color: #0ea5e9;
+        }
+
+        .row-siu {
+            background: var(--row-siu);
+        }
+
+        select.final-grade {
+            min-width: 110px;
+        }
+
+        .obs-input {
+            min-width: 200px;
+        }
+
+        .muted-cell {
+            color: var(--muted);
+        }
+    </style>
+</head>
+
+<body class="notas-finales">
+    <div id="appMenu"></div>
+    <main class="container">
+        <h1>Notas finales</h1>
+
+        <div class="toolbar">
+            <div class="left">
+                <label class="muted">Ver:</label>
+                <select id="statusFilter" class="input" style="width:auto">
+                    <option value="ALL">Todos</option>
+                    <option value="ALTA">Solo ALTA</option>
+                    <option value="BAJA">Solo BAJA</option>
+                </select>
+                <label class="muted">SIU:</label>
+                <select id="siuFilter" class="input" style="width:auto">
+                    <option value="ALL">Todos</option>
+                    <option value="LOADED">Cargados en SIU</option>
+                    <option value="UNLOADED">Sin cargar</option>
+                </select>
+            </div>
+            <div class="right">
+                <input id="q" class="input" placeholder="Buscar por apellido o nombre..." style="min-width:260px" />
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="tbl" id="finalsTable">
+                <thead>
+                    <tr>
+                        <th class="center">ID</th>
+                        <th>Apellido</th>
+                        <th>Nombre</th>
+                        <th class="center">1°P</th>
+                        <th class="center">2°P</th>
+                        <th class="center">TPS 1C</th>
+                        <th class="center">TPS 2C</th>
+                        <th class="center">Calificación final</th>
+                        <th class="center">Condición</th>
+                        <th class="center">Cargado en SIU</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyFinals"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/theme.js"></script>
+    <script src="/assets/js/course-context.js"></script>
+    <script src="/assets/js/menu.js"></script>
+    <script src="/pages/notas-finales/notas-finales.js"></script>
+</body>
+
+</html>

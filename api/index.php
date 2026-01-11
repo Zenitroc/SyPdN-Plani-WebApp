@@ -59,6 +59,7 @@ require __DIR__ . '/src/routes/estudiantes.php';
 require __DIR__ . '/src/routes/grupos.php';
 require __DIR__ . '/src/routes/entregas.php';
 require __DIR__ . '/src/routes/parciales.php';
+require __DIR__ . '/src/routes/notas_finales.php';
 require __DIR__ . '/src/routes/reportes.php';
 require __DIR__ . '/src/routes/asistencia.php';
 require __DIR__ . '/src/routes/planificacion.php';
@@ -77,6 +78,7 @@ register_student_routes();
 register_group_routes();
 register_entregas_routes(); 
 register_parciales_routes();
+register_notas_finales_routes();
 register_report_routes();
 register_asistencia_routes();
 

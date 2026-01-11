@@ -12,6 +12,7 @@
     "grupos": "/pages/grupos/index.html",
     "entregas": "/pages/entregas/index.html",
     "parciales": "/pages/parciales/index.html",
+    "notasFinales": "/pages/notas-finales/index.html",
     "asistencia": "/pages/asistencia/index.html",
     "reportes": "/pages/reportes/index.html",
     "cursosAdmin": "/pages/cursos-admin/index.html",
