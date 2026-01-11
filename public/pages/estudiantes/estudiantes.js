@@ -171,17 +171,24 @@ function renderEditTable(rows){
   // CSV
 qs('btnBulk').onclick = () => {
     if (!CAN_EDIT) { alert('Sin permisos para carga masiva.'); return; }
-    qs('b_file').value=''; qs('b_dry').checked=true; qs('b_msg').textContent=''; modalShow('modalBulk');
+    qs('b_file').value='';
+    qs('b_dry').checked=true;
+    qs('b_msg').textContent='';
+    qs('b_format').value='standard';
+    updateBulkFormatInfo();
+    modalShow('modalBulk');
   };
   Array.from(document.querySelectorAll('#modalBulk [data-close]')).forEach(b => b.onclick = ()=>modalHide('modalBulk'));
+  qs('b_format').addEventListener('change', updateBulkFormatInfo);
   qs('b_upload').onclick = async () => {
     if (!CAN_EDIT) { qs('b_msg').textContent='Sin permisos para carga masiva.'; return; }
     const f = qs('b_file').files[0];
     const dry = qs('b_dry').checked ? 1 : 0;
+    const format = qs('b_format').value || 'standard';
     if (!f) { qs('b_msg').textContent = 'Seleccioná un CSV.'; return; }
     const fd = new FormData(); fd.append('file', f);
     try {
-      const res = await fetch(`${API_BASE}/estudiantes/bulk?course_id=${courseId}&dry_run=${dry}`, {
+      const res = await fetch(`${API_BASE}/estudiantes/bulk?course_id=${courseId}&dry_run=${dry}&format=${encodeURIComponent(format)}`, {
         method:'POST', headers: { Authorization: `Bearer ${api.getToken()}` }, body: fd
       });
       const txt = await res.text(); const data = txt ? JSON.parse(txt) : {};
@@ -248,3 +255,22 @@ qs('btnBulk').onclick = () => {
   // init
   await load();
 })();
+
+function updateBulkFormatInfo() {
+  const info = qs('b_format_info');
+  const format = qs('b_format').value;
+  if (format === 'siu') {
+    info.innerHTML = `
+      Formato SIU: primera fila con títulos. Columnas A-F:
+      <code>A: ID (ignorar)</code>,
+      <code>B: Legajo</code>,
+      <code>C: Apellido y Nombre</code>,
+      <code>D: Estado (ignorar)</code>,
+      <code>E: E-mail</code>,
+      <code>F: Inscripción (ignorar)</code>.
+      La plataforma adapta automáticamente el formato.
+    `;
+    return;
+  }
+  info.innerHTML = 'Formato: <code>apellido, nombre, legajo, email_inst</code> (separado por coma o punto y coma).';
+}

@@ -311,10 +311,11 @@ function register_student_routes(): void
     ensure_course_access($courseId);
     require_role(current_user(), ['GURU','SENIOR']);
     $dry = (int) ($_GET['dry_run'] ?? 0) === 1;
+    $format = (string) ($_GET['format'] ?? 'standard');
 
     $rows = [];
     if (!empty($_FILES['file']['tmp_name'])) {
-      $rows = parse_csv_rows($_FILES['file']['tmp_name']);
+      $rows = parse_csv_rows($_FILES['file']['tmp_name'], $format);
     } else {
       $data = read_json();
       if (isset($data[0]) && is_array($data[0]))
@@ -455,7 +456,7 @@ function ensure_no_active_in_other_course(PDO $pdo, int $personId, int $courseId
   }
 }
 
-function parse_csv_rows(string $tmpfile): array
+function parse_csv_rows(string $tmpfile, string $format = 'standard'): array
 {
   $fh = fopen($tmpfile, 'r');
   if (!$fh)
@@ -469,6 +470,20 @@ function parse_csv_rows(string $tmpfile): array
   rewind($fh);
 
   $rows = [];
+  if (strtolower($format) === 'siu') {
+    $headerSkipped = false;
+    while (($data = fgetcsv($fh, 0, $delim, '"', '\\')) !== false) {
+      if (!$headerSkipped) {
+        $headerSkipped = true;
+        continue;
+      }
+      if (!array_filter($data, fn($v) => trim((string) $v) !== ''))
+        continue;
+      $rows[] = row_from_siu($data);
+    }
+    fclose($fh);
+    return $rows;
+  }
   $header = null;
   while (($data = fgetcsv($fh, 0, $delim, '"', '\\')) !== false) {
     if ($header === null) {
@@ -498,6 +513,29 @@ function row_from_fixed(array $d): array
     'legajo' => $d[2] ?? '',
     'email_inst' => $d[3] ?? ''
   ]);
+}
+function row_from_siu(array $d): array
+{
+  $full = trim((string) ($d[2] ?? ''));
+  [$last, $first] = split_siu_name($full);
+  return normalize_row([
+    'last_name' => $last,
+    'first_name' => $first,
+    'legajo' => trim((string) ($d[1] ?? '')),
+    'email_inst' => trim((string) ($d[4] ?? ''))
+  ]);
+}
+function split_siu_name(string $full): array
+{
+  if ($full === '')
+    return ['', ''];
+  $parts = array_map('trim', explode(',', $full));
+  if (count($parts) >= 2) {
+    $last = $parts[0];
+    $first = implode(', ', array_slice($parts, 1));
+    return [$last, $first];
+  }
+  return [trim($full), ''];
 }
 function normalize_row(array $r): array
 {

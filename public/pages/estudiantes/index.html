@@ -113,8 +113,15 @@
   <div id="modalBulk" class="modal-back">
     <div class="modal fx-pop">
       <h3>Cargar CSV</h3>
-      <div class="card small" style="margin-bottom:.6rem">
-        Formato: <code>apellido, nombre, legajo, email_inst</code> (separado por coma o punto y coma)
+      <div class="field">
+        <label class="label">Formato</label>
+        <select id="b_format" class="select">
+          <option value="standard" selected>Formato estándar</option>
+          <option value="siu">Formato SIU</option>
+        </select>
+      </div>
+      <div id="b_format_info" class="card small" style="margin-bottom:.6rem">
+        Formato: <code>apellido, nombre, legajo, email_inst</code> (separado por coma o punto y coma).
       </div>
       <div class="field"><label class="label">Archivo CSV</label><input id="b_file" type="file" accept=".csv"></div>
       <div class="field"><label><input id="b_dry" type="checkbox" checked> Validar sin guardar (dry-run)</label></div>
