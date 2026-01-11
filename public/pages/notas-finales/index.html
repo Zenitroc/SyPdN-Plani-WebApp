@@ -134,6 +134,44 @@
         .muted-cell {
             color: var(--muted);
         }
+
+        .section-title {
+            margin-top: 2rem;
+        }
+
+        .partial-table {
+            min-width: 1200px;
+        }
+
+        .partial-table th,
+        .partial-table td {
+            text-align: center;
+        }
+
+        .partial-table th.sticky-left,
+        .partial-table td.sticky-left {
+            position: sticky;
+            left: 0;
+            background: var(--surface);
+            z-index: 1;
+        }
+
+        .partial-table td.text-left,
+        .partial-table th.text-left {
+            text-align: left;
+        }
+
+        .td-pass {
+            background: color-mix(in oklab, var(--ok) 18%, var(--surface));
+        }
+
+        .td-fail {
+            background: color-mix(in oklab, var(--bad) 18%, var(--surface));
+        }
+
+        .td-topic-pass {
+            background: color-mix(in oklab, var(--ok) 14%, var(--surface));
+        }
     </style>
 </head>
 
@@ -149,6 +187,23 @@
                     <option value="ALL">Todos</option>
                     <option value="ALTA">Solo ALTA</option>
                     <option value="BAJA">Solo BAJA</option>
+                </select>
+                 <label class="muted">Columnas:</label>
+                <select id="showCols" class="input" style="width:auto">
+                    <option value="ALL">Todos</option>
+                    <option value="P1">Sólo 1° Parcial</option>
+                    <option value="P2">Sólo 2° Parcial</option>
+                </select>
+                <label class="muted">Tema:</label>
+                <select id="topicFilter" class="input" style="width:auto">
+                    <option value="ALL">Todos</option>
+                </select>
+                <select id="attemptFilter" class="input" style="width:auto">
+                    <option value="ALL">Todos</option>
+                    <option value="PA">Parcial</option>
+                    <option value="1R">1° Recup</option>
+                    <option value="2R">2° Recup</option>
+                    <option value="REC">Solo recuperatorios</option>
                 </select>
                 <label class="muted">SIU:</label>
                 <select id="siuFilter" class="input" style="width:auto">
@@ -182,12 +237,21 @@
                 <tbody id="tbodyFinals"></tbody>
             </table>
         </div>
+        <h2 class="section-title">Parciales</h2>
+        <div class="table-wrap">
+            <table class="tbl partial-table" id="partialsTable">
+                <thead id="partialsHead"></thead>
+                <tbody id="partialsBody"></tbody>
+            </table>
+        </div>
     </main>
 
     <script src="/assets/js/api.js"></script>
     <script src="/assets/js/theme.js"></script>
     <script src="/assets/js/course-context.js"></script>
     <script src="/assets/js/menu.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.min.js"></script>
     <script src="/pages/notas-finales/notas-finales.js"></script>
 </body>
 

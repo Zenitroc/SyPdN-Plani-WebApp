@@ -12,6 +12,7 @@ function register_notas_finales_routes(): void
         enrollment_id BIGINT UNSIGNED NOT NULL,
         final_grade TINYINT NULL,
         final_deserto TINYINT(1) NOT NULL DEFAULT 0,
+        final_condition VARCHAR(16) NULL,
         siu_loaded TINYINT(1) NOT NULL DEFAULT 0,
         updated_at DATETIME NOT NULL,
         UNIQUE KEY ux_fg_unique (enrollment_id),
@@ -21,6 +22,17 @@ function register_notas_finales_routes(): void
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ";
     $pdo->exec($sql);
+    $colCheck = $pdo->prepare("
+      SELECT COUNT(*)
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'final_grades'
+        AND COLUMN_NAME = 'final_condition'
+    ");
+    $colCheck->execute();
+    if ((int)$colCheck->fetchColumn() === 0) {
+      $pdo->exec("ALTER TABLE final_grades ADD COLUMN final_condition VARCHAR(16) NULL AFTER final_deserto");
+    }
 
     $sqlPartial = "
       CREATE TABLE IF NOT EXISTS partial_grades (
@@ -83,9 +95,16 @@ function register_notas_finales_routes(): void
 
     return $approval;
   };
+  $compute_condition = function(?int $finalGrade, int $finalDeserto): ?string {
+    if ($finalDeserto === 1) return 'DESERTO';
+    if ($finalGrade === null) return null;
+    if ($finalGrade < 6) return 'RECURSA';
+    if ($finalGrade < 8) return 'FIRMA';
+    return 'PROMOCIONA';
+  };
 
   // ====== GET /api/notas-finales?course_id=... ==============================
-  route('GET', '/api/notas-finales', function() use ($ensure_schema, $pass, $compute_term_approval) {
+  route('GET', '/api/notas-finales', function() use ($ensure_schema, $pass, $compute_term_approval, $compute_condition) {
     auth_require();
     require_role(current_user(), ['GURU','SENIOR']);
 
@@ -128,13 +147,14 @@ function register_notas_finales_routes(): void
     $P2 = ['PLS','CUR','TEO2'];
     $ATT = ['PA','1R','2R'];
 
-    $stf = $pdo->prepare("SELECT enrollment_id, final_grade, final_deserto, siu_loaded FROM final_grades WHERE course_id=?");
+    $stf = $pdo->prepare("SELECT enrollment_id, final_grade, final_deserto, siu_loaded, final_condition FROM final_grades WHERE course_id=?");
     $stf->execute([$courseId]);
     $finals = $stf->fetchAll(PDO::FETCH_ASSOC);
     $finalIdx = [];
     foreach ($finals as $f) {
       $finalIdx[(int)$f['enrollment_id']] = $f;
     }
+    $stc = $pdo->prepare("UPDATE final_grades SET final_condition=? WHERE enrollment_id=?");
 
     $rows = [];
     foreach ($students as $s) {
@@ -154,6 +174,7 @@ function register_notas_finales_routes(): void
         'tps_2c' => $s['group_id'] ? ($approval2[(int)$s['group_id']] ?? null) : null,
         'final_grade' => null,
         'final_deserto' => 0,
+        'final_condition' => null,
         'siu_loaded' => 0
       ];
 
@@ -176,19 +197,33 @@ function register_notas_finales_routes(): void
       }
 
       if (isset($finalIdx[$e])) {
-        $row['final_grade'] = $finalIdx[$e]['final_grade'] !== null ? (int)$finalIdx[$e]['final_grade'] : null;
-        $row['final_deserto'] = (int)($finalIdx[$e]['final_deserto'] ?? 0);
+        $finalGrade = $finalIdx[$e]['final_grade'] !== null ? (int)$finalIdx[$e]['final_grade'] : null;
+        $finalDeserto = (int)($finalIdx[$e]['final_deserto'] ?? 0);
+        $finalCondition = $finalIdx[$e]['final_condition'] ?? null;
+        if ($finalCondition === null) {
+          $finalCondition = $compute_condition($finalGrade, $finalDeserto);
+          if ($finalCondition !== null) {
+            $stc->execute([$finalCondition, $e]);
+          }
+        }
+        $row['final_grade'] = $finalGrade;
+        $row['final_deserto'] = $finalDeserto;
+        $row['final_condition'] = $finalCondition;
         $row['siu_loaded'] = (int)($finalIdx[$e]['siu_loaded'] ?? 0);
       }
 
       $rows[] = $row;
     }
 
-    json_ok(['students' => $rows]);
+    json_ok([
+      'students' => $rows,
+      'topics' => ['p1' => $P1, 'p2' => $P2],
+      'attempts' => $ATT
+    ]);
   });
 
   // ====== POST /api/notas-finales/guardar ===================================
-  route('POST', '/api/notas-finales/guardar', function() use ($ensure_schema) {
+  route('POST', '/api/notas-finales/guardar', function() use ($ensure_schema, $compute_condition) {
     auth_require();
     $in = read_json();
 
@@ -220,20 +255,21 @@ function register_notas_finales_routes(): void
     $own->execute([$enrollId, $courseId]);
     if ((int)$own->fetchColumn() === 0) json_error('enrollment no pertenece al curso', 400);
 
-    $existing = db_one($pdo, "SELECT final_grade, final_deserto, siu_loaded FROM final_grades WHERE enrollment_id=?", [$enrollId]);
+    $existing = db_one($pdo, "SELECT final_grade, final_deserto, final_condition, siu_loaded FROM final_grades WHERE enrollment_id=?", [$enrollId]);
 
     $nextFinal = $finalGrade ?? ($existing['final_grade'] ?? null);
     $nextDeserto = $finalDeserto ?? ($existing['final_deserto'] ?? 0);
     $nextSiu = $siuLoaded ?? ($existing['siu_loaded'] ?? 0);
+    $nextCond = $compute_condition($nextFinal !== null ? (int)$nextFinal : null, (int)$nextDeserto);
 
     $sql = "
-      INSERT INTO final_grades (course_id,enrollment_id,final_grade,final_deserto,siu_loaded,updated_at)
-      VALUES (?,?,?,?,?,NOW())
+      INSERT INTO final_grades (course_id,enrollment_id,final_grade,final_deserto,final_condition,siu_loaded,updated_at)
+      VALUES (?,?,?,?,?,?,NOW())
       ON DUPLICATE KEY UPDATE final_grade=VALUES(final_grade), final_deserto=VALUES(final_deserto),
-        siu_loaded=VALUES(siu_loaded), updated_at=NOW()
+        final_condition=VALUES(final_condition), siu_loaded=VALUES(siu_loaded), updated_at=NOW()
     ";
     $st = $pdo->prepare($sql);
-    $st->execute([$courseId, $enrollId, $nextFinal, $nextDeserto, $nextSiu]);
+    $st->execute([$courseId, $enrollId, $nextFinal, $nextDeserto, $nextCond, $nextSiu]);
 
     json_ok(['saved' => 1]);
   });
