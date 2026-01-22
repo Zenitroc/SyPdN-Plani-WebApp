@@ -38,6 +38,20 @@
             flex-wrap: wrap;
         }
 
+         .table-scroll {
+            overflow-x: auto;
+            overflow-y: hidden;
+            height: 12px;
+            margin-bottom: .4rem;
+            border-radius: var(--radius);
+            background: color-mix(in oklab, var(--surface) 80%, transparent);
+        }
+
+        .table-scroll-inner {
+            height: 1px;
+        }
+
+
         .table-wrap {
             border: 1px solid var(--border);
             border-radius: var(--radius);
@@ -58,6 +72,41 @@
             white-space: nowrap;
             font-size: .92rem;
             text-align: left;
+        }
+
+        .tbl th.tiny,
+        .tbl td.tiny {
+            font-size: .78rem;
+            padding: .35rem .4rem;
+            min-width: 48px;
+            text-align: center;
+        }
+
+        .tbl th.sticky-col-1,
+        .tbl td.sticky-col-1 {
+            position: sticky;
+            left: 0;
+            background: var(--surface);
+            z-index: 3;
+            min-width: 70px;
+        }
+
+        .tbl th.sticky-col-2,
+        .tbl td.sticky-col-2 {
+            position: sticky;
+            left: 70px;
+            background: var(--surface);
+            z-index: 3;
+            min-width: 170px;
+        }
+
+        .tbl th.sticky-col-3,
+        .tbl td.sticky-col-3 {
+            position: sticky;
+            left: 240px;
+            background: var(--surface);
+            z-index: 3;
+            min-width: 170px;
         }
 
         .tbl th {
@@ -213,32 +262,25 @@
                 </select>
             </div>
             <div class="right">
+                <button id="btnDownloadPdf" class="btn">Descargar PDF</button>
                 <input id="q" class="input" placeholder="Buscar por apellido o nombre..." style="min-width:260px" />
             </div>
         </div>
 
-        <div class="table-wrap">
+        <div class="table-scroll" data-target="finalsTableWrap">
+            <div class="table-scroll-inner"></div>
+        </div>
+        <div class="table-wrap" id="finalsTableWrap">
             <table class="tbl" id="finalsTable">
-                <thead>
-                    <tr>
-                        <th class="center">ID</th>
-                        <th>Apellido</th>
-                        <th>Nombre</th>
-                        <th class="center">1°P</th>
-                        <th class="center">2°P</th>
-                        <th class="center">TPS 1C</th>
-                        <th class="center">TPS 2C</th>
-                        <th class="center">Calificación final</th>
-                        <th class="center">Condición</th>
-                        <th class="center">Cargado en SIU</th>
-                        <th>Observaciones</th>
-                    </tr>
-                </thead>
+                <thead id="finalsHead"></thead>
                 <tbody id="tbodyFinals"></tbody>
             </table>
         </div>
         <h2 class="section-title">Parciales</h2>
-        <div class="table-wrap">
+        <div class="table-scroll" data-target="partialsTableWrap">
+            <div class="table-scroll-inner"></div>
+        </div>
+        <div class="table-wrap" id="partialsTableWrap">
             <table class="tbl partial-table" id="partialsTable">
                 <thead id="partialsHead"></thead>
                 <tbody id="partialsBody"></tbody>
@@ -250,7 +292,7 @@
     <script src="/assets/js/theme.js"></script>
     <script src="/assets/js/course-context.js"></script>
     <script src="/assets/js/menu.js"></script>
-     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.min.js"></script>
     <script src="/pages/notas-finales/notas-finales.js"></script>
 </body>

@@ -20,6 +20,7 @@ renderMenu();
     let SHOW = 'ALL';
     let ATT = 'ALL';
     let TOPIC_FILTER = 'ALL';
+    let SCROLL_SYNC_READY = false;
 
     const MAP_P1 = { ORG: 'O', MET: 'M', TEO1: 'T' };
     const MAP_P2 = { PLS: 'P', CUR: 'C', TEO2: 'T' };
@@ -143,13 +144,38 @@ renderMenu();
     function renderTables() {
         renderFinalsTable();
         renderPartialTable();
+        setupScrollSync();
     }
 
     function renderFinalsTable() {
-        const rows = filteredFinals();;
+        const rows = filteredFinals();
         const body = qs('tbodyFinals');
+        const head = qs('finalsHead');
+        const topics = topicData();
+        const attempts = ALL_ATTEMPTS;
+        const finalsTopics = {
+            p1: topics.p1 || [],
+            p2: topics.p2 || []
+        };
+        const headerCells = [
+            '<th class="center sticky-col-1">ID</th>',
+            '<th class="sticky-col-2">Apellido</th>',
+            '<th class="sticky-col-3">Nombre</th>',
+            '<th class="center">1°P</th>',
+            '<th class="center">2°P</th>',
+            ...[...finalsTopics.p1, ...finalsTopics.p2].flatMap(topic =>
+                attempts.map(a => `<th class="tiny">${topic}_${ATT_LABEL[a]}</th>`)
+            ),
+            '<th class="center">TPS 1C</th>',
+            '<th class="center">TPS 2C</th>',
+            '<th class="center">Calificación final</th>',
+            '<th class="center">Condición</th>',
+            '<th class="center">Cargado en SIU</th>',
+            '<th>Observaciones</th>'
+        ];
+        head.innerHTML = `<tr>${headerCells.join('')}</tr>`;
         if (!rows.length) {
-            body.innerHTML = '<tr><td colspan="11" class="muted">Sin estudiantes</td></tr>';
+            body.innerHTML = `<tr><td colspan="${headerCells.length}" class="muted">Sin estudiantes</td></tr>`;
             return;
         }
 
@@ -162,6 +188,13 @@ renderMenu();
             const rowClass = Number(row.siu_loaded) === 1 ? 'row-siu' : '';
             const apellido = escapeHtml(row.apellido);
             const nombre = escapeHtml(row.nombre);
+            const partialCells = [];
+            finalsTopics.p1.forEach(topic => attempts.forEach(a => {
+                partialCells.push(`<td class="tiny">${escapeHtml(row.p1?.[topic]?.[a] ?? '-')}</td>`);
+            }));
+            finalsTopics.p2.forEach(topic => attempts.forEach(a => {
+                partialCells.push(`<td class="tiny">${escapeHtml(row.p2?.[topic]?.[a] ?? '-')}</td>`);
+            }));
 
             const finalCell = CAN_EDIT
                 ? `<select class="input final-grade" data-enroll="${row.enrollment_id}">${finalGradeOptions(row.final_grade, row.final_deserto)}</select>`
@@ -179,11 +212,12 @@ renderMenu();
 
             return `
       <tr class="${rowClass}">
-        <td class="center">${row.course_id_seq}</td>
-        <td>${apellido}</td>
-        <td>${nombre}</td>
+        <td class="center sticky-col-1">${row.course_id_seq}</td>
+        <td class="sticky-col-2">${apellido}</td>
+        <td class="sticky-col-3">${nombre}</td>
         <td class="center">${p1}</td>
         <td class="center">${p2}</td>
+        ${partialCells.join('')}
         <td class="center">${tps1}</td>
         <td class="center">${tps2}</td>
         <td class="center">${finalCell}</td>
@@ -213,12 +247,12 @@ renderMenu();
         const { p1, p2 } = topicsForShow();
         const base = `
       <tr>
-        <th>ID</th>
-        <th>Apellido</th>
-        <th>Nombre</th>
+        <th class="sticky-col-1">ID</th>
+        <th class="sticky-col-2">Apellido</th>
+        <th class="sticky-col-3">Nombre</th>
         <th>1°P</th>
         <th>2°P</th>
-        ${[...p1, ...p2].map(topic => atts.map(a => `<th>${topic}_${ATT_LABEL[a]}</th>`).join('')).join('')}
+        ${[...p1, ...p2].map(topic => atts.map(a => `<th class="tiny">${topic}_${ATT_LABEL[a]}</th>`).join('')).join('')}
       </tr>`;
         return base;
     }
@@ -239,7 +273,7 @@ renderMenu();
             const value = row[p]?.[t]?.[a] ?? '';
             const gClass = cellClassFromGrade(value);
             const topicPassClass = !gClass && hasAnyPass(p, t) ? 'td-topic-pass' : '';
-            const tdClass = [gClass, topicPassClass].filter(Boolean).join(' ');
+            const tdClass = ['tiny', gClass, topicPassClass].filter(Boolean).join(' ');
             return `<td class="${tdClass}">${escapeHtml(value || '-')}</td>`;
         };
 
@@ -249,9 +283,9 @@ renderMenu();
 
         return `
       <tr>
-        <td>${row.course_id_seq}</td>
-        <td class="text-left">${escapeHtml(row.apellido)}</td>
-        <td class="text-left">${escapeHtml(row.nombre)}</td>
+        <td class="sticky-col-1">${row.course_id_seq}</td>
+        <td class="text-left sticky-col-2">${escapeHtml(row.apellido)}</td>
+        <td class="text-left sticky-col-3">${escapeHtml(row.nombre)}</td>
         <td>${p1AP ? '<span class="txt-ok">AP</span>' : `<span class="txt-bad">${row.adeuda_p1.map(t => MAP_P1[t] || t).join('-')}</span>`}</td>
         <td>${p2AP ? '<span class="txt-ok">AP</span>' : `<span class="txt-bad">${row.adeuda_p2.map(t => MAP_P2[t] || t).join('-')}</span>`}</td>
         ${cells.join('')}
@@ -262,15 +296,42 @@ renderMenu();
         const rows = filteredBase();
         const head = qs('partialsHead');
         const body = qs('partialsBody');
+        head.innerHTML = headPartialTable();
         if (!rows.length) {
-            head.innerHTML = '';
-            body.innerHTML = '<tr><td colspan="8" class="muted">Sin estudiantes</td></tr>';
+            const colCount = head.querySelectorAll('th').length || 8;
+            body.innerHTML = `<tr><td colspan="${colCount}" class="muted">Sin estudiantes</td></tr>`;
             return;
         }
 
-        head.innerHTML = headPartialTable();
         body.innerHTML = rows.map(renderPartialRow).join('');
     }
+
+    function setupScrollSync() {
+        document.querySelectorAll('.table-scroll').forEach(scrollbar => {
+            const targetId = scrollbar.getAttribute('data-target');
+            const target = document.getElementById(targetId);
+            if (!target) return;
+            const inner = scrollbar.querySelector('.table-scroll-inner');
+            const syncSize = () => {
+                inner.style.width = `${target.scrollWidth}px`;
+            };
+            const syncFromTop = () => {
+                target.scrollLeft = scrollbar.scrollLeft;
+            };
+            const syncFromBody = () => {
+                scrollbar.scrollLeft = target.scrollLeft;
+            };
+            if (!SCROLL_SYNC_READY) {
+                scrollbar.addEventListener('scroll', syncFromTop);
+                target.addEventListener('scroll', syncFromBody);
+                window.addEventListener('resize', syncSize);
+            }
+            syncSize();
+            syncFromBody();
+        });
+        SCROLL_SYNC_READY = true;
+    }
+
 
     function updateRow(enrollmentId, changes) {
         const row = DATA.students.find(r => Number(r.enrollment_id) === Number(enrollmentId));
@@ -361,7 +422,10 @@ renderMenu();
         });
     })();
 
-     qs('btnDownloadPdf').addEventListener('click', () => downloadPdf());
+    const btnDownloadPdf = qs('btnDownloadPdf');
+    if (btnDownloadPdf) {
+        btnDownloadPdf.addEventListener('click', () => downloadPdf());
+    }
 
     function parcialPlain(adeuda, p) {
         if (!adeuda || adeuda.length === 0) return 'AP';
@@ -437,6 +501,8 @@ renderMenu();
     }
 
     load().catch(e => {
-        qs('tbodyFinals').innerHTML = `<tr><td colspan="11" style="padding:1rem">Error: ${e.message || e}</td></tr>`;
+        const head = qs('finalsHead');
+        const colCount = head ? head.querySelectorAll('th').length : 11;
+        qs('tbodyFinals').innerHTML = `<tr><td colspan="${colCount}" style="padding:1rem">Error: ${e.message || e}</td></tr>`;
     });
 })();
