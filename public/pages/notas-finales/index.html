@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Notas finales — SyPdN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <style>
+        :root {
+            --ok: #16a34a;
+            --bad: #ef4444;
+            --warn: #facc15;
+            --info: #38bdf8;
+            --neutral: #94a3b8;
+            --row-siu: color-mix(in oklab, #fde68a 35%, var(--surface));
+            --col-org: #e0f2fe;
+            /* ORG / PLS */
+            --col-met: #ffedd5;
+            /* MET / CUR  */
+            --col-teo: #fef9c3;
+            /* TEO1 / TEO2 */
+            --col-pls: #e9d5ff;
+            /* lila pastel  */
+            --col-cur: #fbcfe8;
+            /* rosa pastel  */
+            --col-teo2: #fed7aa;
+            /* naranja pastel */
+            --hdr-fg: #0c111a;
+        }
+
+        body.notas-finales main.container {
+            max-width: 100%;
+            padding: 0 1rem 3rem;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: .75rem;
+            align-items: center;
+            justify-content: space-between;
+            margin: .75rem 0;
+            flex-wrap: wrap;
+        }
+
+        .toolbar .left,
+        .toolbar .right {
+            display: flex;
+            gap: .5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            overflow-y: hidden;
+            height: 12px;
+            margin-bottom: .4rem;
+            border-radius: var(--radius);
+            background: color-mix(in oklab, var(--surface) 80%, transparent);
+        }
+
+        .table-scroll-inner {
+            height: 1px;
+        }
+
+        .table-scroll-bottom {
+            position: sticky;
+            bottom: .5rem;
+            z-index: 4;
+            margin-top: .4rem;
+            margin-bottom: 0;
+            box-shadow: 0 0 0 1px var(--border);
+        }
+
+
+        .table-wrap {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: auto;
+            background: var(--surface);
+        }
+
+        .table-wrap::-webkit-scrollbar:horizontal {
+            height: 0;
+        }
+
+        .table-wrap {
+            scrollbar-width: none;
+        }
+
+        .tbl {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 980px;
+        }
+
+        .tbl th,
+        .tbl td {
+            border-bottom: 1px solid var(--border);
+            padding: .5rem .6rem;
+            white-space: nowrap;
+            font-size: .92rem;
+            text-align: left;
+        }
+
+        .tbl th.tiny,
+        .tbl td.tiny {
+            font-size: .78rem;
+            padding: .35rem .4rem;
+            min-width: 48px;
+            text-align: center;
+        }
+
+        .tbl th.sticky-col-1,
+        .tbl td.sticky-col-1 {
+            position: sticky;
+            left: 0;
+            background: var(--surface);
+            z-index: 3;
+            min-width: 70px;
+        }
+
+        .tbl th.sticky-col-2,
+        .tbl td.sticky-col-2 {
+            position: sticky;
+            left: 70px;
+            background: var(--surface);
+            z-index: 3;
+            min-width: 170px;
+        }
+
+        .tbl th.sticky-col-3,
+        .tbl td.sticky-col-3 {
+            position: sticky;
+            left: 240px;
+            background: var(--surface);
+            z-index: 3;
+            min-width: 170px;
+        }
+
+        .tbl th {
+            position: sticky;
+            top: 0;
+            background: var(--surface);
+            z-index: 2;
+            font-weight: 700;
+        }
+
+        .tbl td.tone-org {
+            background: var(--col-org);
+            color: var(--hdr-fg);
+        }
+
+        .tbl td.tone-met {
+            background: var(--col-met);
+            color: var(--hdr-fg);
+        }
+
+        .tbl td.tone-teo {
+            background: var(--col-teo);
+            color: var(--hdr-fg);
+        }
+
+        .tbl td.tone-pls {
+            background: color-mix(in oklab, var(--col-pls) 65%, var(--surface));
+            color: var(--hdr-fg);
+        }
+
+        .tbl td.tone-cur {
+            background: color-mix(in oklab, var(--col-cur) 65%, var(--surface));
+            color: var(--hdr-fg);
+        }
+
+        .tbl td.tone-teo2 {
+            background: color-mix(in oklab, var(--col-teo2) 65%, var(--surface));
+            color: var(--hdr-fg);
+        }
+
+        .tbl td.center,
+        .tbl th.center {
+            text-align: center;
+        }
+
+        .tbl td.right,
+        .tbl th.right {
+            text-align: right;
+        }
+
+        .txt-ok {
+            color: var(--ok);
+            font-weight: 700;
+        }
+
+        .txt-bad {
+            color: var(--bad);
+            font-weight: 700;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: .1rem .45rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: .78rem;
+            letter-spacing: .02em;
+            text-transform: uppercase;
+        }
+
+        .badge.deserto {
+            background: color-mix(in oklab, var(--neutral) 20%, var(--surface));
+            color: var(--neutral);
+        }
+
+        .badge.recursa {
+            background: color-mix(in oklab, var(--bad) 18%, var(--surface));
+            color: var(--bad);
+        }
+
+        .badge.firma {
+            background: color-mix(in oklab, var(--ok) 18%, var(--surface));
+            color: var(--ok);
+        }
+
+        .badge.promociona {
+            background: color-mix(in oklab, var(--info) 22%, var(--surface));
+            color: #0ea5e9;
+        }
+
+        .row-siu {
+            background: var(--row-siu);
+        }
+
+        select.final-grade {
+            min-width: 110px;
+        }
+
+        .obs-input {
+            min-width: 200px;
+        }
+
+        .muted-cell {
+            color: var(--muted);
+        }
+
+        .td-pass {
+            background: color-mix(in oklab, var(--ok) 18%, var(--surface));
+        }
+
+        .td-fail {
+            background: color-mix(in oklab, var(--bad) 18%, var(--surface));
+        }
+
+        .td-topic-pass {
+            background: color-mix(in oklab, var(--ok) 14%, var(--surface));
+        }
+    </style>
+</head>
+
+<body class="notas-finales">
+    <div id="appMenu"></div>
+    <main class="container">
+        <h1>Notas finales</h1>
+
+        <div class="toolbar">
+            <div class="left">
+                <label class="muted">Ver:</label>
+                <select id="statusFilter" class="input" style="width:auto">
+                    <option value="ALL">Todos</option>
+                    <option value="ALTA">Solo ALTA</option>
+                    <option value="BAJA">Solo BAJA</option>
+                </select>
+                 <label class="muted">Columnas:</label>
+                <select id="showCols" class="input" style="width:auto">
+                    <option value="ALL">Todos</option>
+                    <option value="P1">Sólo 1° Parcial</option>
+                    <option value="P2">Sólo 2° Parcial</option>
+                </select>
+                <label class="muted">Tema:</label>
+                <select id="topicFilter" class="input" style="width:auto">
+                    <option value="ALL">Todos</option>
+                </select>
+                <select id="attemptFilter" class="input" style="width:auto">
+                    <option value="ALL">Todos</option>
+                    <option value="PA">Parcial</option>
+                    <option value="1R">1° Recup</option>
+                    <option value="2R">2° Recup</option>
+                    <option value="REC">Solo recuperatorios</option>
+                </select>
+                <label class="muted">SIU:</label>
+                <select id="siuFilter" class="input" style="width:auto">
+                    <option value="ALL">Todos</option>
+                    <option value="LOADED">Cargados en SIU</option>
+                    <option value="UNLOADED">Sin cargar</option>
+                </select>
+            </div>
+            <div class="right">
+                <button id="btnDownloadPdf" class="btn">Descargar PDF</button>
+                <input id="q" class="input" placeholder="Buscar por apellido o nombre..." style="min-width:260px" />
+            </div>
+        </div>
+
+        <div class="table-wrap" id="finalsTableWrap">
+            <table class="tbl" id="finalsTable">
+                <thead id="finalsHead"></thead>
+                <tbody id="tbodyFinals"></tbody>
+            </table>
+        </div>
+        <div class="table-scroll table-scroll-bottom" data-target="finalsTableWrap">
+            <div class="table-scroll-inner"></div>
+        </div>
+    </main>
+
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/theme.js"></script>
+    <script src="/assets/js/course-context.js"></script>
+    <script src="/assets/js/menu.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.min.js"></script>
+    <script src="/pages/notas-finales/notas-finales.js"></script>
+</body>
+
+</html>

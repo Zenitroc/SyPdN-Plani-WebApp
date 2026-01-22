@@ -1,77 +1,85 @@
 # Actualizaciones del repositorio
 
-Este documento resume los cambios por período a partir del historial de commits.
+Este documento resume las funcionalidades y mejoras más relevantes incorporadas por período. La idea es explicar qué se agregó y qué cambió para quien usa la app, con fechas de referencia.
 
-## Periodo: 6–7 de septiembre de 2025
-**Enfoque:** base funcional de la plataforma, API inicial, estilos, ABM de estudiantes/grupos/entregas, y mejoras visuales.
+## Periodo: 6–7 de septiembre de 2025 — Base funcional y primeros módulos
+**Enfoque:** cimientos del sistema, primeros ABM y personalización visual.
 
-**Cambios destacados**
-- Se creó la base del proyecto con API PHP, autenticación JWT, RBAC y primeras rutas.
-- Se agregaron temas claro/oscuro, mejoras de estilo y componentes UI.
-- Se implementaron ABM de estudiantes, grupos y trabajos prácticos con promedio.
-- Se enriqueció el Home con selección de cursos y colores por curso.
-- Se incorporó el módulo de parciales y el service worker.
+**Qué se incorporó y por qué importa**
+- **Base completa del sistema:** se levantó la estructura inicial con API PHP, autenticación JWT y control de roles (RBAC), para que el acceso ya quede protegido y con permisos por perfil.
+- **Primeros módulos de gestión (ABM):** quedaron operativos estudiantes, grupos y trabajos prácticos. Esto permitió empezar a administrar cursos reales con notas y conformación de equipos.
+- **Parciales iniciales:** se habilitó el registro de parciales para llevar calificaciones de evaluaciones formales.
+- **Home mejorado:** el inicio ahora permite elegir curso/comisión y asignar color por curso, haciendo más clara la navegación.
+- **Estilo y temas:** se sumaron temas (claro/oscuro y variantes) y mejoras visuales en botones y animaciones para dar más claridad y feedback.
+- **Service worker y mejoras de UI:** se consolidó la base para mejorar la experiencia offline y la interacción.
 
-**Commits**
-- `f77bb6b` — Initial commit
-- `0004ff6` — Toda la base funcional con bdd y usuarios
-- `442b372` — Tema Claro/Oscuro
-- `a82127f` — Agrego estilo, botones y mini animaciones
-- `ba37aaa` — ABM Grupos y Usuarios
-- `dd4bf49` — ABM TPS con calculo de promedio
-- `472771c` — Agrego muchos temas lindos
-- `1973dfd` — Panel home mejorado con color por cursos
-- `9b5bd35` — Merge pull request #1 from Zenitroc/homeSelector
-- `2dd44bc` — Agrego cursos a bd
-- `db43e89` — Merge pull request #2 from Zenitroc/responsiveCelu
-- `d8144de` — Merge branch 'main' into temas
-- `aeea3f3` — Merge pull request #3 from Zenitroc/temas
-- `1201d2f` — ABM parciales
+**Comparado con antes:** antes no existía plataforma funcional; ahora hay login, módulos de carga de datos y experiencia visual completa para operar un curso.
 
-## Periodo: 8 de septiembre de 2025
-**Enfoque:** nuevo login y ajustes en estudiantes.
+## Periodo: 8 de septiembre de 2025 — Nuevo login y mejoras de estudiantes
+**Enfoque:** experiencia de acceso y correcciones de carga masiva.
 
-**Cambios destacados**
-- Se rediseñó el login, aislando estilos y mejorando la experiencia visual.
-- Se agregaron mejoras en validaciones y flujos de login.
-- Se corrigió la importación CSV de estudiantes.
+**Qué se incorporó y por qué importa**
+- **Rediseño integral del login:** se aisló el estilo del login y se actualizó el flujo visual, haciendo el acceso más claro y moderno.
+- **Validaciones y ajustes de autenticación:** mejoras pequeñas pero claves para evitar errores de login.
+- **CSV de estudiantes corregido:** se corrigió el flujo de importación de estudiantes por CSV, que antes fallaba o era inestable.
 
-**Commits**
-- `61f1005` — mejoro login
-- `a1e99ff` — feat: isolate login styles
-- `eb17c02` — Merge pull request #7 from Zenitroc/codex/improve-login-aesthetic
-- `1c43236` — Corrijo error tipeo
-- `532a648` — Actualizaciones copadas del login
-- `0af3863` — detallecitos
-- `27b96e5` — Merge pull request #8 from Zenitroc/nuevoLogin
-- `b889928` — Merge pull request #9 from Zenitroc/nuevoLogin
-- `d9ed993` — Funciona el csv en estudiantes
+**Comparado con antes:** el login era más básico y la carga por CSV no terminaba de funcionar; ahora el ingreso es más claro y la importación es confiable.
 
-## Periodo: 11 de septiembre de 2025
-**Enfoque:** asistencia, reportes y planificación.
+## Periodo: 11 de septiembre de 2025 — Asistencia, reportes y planificación
+**Enfoque:** operación diaria docente y comunicación.
 
-**Cambios destacados**
-- Se creó el módulo de asistencia con exportación a PDF y Excel.
-- Se añadió el centro de reportes con envío de mensajes.
-- Se incorporó la pantalla de planificación con iframe.
-- Se ajustaron rutas relativas en páginas.
+**Qué se incorporó y por qué importa**
+- **Asistencia con exportación:** se agregó la toma de asistencia con exportación a PDF y Excel para llevar registros formales.
+- **Centro de reportes:** se habilitó el envío de reportes (bugs, ideas, pedidos) desde la interfaz.
+- **Planificación del curso:** se sumó la pantalla de planificación con iframe para integrar un plan externo.
+- **Rutas corregidas:** ajustes en rutas relativas para mejorar navegación.
 
-**Commits**
-- `aac74d7` — Agrego reportes y asistencia, ambos a mejorar
-- `86cb2e6` — Asistencia mejorada y exporta pdf y excel
-- `4973858` — Supuestamente funciona la plani, pero no la veo en el menú, hay q arreglar
-- `760e9bd` — Cambio rutas relativas a generales
+**Comparado con antes:** no había asistencia ni reportes; ahora se puede registrar y exportar, y centralizar feedback.
 
-## Periodo: 29 de diciembre de 2025
-**Enfoque:** administración de cursos.
+## Periodo: 29–30 de diciembre de 2025 — Administración avanzada y usuarios
+**Enfoque:** administración de cursos y gestión de usuarios.
 
-**Cambios destacados**
-- Se añadió el panel de administración de cursos con CRUD y asignación de usuarios.
-- Se ajustó la navegación y estilos relacionados, solo hay tema claro y oscuro.
+**Qué se incorporó y por qué importa**
+- **Gestión de cursos (CRUD):** se creó el panel de administración de cursos y asignación de usuarios a cursos. Ahora los cursos se pueden crear, editar y asignar desde la app.
+- **Gestión de usuarios:** se sumó un gestor de usuarios con perfil, más datos en la base y correcciones de UI. Esto habilita administrar cuentas y roles en un lugar central.
+- **Correcciones de roles en cursos:** se arregló la visualización de roles en la gestión de cursos.
+- **Ajustes de tema y visuales:** se simplificaron los temas a claro/oscuro y se corrigieron inconsistencias de estilo.
+- **Documentación:** se incorporaron documentos de pantallas y actualizaciones para dejar trazabilidad funcional.
 
-**Commits**
-- `8403dd4` — Cambios y gestion de cursos, a modificar, tmbn borrar todos los temas y dejar claro y oscuro nomas
-- `b130614` — Merge pull request #17 from Zenitroc/nuevoLogin
-- `ca12345` - Se eliminan todos los temas, se agrega gestior de cursos, falta arreglar que no se ven los roles
-- `0151cba` - Merge pull request #18 from Zenitroc/nuevoLogin
-- `6d4304b` - agrego docs de actualizaciones y explicaciòn pantallas
+**Comparado con antes:** no existía administración central de usuarios ni cursos; ahora hay paneles específicos y control de roles más claro.
+
+## Periodo: 31 de diciembre de 2025 – 1 de enero de 2026 — Preparación para deploy y onboarding
+**Enfoque:** despliegue, navegación, y solicitud de cuentas.
+
+**Qué se incorporó y por qué importa**
+- **Ajustes para deploy:** se reconfiguraron rutas y estructura de archivos para poder publicar la app (incluyendo cambios en rutas del front y eliminación de dependencias de `/public`).
+- **Correcciones de navegación y pantallas negras:** se arreglaron redirecciones y rutas que generaban pantallas en blanco.
+- **Solicitud de cuenta funcional:** se dejó operativo el flujo de “Solicitar cuenta” y se agregó animación de carga para mejorar feedback.
+- **Pantalla de carga en Home:** se incorporó un loading screen y mejoras de botones para percepción de fluidez.
+- **Rutas y scripts del front:** se agregó un JSON de rutas y se corrigieron referencias a scripts en `index.html`.
+- **Actualización de base de datos:** se ajustó la BD para reflejar nuevos campos y requerimientos.
+
+**Comparado con antes:** el deploy era difícil y la navegación fallaba; ahora la app está preparada para publicación y el onboarding de usuarios funciona.
+
+## Periodo: 4–7 de enero de 2026 — Nuevo front, roles y centro de recursos
+**Enfoque:** rediseño visual, roles y contenidos informativos.
+
+**Qué se incorporó y por qué importa**
+- **Rediseño visual completo:** se actualizó el look & feel (colores, fondos y estilos) para una interfaz más moderna y coherente.
+- **Roles más restrictivos:** se ajustó el rol “ayudante” para limitar accesos, mejorando la seguridad por perfil.
+- **Login actualizado:** cambio de login alineado con el nuevo front.
+- **Centro de novedades y recursos:** se agregó un espacio dedicado a noticias y recursos, útil para comunicar novedades a los usuarios.
+- **Correcciones de menú y textos:** se corrigieron textos y comportamiento del menú para mayor claridad.
+- **Base de datos de referencia:** se creó `baseDeDatos.sql` para facilitar la carga/replicación de datos.
+
+**Comparado con antes:** la UI era más básica y no había un centro de novedades; ahora la app luce más moderna y ofrece un espacio informativo central.
+
+## Periodo: 11 de enero de 2026 — Mejoras en parciales, asistencia y CSV
+**Enfoque:** seguimiento académico y mejoras en importación.
+
+**Qué se incorporó y por qué importa**
+- **Parciales con filtro por tema:** ahora se puede filtrar por tema y marcar visualmente cuando un estudiante aprueba una instancia (resuelve #37).
+- **Asistencia con indicadores por tema aprobado:** se colorea la asistencia según aprobaciones, permitiendo detectar rápidamente avances.
+- **Nuevo método de carga CSV (SIU):** se agregó un método adicional para importar estudiantes desde CSV, ampliando compatibilidad con formatos externos.
+
+**Comparado con antes:** no había filtros ni señales visuales por tema; ahora el seguimiento es más claro y la importación de datos es más flexible.

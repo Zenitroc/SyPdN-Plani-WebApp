@@ -13,13 +13,16 @@
   window.renderMenu = async function (containerId = 'appMenu') {
     const page = (path) => window.getPageRoute ? window.getPageRoute(path) : (BASE_APP + `/pages/${path}/`);
     let isGuru = false;
+     let isSenior = false;
     let me = null;
     if (api.getToken()) {
       try {
         me = await api.get('/me');
         isGuru = Array.isArray(me.roles) && me.roles.includes('GURU');
+        isSenior = Array.isArray(me.roles) && me.roles.includes('SENIOR');
       } catch (e) {
         isGuru = false;
+        isSenior = false;
       }
     }
     const displayName = me ? `${me.name || ''}${me.last_name ? ' ' + me.last_name : ''}`.trim() : '';
@@ -42,6 +45,7 @@
         ${item(page('grupos'), 'Grupos')}
         ${item(page('entregas'), 'Trabajos Prácticos')}
         ${item(page('parciales'), 'Parciales')}
+        ${(isGuru || isSenior) ? item(page('notas-finales'), 'Notas finales') : ''}
         ${item(page('asistencia'), 'Asistencia')}
         ${item(page('reportes'), 'Novedades/Reportes')}
         
