@@ -192,8 +192,7 @@ renderMenu();
                 const value = row[p]?.[t]?.[a] ?? '';
                 const gClass = cellClassFromGrade(value);
                 const topicPassClass = !gClass && hasAnyPass(p, t) ? 'td-topic-pass' : '';
-                 const toneClass = TONE_CLASS[t] || '';
-                const tdClass = ['tiny', gClass, topicPassClass, toneClass].filter(Boolean).join(' ');
+                const tdClass = ['tiny', gClass, topicPassClass].filter(Boolean).join(' ');
                 return `<td class="${tdClass}">${escapeHtml(value || '-')}</td>`;
             };
             finalsTopics.p1.forEach(topic => attempts.forEach(a => {
