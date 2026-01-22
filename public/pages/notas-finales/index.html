@@ -184,32 +184,6 @@
             color: var(--muted);
         }
 
-        .section-title {
-            margin-top: 2rem;
-        }
-
-        .partial-table {
-            min-width: 1200px;
-        }
-
-        .partial-table th,
-        .partial-table td {
-            text-align: center;
-        }
-
-        .partial-table th.sticky-left,
-        .partial-table td.sticky-left {
-            position: sticky;
-            left: 0;
-            background: var(--surface);
-            z-index: 1;
-        }
-
-        .partial-table td.text-left,
-        .partial-table th.text-left {
-            text-align: left;
-        }
-
         .td-pass {
             background: color-mix(in oklab, var(--ok) 18%, var(--surface));
         }
@@ -274,16 +248,6 @@
             <table class="tbl" id="finalsTable">
                 <thead id="finalsHead"></thead>
                 <tbody id="tbodyFinals"></tbody>
-            </table>
-        </div>
-        <h2 class="section-title">Parciales</h2>
-        <div class="table-scroll" data-target="partialsTableWrap">
-            <div class="table-scroll-inner"></div>
-        </div>
-        <div class="table-wrap" id="partialsTableWrap">
-            <table class="tbl partial-table" id="partialsTable">
-                <thead id="partialsHead"></thead>
-                <tbody id="partialsBody"></tbody>
             </table>
         </div>
     </main>

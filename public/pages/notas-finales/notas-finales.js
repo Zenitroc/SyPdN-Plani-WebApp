@@ -143,7 +143,6 @@ renderMenu();
 
     function renderTables() {
         renderFinalsTable();
-        renderPartialTable();
         setupScrollSync();
     }
 
@@ -151,12 +150,8 @@ renderMenu();
         const rows = filteredFinals();
         const body = qs('tbodyFinals');
         const head = qs('finalsHead');
-        const topics = topicData();
-        const attempts = ALL_ATTEMPTS;
-        const finalsTopics = {
-            p1: topics.p1 || [],
-            p2: topics.p2 || []
-        };
+        const attempts = attemptsShown();
+        const finalsTopics = topicsForShow();
         const headerCells = [
             '<th class="center sticky-col-1">ID</th>',
             '<th class="sticky-col-2">Apellido</th>',
@@ -189,11 +184,19 @@ renderMenu();
             const apellido = escapeHtml(row.apellido);
             const nombre = escapeHtml(row.nombre);
             const partialCells = [];
+            const hasAnyPass = (p, t) => ALL_ATTEMPTS.some(a => pass(row[p]?.[t]?.[a]));
+            const gradeCell = (p, t, a) => {
+                const value = row[p]?.[t]?.[a] ?? '';
+                const gClass = cellClassFromGrade(value);
+                const topicPassClass = !gClass && hasAnyPass(p, t) ? 'td-topic-pass' : '';
+                const tdClass = ['tiny', gClass, topicPassClass].filter(Boolean).join(' ');
+                return `<td class="${tdClass}">${escapeHtml(value || '-')}</td>`;
+            };
             finalsTopics.p1.forEach(topic => attempts.forEach(a => {
-                partialCells.push(`<td class="tiny">${escapeHtml(row.p1?.[topic]?.[a] ?? '-')}</td>`);
+                partialCells.push(gradeCell('p1', topic, a));
             }));
             finalsTopics.p2.forEach(topic => attempts.forEach(a => {
-                partialCells.push(`<td class="tiny">${escapeHtml(row.p2?.[topic]?.[a] ?? '-')}</td>`);
+                partialCells.push(gradeCell('p2', topic, a));
             }));
 
             const finalCell = CAN_EDIT
@@ -242,68 +245,9 @@ renderMenu();
             .join('');
     }
 
-    function headPartialTable() {
-        const atts = attemptsShown();
-        const { p1, p2 } = topicsForShow();
-        const base = `
-      <tr>
-        <th class="sticky-col-1">ID</th>
-        <th class="sticky-col-2">Apellido</th>
-        <th class="sticky-col-3">Nombre</th>
-        <th>1°P</th>
-        <th>2°P</th>
-        ${[...p1, ...p2].map(topic => atts.map(a => `<th class="tiny">${topic}_${ATT_LABEL[a]}</th>`).join('')).join('')}
-      </tr>`;
-        return base;
-    }
-
     function cellClassFromGrade(code) {
         if (isBlank(code)) return '';
         return FAIL.has(String(code).toUpperCase()) ? 'td-fail' : 'td-pass';
-    }
-
-    function renderPartialRow(row) {
-        const atts = attemptsShown();
-        const { p1, p2 } = topicsForShow();
-        const p1AP = !row.adeuda_p1 || row.adeuda_p1.length === 0;
-        const p2AP = !row.adeuda_p2 || row.adeuda_p2.length === 0;
-
-        const hasAnyPass = (p, t) => ALL_ATTEMPTS.some(a => pass(row[p]?.[t]?.[a]));
-        const gradeCell = (p, t, a) => {
-            const value = row[p]?.[t]?.[a] ?? '';
-            const gClass = cellClassFromGrade(value);
-            const topicPassClass = !gClass && hasAnyPass(p, t) ? 'td-topic-pass' : '';
-            const tdClass = ['tiny', gClass, topicPassClass].filter(Boolean).join(' ');
-            return `<td class="${tdClass}">${escapeHtml(value || '-')}</td>`;
-        };
-
-        const cells = [];
-        p1.forEach(topic => atts.forEach(a => cells.push(gradeCell('p1', topic, a))));
-        p2.forEach(topic => atts.forEach(a => cells.push(gradeCell('p2', topic, a))));
-
-        return `
-      <tr>
-        <td class="sticky-col-1">${row.course_id_seq}</td>
-        <td class="text-left sticky-col-2">${escapeHtml(row.apellido)}</td>
-        <td class="text-left sticky-col-3">${escapeHtml(row.nombre)}</td>
-        <td>${p1AP ? '<span class="txt-ok">AP</span>' : `<span class="txt-bad">${row.adeuda_p1.map(t => MAP_P1[t] || t).join('-')}</span>`}</td>
-        <td>${p2AP ? '<span class="txt-ok">AP</span>' : `<span class="txt-bad">${row.adeuda_p2.map(t => MAP_P2[t] || t).join('-')}</span>`}</td>
-        ${cells.join('')}
-      </tr>`;
-    }
-
-    function renderPartialTable() {
-        const rows = filteredBase();
-        const head = qs('partialsHead');
-        const body = qs('partialsBody');
-        head.innerHTML = headPartialTable();
-        if (!rows.length) {
-            const colCount = head.querySelectorAll('th').length || 8;
-            body.innerHTML = `<tr><td colspan="${colCount}" class="muted">Sin estudiantes</td></tr>`;
-            return;
-        }
-
-        body.innerHTML = rows.map(renderPartialRow).join('');
     }
 
     function setupScrollSync() {
@@ -408,9 +352,9 @@ renderMenu();
 
     qs('statusFilter').addEventListener('change', e => { STATUS_FILTER = e.target.value; renderTables(); });
     qs('siuFilter').addEventListener('change', e => { SIU_FILTER = e.target.value; renderTables(); });
-    qs('showCols').addEventListener('change', e => { SHOW = e.target.value; renderPartialTable(); });
-    qs('attemptFilter').addEventListener('change', e => { ATT = e.target.value; renderPartialTable(); });
-    qs('topicFilter').addEventListener('change', e => { TOPIC_FILTER = e.target.value; renderPartialTable(); });
+    qs('showCols').addEventListener('change', e => { SHOW = e.target.value; renderTables(); });
+    qs('attemptFilter').addEventListener('change', e => { ATT = e.target.value; renderTables(); });
+    qs('topicFilter').addEventListener('change', e => { TOPIC_FILTER = e.target.value; renderTables(); });
     (function () {
         let t = null;
         qs('q').addEventListener('input', e => {
