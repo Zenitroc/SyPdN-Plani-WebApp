@@ -28,6 +28,7 @@ renderMenu();
     const ATT_LABEL = { PA: 'PARC', '1R': '1R', '2R': '2R' };
     const ALL_ATTEMPTS = ['PA', '1R', '2R'];
     const DEFAULT_TOPICS = { p1: ['ORG', 'MET', 'TEO1'], p2: ['PLS', 'CUR', 'TEO2'] };
+    const TONE_CLASS = { ORG: 'tone-org', MET: 'tone-met', TEO1: 'tone-teo', PLS: 'tone-pls', CUR: 'tone-cur', TEO2: 'tone-teo2' };
     const CONDITION_LABELS = {
         DESERTO: { text: 'DESERTÓ', cls: 'deserto' },
         RECURSA: { text: 'RECURSA', cls: 'recursa' },
@@ -158,9 +159,11 @@ renderMenu();
             '<th class="sticky-col-3">Nombre</th>',
             '<th class="center">1°P</th>',
             '<th class="center">2°P</th>',
-            ...[...finalsTopics.p1, ...finalsTopics.p2].flatMap(topic =>
-                attempts.map(a => `<th class="tiny">${topic}_${ATT_LABEL[a]}</th>`)
-            ),
+            ...[...finalsTopics.p1, ...finalsTopics.p2].flatMap(topic => {
+                const toneClass = TONE_CLASS[topic] || '';
+                const classes = ['tiny', toneClass].filter(Boolean).join(' ');
+                return attempts.map(a => `<th class="${classes}">${topic}_${ATT_LABEL[a]}</th>`);
+            }),
             '<th class="center">TPS 1C</th>',
             '<th class="center">TPS 2C</th>',
             '<th class="center">Calificación final</th>',
@@ -189,7 +192,8 @@ renderMenu();
                 const value = row[p]?.[t]?.[a] ?? '';
                 const gClass = cellClassFromGrade(value);
                 const topicPassClass = !gClass && hasAnyPass(p, t) ? 'td-topic-pass' : '';
-                const tdClass = ['tiny', gClass, topicPassClass].filter(Boolean).join(' ');
+                 const toneClass = TONE_CLASS[t] || '';
+                const tdClass = ['tiny', gClass, topicPassClass, toneClass].filter(Boolean).join(' ');
                 return `<td class="${tdClass}">${escapeHtml(value || '-')}</td>`;
             };
             finalsTopics.p1.forEach(topic => attempts.forEach(a => {

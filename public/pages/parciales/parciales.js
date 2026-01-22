@@ -15,6 +15,7 @@ renderMenu();
     let CAN_EDIT = false;
     let PERMISSIONS_READY = false;
     let STATUS_FILTER = 'ALL', SHOW = 'ALL', ATT = 'ALL', QUERY = '', TOPIC_FILTER = 'ALL';
+    let SCROLL_SYNC_READY = false;
 
     // Coloreo
     const FAIL = new Set(['A', 'N_E', 'NO_SAT', 'N_S']);
@@ -174,6 +175,7 @@ renderMenu();
         qs('tbodyLeft').innerHTML = st.map(rowLeft).join('') || `<tr><td colspan="6" class="muted">Sin estudiantes</td></tr>`;
         qs('theadRight').innerHTML = headRight();
         qs('tbodyRight').innerHTML = st.map(rowRight).join('') || `<tr><td class="muted">Sin datos</td></tr>`;
+        setupScrollSync();
 
         // Guardar sin “recalcular anchos”
         qs('tbodyRight').querySelectorAll('select.score').forEach(s => {
@@ -206,6 +208,32 @@ renderMenu();
                 }
             });
         });
+    }
+
+    function setupScrollSync() {
+        document.querySelectorAll('.table-scroll').forEach(scrollbar => {
+            const targetId = scrollbar.getAttribute('data-target');
+            const target = document.getElementById(targetId);
+            if (!target) return;
+            const inner = scrollbar.querySelector('.table-scroll-inner');
+            const syncSize = () => {
+                inner.style.width = `${target.scrollWidth}px`;
+            };
+            const syncFromTop = () => {
+                target.scrollLeft = scrollbar.scrollLeft;
+            };
+            const syncFromBody = () => {
+                scrollbar.scrollLeft = target.scrollLeft;
+            };
+            if (!SCROLL_SYNC_READY) {
+                scrollbar.addEventListener('scroll', syncFromTop);
+                target.addEventListener('scroll', syncFromBody);
+                window.addEventListener('resize', syncSize);
+            }
+            syncSize();
+            syncFromBody();
+        });
+        SCROLL_SYNC_READY = true;
     }
 
     // ====== Recarga sin medir anchos (evita “expansiones”) ======

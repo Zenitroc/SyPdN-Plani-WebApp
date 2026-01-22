@@ -64,6 +64,27 @@
             flex-wrap: wrap
         }
 
+        .table-scroll {
+            overflow-x: auto;
+            overflow-y: hidden;
+            height: 12px;
+            margin-top: .4rem;
+            border-radius: var(--radius);
+            background: color-mix(in oklab, var(--surface) 80%, transparent);
+        }
+
+        .table-scroll-inner {
+            height: 1px;
+        }
+
+        .table-scroll-bottom {
+            position: sticky;
+            bottom: .5rem;
+            z-index: 4;
+            box-shadow: 0 0 0 1px var(--border);
+        }
+
+
         /* ===== Doble tabla pegada ===== */
         .twin {
             border: 1px solid var(--border);
@@ -86,6 +107,14 @@
             overflow-y: hidden
         }
 
+        .rightWrap::-webkit-scrollbar:horizontal {
+            height: 0;
+        }
+
+        .rightWrap {
+            scrollbar-width: none;
+        }
+        
         .tbl {
             border-collapse: separate;
             border-spacing: 0

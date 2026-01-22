@@ -14,6 +14,19 @@
             --info: #38bdf8;
             --neutral: #94a3b8;
             --row-siu: color-mix(in oklab, #fde68a 35%, var(--surface));
+            --col-org: #e0f2fe;
+            /* ORG / PLS */
+            --col-met: #ffedd5;
+            /* MET / CUR  */
+            --col-teo: #fef9c3;
+            /* TEO1 / TEO2 */
+            --col-pls: #e9d5ff;
+            /* lila pastel  */
+            --col-cur: #fbcfe8;
+            /* rosa pastel  */
+            --col-teo2: #fed7aa;
+            /* naranja pastel */
+            --hdr-fg: #0c111a;
         }
 
         body.notas-finales main.container {
@@ -38,7 +51,7 @@
             flex-wrap: wrap;
         }
 
-         .table-scroll {
+        .table-scroll {
             overflow-x: auto;
             overflow-y: hidden;
             height: 12px;
@@ -51,12 +64,29 @@
             height: 1px;
         }
 
+        .table-scroll-bottom {
+            position: sticky;
+            bottom: .5rem;
+            z-index: 4;
+            margin-top: .4rem;
+            margin-bottom: 0;
+            box-shadow: 0 0 0 1px var(--border);
+        }
+
 
         .table-wrap {
             border: 1px solid var(--border);
             border-radius: var(--radius);
             overflow: auto;
             background: var(--surface);
+        }
+
+        .table-wrap::-webkit-scrollbar:horizontal {
+            height: 0;
+        }
+
+        .table-wrap {
+            scrollbar-width: none;
         }
 
         .tbl {
@@ -115,6 +145,42 @@
             background: var(--surface);
             z-index: 2;
             font-weight: 700;
+        }
+
+        .tbl th.tone-org,
+        .tbl td.tone-org {
+            background: var(--col-org);
+            color: var(--hdr-fg);
+        }
+
+        .tbl th.tone-met,
+        .tbl td.tone-met {
+            background: var(--col-met);
+            color: var(--hdr-fg);
+        }
+
+        .tbl th.tone-teo,
+        .tbl td.tone-teo {
+            background: var(--col-teo);
+            color: var(--hdr-fg);
+        }
+
+        .tbl th.tone-pls,
+        .tbl td.tone-pls {
+            background: color-mix(in oklab, var(--col-pls) 65%, var(--surface));
+            color: var(--hdr-fg);
+        }
+
+        .tbl th.tone-cur,
+        .tbl td.tone-cur {
+            background: color-mix(in oklab, var(--col-cur) 65%, var(--surface));
+            color: var(--hdr-fg);
+        }
+
+        .tbl th.tone-teo2,
+        .tbl td.tone-teo2 {
+            background: color-mix(in oklab, var(--col-teo2) 65%, var(--surface));
+            color: var(--hdr-fg);
         }
 
         .tbl td.center,
@@ -241,14 +307,14 @@
             </div>
         </div>
 
-        <div class="table-scroll" data-target="finalsTableWrap">
-            <div class="table-scroll-inner"></div>
-        </div>
         <div class="table-wrap" id="finalsTableWrap">
             <table class="tbl" id="finalsTable">
                 <thead id="finalsHead"></thead>
                 <tbody id="tbodyFinals"></tbody>
             </table>
+        </div>
+        <div class="table-scroll table-scroll-bottom" data-target="finalsTableWrap">
+            <div class="table-scroll-inner"></div>
         </div>
     </main>
 
