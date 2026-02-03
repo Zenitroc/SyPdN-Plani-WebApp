@@ -143,7 +143,6 @@ renderMenu();
       <td class="c-id">${r.course_id_seq}</td>
       <td class="c-ape">${r.apellido}</td>
       <td class="c-nom">${r.nombre}</td>
-      <td class="c-leg">${r.legajo ?? ''}</td>
       <td class="c-p1">${p1}</td>
       <td class="c-p2">${p2}</td>
     </tr>`;
@@ -191,7 +190,7 @@ renderMenu();
 
     function renderTables() {
         const st = filtered();
-        qs('tbodyLeft').innerHTML = st.map(rowLeft).join('') || `<tr><td colspan="6" class="muted">Sin estudiantes</td></tr>`;
+        qs('tbodyLeft').innerHTML = st.map(rowLeft).join('') || `<tr><td colspan="5" class="muted">Sin estudiantes</td></tr>`;
         qs('theadRight').innerHTML = headRight();
         qs('tbodyRight').innerHTML = st.map(rowRight).join('') || `<tr><td class="muted">Sin datos</td></tr>`;
         setupScrollSync();
@@ -235,8 +234,10 @@ renderMenu();
             const target = document.getElementById(targetId);
             if (!target) return;
             const inner = scrollbar.querySelector('.table-scroll-inner');
+            const table = target.querySelector('table');
             const syncSize = () => {
-                inner.style.width = `${target.scrollWidth}px`;
+                const width = table ? table.scrollWidth : target.scrollWidth;
+                inner.style.width = `${Math.max(width, target.clientWidth)}px`;
             };
             const syncFromTop = () => {
                 target.scrollLeft = scrollbar.scrollLeft;
@@ -269,48 +270,41 @@ renderMenu();
     // ====== Anchos izquierda: medir 1 sola vez y “congelar” ======
     let LEFT_WIDTHS_READY = false;
     function ensureLeftWidths(force = false) {
-        let LEFT_WIDTHS_READY = false;
-        function ensureLeftWidths(force = false) {
-            if (LEFT_WIDTHS_READY && !force) return;
-            const root = document.documentElement.style;
-            const left = document.getElementById('tblLeft'); if (!left) return;
+        if (LEFT_WIDTHS_READY && !force) return;
+        const root = document.documentElement.style;
+        const left = document.getElementById('tblLeft'); if (!left) return;
 
-            // mide el ancho real usado por header + celdas
-            const widthOf = (sel) => {
-                let m = 0; left.querySelectorAll(sel).forEach(el => {
-                    const w = Math.ceil(el.scrollWidth) + 14; // padding aproximado
-                    if (w > m) m = w;
-                });
-                return Math.max(m, 48);
-            };
+        // mide el ancho real usado por header + celdas
+        const widthOf = (sel) => {
+            let m = 0; left.querySelectorAll(sel).forEach(el => {
+                const w = Math.ceil(el.scrollWidth) + 14; // padding aproximado
+                if (w > m) m = w;
+            });
+            return Math.max(m, 48);
+        };
 
-            // límites máximos para que la izquierda no “se coma” la pantalla
-            const MAX = {
-                id: 88,
-                ape: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--max-ape')) || 180,
-                nom: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--max-nom')) || 180,
-                leg: 120,
-                p1: 64,
-                p2: 64
-            };
+        // límites máximos para que la izquierda no “se coma” la pantalla
+        const MAX = {
+            id: 88,
+            ape: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--max-ape')) || 180,
+            nom: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--max-nom')) || 180,
+            p1: 64,
+            p2: 64
+        };
 
-            const wId = Math.min(widthOf('th:nth-child(1), td.c-id'), MAX.id);
-            const wApe = Math.min(widthOf('th:nth-child(2), td.c-ape'), MAX.ape);
-            const wNom = Math.min(widthOf('th:nth-child(3), td.c-nom'), MAX.nom);
-            const wLeg = Math.min(widthOf('th:nth-child(4), td.c-leg'), MAX.leg);
-            const wP1 = Math.min(widthOf('th:nth-child(5), td.c-p1'), MAX.p1);
-            const wP2 = Math.min(widthOf('th:nth-child(6), td.c-p2'), MAX.p2);
+        const wId = Math.min(widthOf('th:nth-child(1), td.c-id'), MAX.id);
+        const wApe = Math.min(widthOf('th:nth-child(2), td.c-ape'), MAX.ape);
+        const wNom = Math.min(widthOf('th:nth-child(3), td.c-nom'), MAX.nom);
+        const wP1 = Math.min(widthOf('th:nth-child(4), td.c-p1'), MAX.p1);
+        const wP2 = Math.min(widthOf('th:nth-child(5), td.c-p2'), MAX.p2);
 
-            root.setProperty('--w-id', wId + 'px');
-            root.setProperty('--w-ape', wApe + 'px');
-            root.setProperty('--w-nom', wNom + 'px');
-            root.setProperty('--w-leg', wLeg + 'px');
-            root.setProperty('--w-p1', wP1 + 'px');
-            root.setProperty('--w-p2', wP2 + 'px');
+        root.setProperty('--w-id', wId + 'px');
+        root.setProperty('--w-ape', wApe + 'px');
+        root.setProperty('--w-nom', wNom + 'px');
+        root.setProperty('--w-p1', wP1 + 'px');
+        root.setProperty('--w-p2', wP2 + 'px');
 
-            LEFT_WIDTHS_READY = true; // se congelan
-        }
-
+        LEFT_WIDTHS_READY = true; // se congelan
     }
 
     // Solo si el usuario cambia el tamaño de la ventana, re-medimos
@@ -340,5 +334,5 @@ renderMenu();
     qs('topicFilter').addEventListener('change', e => { TOPIC_FILTER = e.target.value; renderTables(); syncRowHeights(); });
     (function () { let t = null; qs('q').addEventListener('input', e => { clearTimeout(t); t = setTimeout(() => { QUERY = e.target.value.trim().toLowerCase(); renderTables(); syncRowHeights(); }, 160); }); })();
 
-    load().catch(e => { qs('tbodyLeft').innerHTML = `<tr><td colspan="6" style="padding:1rem">Error: ${e.message || e}</td></tr>`; });
+    load().catch(e => { qs('tbodyLeft').innerHTML = `<tr><td colspan="5" style="padding:1rem">Error: ${e.message || e}</td></tr>`; });
 })();
