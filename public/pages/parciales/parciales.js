@@ -102,6 +102,7 @@ renderMenu();
     const ATT_LABEL = { PA: 'PARC', '1R': '1R', '2R': '2R' };
     const ALL_ATTEMPTS = ['PA', '1R', '2R'];
     const TONE_CLASS = { ORG: 'tone-org', MET: 'tone-met', TEO1: 'tone-teo', PLS: 'tone-pls', CUR: 'tone-cur', TEO2: 'tone-teo2' };
+    const SCROLL_OBSERVERS = new WeakMap()
 
     function renderTopicOptions() {
         const select = qs('topicFilter');
@@ -236,7 +237,7 @@ renderMenu();
             const inner = scrollbar.querySelector('.table-scroll-inner');
             const table = target.querySelector('table');
             const syncSize = () => {
-                const width = table ? table.scrollWidth : target.scrollWidth;
+                const width = Math.max(target.scrollWidth, table ? table.scrollWidth : 0);
                 inner.style.width = `${Math.max(width, target.clientWidth)}px`;
             };
             const syncFromTop = () => {
@@ -250,7 +251,14 @@ renderMenu();
                 target.addEventListener('scroll', syncFromBody);
                 window.addEventListener('resize', syncSize);
             }
+            if (!SCROLL_OBSERVERS.has(scrollbar)) {
+                const observer = new ResizeObserver(syncSize);
+                observer.observe(target);
+                if (table) observer.observe(table);
+                SCROLL_OBSERVERS.set(scrollbar, observer);
+            }
             syncSize();
+            requestAnimationFrame(syncSize);
             syncFromBody();
         });
         SCROLL_SYNC_READY = true;
