@@ -35,6 +35,7 @@
             --w-nom: 220px;
             --w-p1: 60px;
             --w-p2: 60px;
+            --w-left-total: calc(var(--w-id) + var(--w-ape) + var(--w-nom) + var(--w-p1) + var(--w-p2));
 
             /* ancho fijo de selects (evita “saltos”) */
             --score-w: 6rem;
@@ -66,7 +67,7 @@
         .table-scroll {
             overflow-x: auto;
             overflow-y: hidden;
-            height: 12px;
+            height: 15px;
             margin-top: .4rem;
             border-radius: var(--radius);
             background: color-mix(in oklab, var(--surface) 80%, transparent);
@@ -81,6 +82,8 @@
             bottom: .5rem;
             z-index: 4;
             box-shadow: 0 0 0 1px var(--border);
+            margin-left: var(--w-left-total);
+            width: max(0px, calc(100% - var(--w-left-total)))
         }
 
 

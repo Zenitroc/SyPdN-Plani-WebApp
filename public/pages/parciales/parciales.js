@@ -311,6 +311,7 @@ renderMenu();
         root.setProperty('--w-nom', wNom + 'px');
         root.setProperty('--w-p1', wP1 + 'px');
         root.setProperty('--w-p2', wP2 + 'px');
+        root.setProperty('--w-left-total', (wId + wApe + wNom + wP1 + wP2 + 1) + 'px');
 
         LEFT_WIDTHS_READY = true; // se congelan
     }
