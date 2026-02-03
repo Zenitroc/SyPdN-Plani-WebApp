@@ -30,7 +30,7 @@ renderMenu();
     const DEFAULT_TOPICS = { p1: ['ORG', 'MET', 'TEO1'], p2: ['PLS', 'CUR', 'TEO2'] };
     const TONE_CLASS = { ORG: 'tone-org', MET: 'tone-met', TEO1: 'tone-teo', PLS: 'tone-pls', CUR: 'tone-cur', TEO2: 'tone-teo2' };
     const CONDITION_LABELS = {
-        DESERTO: { text: 'DESERTÓ', cls: 'deserto' },
+        DESERTO: { text: 'AUSENTE', cls: 'deserto' },
         RECURSA: { text: 'RECURSA', cls: 'recursa' },
         FIRMA: { text: 'FIRMA', cls: 'firma' },
         PROMOCIONA: { text: 'PROMOCIONA', cls: 'promociona' }
@@ -71,7 +71,7 @@ renderMenu();
         const selected = deserto ? 'DESERTO' : (value != null ? String(value) : '');
         const base = [
             { value: '', label: '' },
-            { value: 'DESERTO', label: 'Desertó' },
+            { value: 'DESERTO', label: 'AUSENTE' },
             ...Array.from({ length: 10 }, (_, i) => ({ value: String(i + 1), label: String(i + 1) }))
         ];
         return base.map(opt => `<option value="${opt.value}"${opt.value === selected ? ' selected' : ''}>${opt.label}</option>`).join('');
@@ -204,7 +204,7 @@ renderMenu();
 
             const finalCell = CAN_EDIT
                 ? `<select class="input final-grade" data-enroll="${row.enrollment_id}">${finalGradeOptions(row.final_grade, row.final_deserto)}</select>`
-                : `<span>${row.final_deserto ? 'Desertó' : (row.final_grade ?? '-')}</span>`;
+                : `<span>${row.final_deserto ? 'AUSENTE' : (row.final_grade ?? '-')}</span>`;
 
             const siuCell = IS_GURU
                 ? `<input type="checkbox" class="siu-check" data-enroll="${row.enrollment_id}" ${Number(row.siu_loaded) === 1 ? 'checked' : ''}>`
@@ -400,7 +400,7 @@ renderMenu();
                 parcialPlain(row.adeuda_p2, 2),
                 row.tps_1c == null ? '-' : `${row.tps_1c}%`,
                 row.tps_2c == null ? '-' : `${row.tps_2c}%`,
-                row.final_deserto ? 'Desertó' : (row.final_grade ?? '-'),
+                row.final_deserto ? 'AUSENTE' : (row.final_grade ?? '-'),
                 cond.text || '-',
                 Number(row.siu_loaded) === 1 ? 'Sí' : 'No',
                 row.observaciones || ''
