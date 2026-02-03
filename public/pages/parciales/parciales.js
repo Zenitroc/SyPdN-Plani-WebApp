@@ -119,10 +119,17 @@ renderMenu();
         const atts = attemptsShown();
         const { p1, p2 } = topicsForShow();
         const cells = [];
+        const lastAttempt = atts[atts.length - 1];
+        const lastTopic = (list, topic) => list.length && list[list.length - 1] === topic;
         const addTopic = (topic, attempt) => {
             const tone = TONE_CLASS[topic] || '';
-            const toneClass = tone ? ` class="${tone}"` : '';
-            cells.push(`<th${toneClass}>${topic}_${ATT_LABEL[attempt]}</th>`);
+            const isTopicEnd = attempt === lastAttempt;
+            const isPartialDivider = isTopicEnd && p2.length && p1.includes(topic) && lastTopic(p1, topic);
+            const classes = [tone];
+            if (isTopicEnd) classes.push('topic-end');
+            if (isPartialDivider) classes.push('partial-divider');
+            const classAttr = classes.filter(Boolean).length ? ` class="${classes.filter(Boolean).join(' ')}"` : '';
+            cells.push(`<th${classAttr}>${topic}_${ATT_LABEL[attempt]}</th>`);
         };
         p1.forEach(topic => atts.forEach(a => addTopic(topic, a)));
         p2.forEach(topic => atts.forEach(a => addTopic(topic, a)));
@@ -152,21 +159,33 @@ renderMenu();
         const { p1, p2 } = topicsForShow();
         const p1AP = !r.adeuda_p1 || r.adeuda_p1.length === 0;
         const p2AP = !r.adeuda_p2 || r.adeuda_p2.length === 0;
+        const lastAttempt = atts[atts.length - 1];
+        const lastTopic = (list, topic) => list.length && list[list.length - 1] === topic;
 
         const hasAnyPass = (p, t) => ALL_ATTEMPTS.some(a => pass(r[p]?.[t]?.[a]));
 
-        const sel = (p, t, a) => {
+        const sel = (p, t, a, options = {}) => {
             const v = (r[p]?.[t]?.[a] || '');
             const gClass = cellClassFromGrade(v);
             const apClass = (p === 'p1' && p1AP) || (p === 'p2' && p2AP) ? 'td-partial-ap' : '';
             const topicPassClass = !gClass && hasAnyPass(p, t) ? 'td-topic-pass' : '';
             const sClass = gClass === 'td-fail' ? 'fail' : (gClass === 'td-pass' ? 'pass' : '');
             const tdClass = gClass || apClass || topicPassClass;
-            return `<td class="${tdClass}"><select class="score ${sClass}" data-enroll="${r.enrollment_id}" data-partial="${p === 'p1' ? 1 : 2}" data-topic="${t}" data-attempt="${a}">${optHTML(v)}</select></td>`;
-        };
+            const classes = [];
+            if (tdClass) classes.push(tdClass);
+            if (options.topicEnd) classes.push('topic-end');
+            if (options.partialDivider) classes.push('partial-divider');
+            return `<td class="${classes.join(' ')}"><select class="score ${sClass}" data-enroll="${r.enrollment_id}" data-partial="${p === 'p1' ? 1 : 2}" data-topic="${t}" data-attempt="${a}">${optHTML(v)}</select></td>`;        };
         const cells = [];
-        p1.forEach(topic => atts.forEach(a => cells.push(sel('p1', topic, a))));
-        p2.forEach(topic => atts.forEach(a => cells.push(sel('p2', topic, a))));
+        p1.forEach(topic => atts.forEach(a => {
+            const isTopicEnd = a === lastAttempt;
+            const isPartialDivider = isTopicEnd && p2.length && lastTopic(p1, topic);
+            cells.push(sel('p1', topic, a, { topicEnd: isTopicEnd, partialDivider: isPartialDivider }));
+        }));
+        p2.forEach(topic => atts.forEach(a => {
+            const isTopicEnd = a === lastAttempt;
+            cells.push(sel('p2', topic, a, { topicEnd: isTopicEnd }));
+        }));
         return `<tr data-row>${cells.join('')}</tr>`;
     }
 
