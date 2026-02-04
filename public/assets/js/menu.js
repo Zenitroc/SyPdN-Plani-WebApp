@@ -87,6 +87,27 @@
 
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
       api.clearToken(); courseContext.clear(); location.href = page('home');
+    }); const groups = Array.from(document.querySelectorAll('.menu-group'));
+    const closeOtherGroups = (current) => {
+      groups.forEach(group => {
+        if (group !== current) {
+          group.removeAttribute('open');
+        }
+      });
+    };
+    groups.forEach(group => {
+      group.addEventListener('toggle', () => {
+        if (group.open) {
+          closeOtherGroups(group);
+        }
+      });
+      group.addEventListener('mouseenter', () => {
+        group.setAttribute('open', '');
+        closeOtherGroups(group);
+      });
+      group.addEventListener('mouseleave', () => {
+        group.removeAttribute('open');
+      });
     });
   };
 })();
