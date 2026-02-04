@@ -703,9 +703,12 @@ renderMenu();
     const groupBars = groupTop.length
       ? groupTop.map(group => {
         const ratio = group.ratio ?? 0;
+        const groupLabel = group.name && String(group.name).trim()
+          ? group.name
+          : `Grupo ${group.number}`;
         return `
           <div class="bar">
-            <div>Grupo ${group.number}</div>
+            <div>${groupLabel}</div>
             <div class="bar-track"><div class="bar-fill" style="width:${ratio}%"></div></div>
             <div>${ratio ?? '—'}%</div>
           </div>`;
