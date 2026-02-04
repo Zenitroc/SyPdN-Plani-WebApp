@@ -39,7 +39,7 @@
     const html = `
       <div class="menu">
         ${item(page('home'), 'Home')}
-        <!--${item(page('cursoDashboard'), 'Dashboard')}-->
+        ${item(page('cursoDashboard'), 'Dashboard')}
         ${item(page('planificacion'), 'Planificación')}
         ${item(page('estudiantes'), 'Estudiantes')}
         ${item(page('grupos'), 'Grupos')}
