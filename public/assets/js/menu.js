@@ -10,6 +10,28 @@
     const active = here.startsWith(normalizedHref);
     return `<a href="${href}" class="${active ? 'active' : ''}">${label}</a>`;
   }
+  function isActivePath(href) {
+    const here = location.pathname.replace(/\/index\.html?$/,'/').toLowerCase();
+    const normalizedHref = href.replace(/\/index\.html?$/i, '/').toLowerCase();
+    return here.startsWith(normalizedHref);
+  }
+  function menuGroup(label, items = []) {
+    const visibleItems = items.filter(menuItem => menuItem && menuItem.href && menuItem.label);
+    if (!visibleItems.length) return '';
+    const anyActive = visibleItems.some(menuItem => isActivePath(menuItem.href));
+    const openAttr = anyActive ? ' open' : '';
+    const links = visibleItems.map(menuItem => item(menuItem.href, menuItem.label)).join('');
+    return `
+      <details class="menu-group"${openAttr}>
+        <summary class="menu-group__summary ${anyActive ? 'active' : ''}">
+          <span>${label}</span>
+          <span class="menu-group__chevron">▾</span>
+        </summary>
+        <div class="menu-group__items">
+          ${links}
+        </div>
+      </details>`;
+  }
   window.renderMenu = async function (containerId = 'appMenu') {
     const page = (path) => window.getPageRoute ? window.getPageRoute(path) : (BASE_APP + `/pages/${path}/`);
     let isGuru = false;
@@ -39,15 +61,21 @@
     const html = `
       <div class="menu">
         ${item(page('home'), 'Home')}
-        <!--${item(page('cursoDashboard'), 'Dashboard')}-->
         ${item(page('planificacion'), 'Planificación')}
-        ${item(page('estudiantes'), 'Estudiantes')}
-        ${item(page('grupos'), 'Grupos')}
+        ${menuGroup('Dashboard', [
+          { href: page('cursoDashboard'), label: 'Dashboard' },
+          { href: page('reportes'), label: 'Novedades/Reportes' }
+        ])}
+        ${menuGroup('Estudiantes', [
+          { href: page('estudiantes'), label: 'Estudiantes' },
+          { href: page('grupos'), label: 'Grupos' }
+        ])}
         ${item(page('entregas'), 'Trabajos Prácticos')}
-        ${item(page('parciales'), 'Parciales')}
-        ${(isGuru || isSenior) ? item(page('notas-finales'), 'Notas finales') : ''}
-        ${item(page('asistencia'), 'Asistencia')}
-        ${item(page('reportes'), 'Novedades/Reportes')}
+        ${menuGroup('Parciales', [
+          { href: page('parciales'), label: 'Parciales' },
+          { href: page('asistencia'), label: 'Asistencia' },
+          (isGuru || isSenior) ? { href: page('notas-finales'), label: 'Calificación final' } : null
+        ])}
         
         <div class="spacer"></div>
         <button class="btn btn-ghost round" onclick="theme.toggle()">🌓 Modo</button>
@@ -59,6 +87,27 @@
 
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
       api.clearToken(); courseContext.clear(); location.href = page('home');
+    }); const groups = Array.from(document.querySelectorAll('.menu-group'));
+    const closeOtherGroups = (current) => {
+      groups.forEach(group => {
+        if (group !== current) {
+          group.removeAttribute('open');
+        }
+      });
+    };
+    groups.forEach(group => {
+      group.addEventListener('toggle', () => {
+        if (group.open) {
+          closeOtherGroups(group);
+        }
+      });
+      group.addEventListener('mouseenter', () => {
+        group.setAttribute('open', '');
+        closeOtherGroups(group);
+      });
+      group.addEventListener('mouseleave', () => {
+        group.removeAttribute('open');
+      });
     });
   };
 })();

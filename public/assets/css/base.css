@@ -104,6 +104,12 @@ body > *{
   z-index:1;
 }
 
+nav#appMenu,
+div#appMenu{
+  position:relative;
+  z-index:2000;
+}
+
 /* ===== Links ===== */
 a{color:var(--primary);text-decoration:none}
 a:hover{text-decoration:underline}
@@ -253,8 +259,9 @@ small, .muted{color:var(--muted)}
   border-bottom:1px solid var(--border);
   background:var(--surface);
   box-shadow:0 10px 25px rgba(15, 23, 42, 0.06);
-   position:relative;
-  overflow:hidden;
+  position:relative;
+  z-index:1000;
+  overflow:visible;
 }
 .menu::before{
   content:"";
@@ -314,6 +321,45 @@ small, .muted{color:var(--muted)}
 .menu a, .menu button{
   transition:transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
   will-change:transform;
+}
+
+.menu-group{
+  position:relative;
+  padding-bottom:.35rem;
+}
+.menu-group__summary{
+  list-style:none;
+  cursor:pointer;
+  padding:.45rem .7rem;
+  border-radius:.7rem;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:.35rem;
+}
+.menu-group__summary::-webkit-details-marker{display:none}
+.menu-group__summary.active,
+.menu-group[open] > .menu-group__summary{
+  background:color-mix(in oklab, var(--primary) 16%, transparent);
+}
+.menu-group__chevron{
+  font-size:.75rem;
+  opacity:.7;
+}
+.menu-group__items{
+  position:absolute;
+  top:100%;
+  left:0;
+  display:flex;
+  flex-direction:column;
+  gap:.25rem;
+  padding:.5rem;
+  min-width:220px;
+  border-radius:.9rem;
+  border:1px solid var(--border);
+  background:var(--surface);
+  box-shadow:var(--shadow);
+  z-index:1100;
 }
 
 /* ===== Loader global ===== */
