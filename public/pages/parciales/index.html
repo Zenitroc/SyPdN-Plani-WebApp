@@ -8,20 +8,21 @@
     <link rel="stylesheet" href="/assets/css/base.css">
     <style>
         :root {
-            --col-org: #e0f2fe;
-            /* ORG / PLS */
-            --col-met: #ffedd5;
-            /* MET / CUR  */
-            --col-teo: #fef9c3;
-            /* TEO1 / TEO2 */
+            --col-org: #dbeafe;
+            /* ORG */
+            --col-met: #bfdbfe;
+            /* MET */
+            --col-teo: #93c5fd;
+            /* TEO1 */
             --max-ape: 180px;
-            --col-pls: #e9d5ff;
-            /* lila pastel  */
-            --col-cur: #fbcfe8;
-            /* rosa pastel  */
-            --col-teo2: #fed7aa;
-            /* naranja pastel */
-            /* naranja fuerte */
+            --col-pls: #fee2e2;
+            /* PLA */
+            --col-cur: #fecaca;
+            /* CUR */
+            --col-teo2: #fca5a5;
+            /* TEO2 */
+            --divider-topic: #6b88b1;
+            --divider-partial: #696767;
             /* ancho máximo para Apellido */
             --max-nom: 180px;
             /* ancho máximo para Nombre   */
@@ -305,15 +306,17 @@
             white-space: nowrap;
         }
 
-        /* Separadores entre temas y parciales */
+          /* Separadores entre temas y parciales */
         .tbl th.topic-end,
         .tbl td.topic-end {
-            border-right: 1px solid var(--border);
+            border-right: 1px solid var(--divider-topic);
+            box-shadow: inset -1px 0 0 color-mix(in oklab, white 35%, transparent);
         }
 
         .tbl th.partial-divider,
         .tbl td.partial-divider {
-            border-right: 3px solid var(--border);
+            border-right: 3px solid var(--divider-partial);
+            box-shadow: inset -1px 0 0 color-mix(in oklab, white 45%, transparent);
         }
     </style>
 </head>
