@@ -181,16 +181,26 @@ renderMenu();
         const head = qs('finalsHead');
         const attempts = attemptsShown();
         const finalsTopics = topicsForShow();
+        const p1TopicCount = finalsTopics.p1.length;
+        const p2TopicCount = finalsTopics.p2.length;
+        const p1Cols = p1TopicCount * attempts.length;
+        const p2Cols = p2TopicCount * attempts.length;
+        const hasTopicDivider = p1Cols > 0 && p2Cols > 0;
         const headerCells = [
             '<th class="center sticky-col-1">ID</th>',
             '<th class="sticky-col-2">Apellido</th>',
             '<th class="sticky-col-3">Nombre</th>',
             '<th class="center">1°P</th>',
-            '<th class="center">2°P</th>',
-            ...[...finalsTopics.p1, ...finalsTopics.p2].flatMap(topic => {
+            `<th class="center${hasTopicDivider ? ' partial-divider' : ''}">2°P</th>`,
+            ...[...finalsTopics.p1, ...finalsTopics.p2].flatMap((topic, topicIdx) => {
                 const toneClass = TONE_CLASS[topic] || '';
-                const classes = ['tiny', toneClass].filter(Boolean).join(' ');
-                return attempts.map(a => `<th class="${classes}">${topic}_${ATT_LABEL[a]}</th>`);
+                return attempts.map((a, attemptIdx) => {
+                    const classes = ['tiny', toneClass];
+                    if (hasTopicDivider && topicIdx === p1TopicCount - 1 && attemptIdx === attempts.length - 1) {
+                        classes.push('partial-divider');
+                    }
+                    return `<th class="${classes.filter(Boolean).join(' ')}">${topic}_${ATT_LABEL[a]}</th>`;
+                });
             }),
             '<th class="center">TPS 1C</th>',
             '<th class="center">TPS 2C</th>',
@@ -217,15 +227,16 @@ renderMenu();
             const nombre = escapeHtml(row.nombre);
             const partialCells = [];
             const hasAnyPass = (p, t) => ALL_ATTEMPTS.some(a => pass(row[p]?.[t]?.[a]));
-            const gradeCell = (p, t, a) => {
+            const gradeCell = (p, t, a, withDivider = false) => {
                 const value = row[p]?.[t]?.[a] ?? '';
                 const gClass = cellClassFromGrade(value);
                 const topicPassClass = !gClass && hasAnyPass(p, t) ? 'td-topic-pass' : '';
-                const tdClass = ['tiny', gClass, topicPassClass].filter(Boolean).join(' ');
+                const tdClass = ['tiny', gClass, topicPassClass, withDivider ? 'partial-divider' : ''].filter(Boolean).join(' ');
                 return `<td class="${tdClass}">${escapeHtml(value || '-')}</td>`;
             };
-            finalsTopics.p1.forEach(topic => attempts.forEach(a => {
-                partialCells.push(gradeCell('p1', topic, a));
+            finalsTopics.p1.forEach((topic, topicIdx) => attempts.forEach((a, attemptIdx) => {
+                const withDivider = hasTopicDivider && topicIdx === p1TopicCount - 1 && attemptIdx === attempts.length - 1;
+                partialCells.push(gradeCell('p1', topic, a, withDivider));
             }));
             finalsTopics.p2.forEach(topic => attempts.forEach(a => {
                 partialCells.push(gradeCell('p2', topic, a));

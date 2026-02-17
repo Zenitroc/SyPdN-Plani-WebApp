@@ -14,18 +14,19 @@
             --info: #38bdf8;
             --neutral: #94a3b8;
             --row-siu: color-mix(in oklab, #fde68a 35%, var(--surface));
-            --col-org: #e0f2fe;
-            /* ORG / PLS */
-            --col-met: #ffedd5;
-            /* MET / CUR  */
-            --col-teo: #fef9c3;
-            /* TEO1 / TEO2 */
-            --col-pls: #e9d5ff;
+            --col-org: #dbeafe;
+            /* ORG */
+            --col-met: #bfdbfe;
+            /* MET */
+            --col-teo: #93c5fd;
+            /* TEO1 */
+            --col-pls: #ffdddd;
             /* lila pastel  */
-            --col-cur: #fbcfe8;
+            --col-cur: #f8c2c2;
             /* rosa pastel  */
-            --col-teo2: #fed7aa;
+            --col-teo2: #fcaaaa;
             /* naranja pastel */
+            --divider-partial: #a09e9e;
             --hdr-fg: #0c111a;
         }
 
@@ -164,35 +165,41 @@
             font-weight: 700;
         }
 
-        .tbl td.tone-org {
+         .tbl :is(th, td).tone-org {
             background: var(--col-org);
             color: var(--hdr-fg);
         }
 
-        .tbl td.tone-met {
+        .tbl :is(th, td).tone-met {
             background: var(--col-met);
             color: var(--hdr-fg);
         }
 
-        .tbl td.tone-teo {
+        .tbl :is(th, td).tone-teo {
             background: var(--col-teo);
             color: var(--hdr-fg);
         }
 
-        .tbl td.tone-pls {
+        .tbl :is(th, td).tone-pls {
             background: color-mix(in oklab, var(--col-pls) 65%, var(--surface));
             color: var(--hdr-fg);
         }
 
-        .tbl td.tone-cur {
+        .tbl :is(th, td).tone-cur {
             background: color-mix(in oklab, var(--col-cur) 65%, var(--surface));
             color: var(--hdr-fg);
         }
 
-        .tbl td.tone-teo2 {
+        .tbl :is(th, td).tone-teo2 {
             background: color-mix(in oklab, var(--col-teo2) 65%, var(--surface));
             color: var(--hdr-fg);
         }
+
+        .tbl :is(th, td).partial-divider {
+            border-right: 0.5px solid var(--divider-partial);
+            box-shadow: inset -1px 0 0 color-mix(in oklab, white 45%, transparent);
+        }
+
 
         .tbl td.center,
         .tbl th.center {
