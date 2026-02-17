@@ -471,7 +471,7 @@ h1, h2, h3, h4, .heading { font-family: var(--font-head); }
   opacity:0;
   pointer-events:none;
   transition:opacity .2s ease;
-  z-index:10050;
+  z-index:2147483000;
 }
 .tutorial-overlay.is-visible{
   opacity:1;
@@ -485,6 +485,7 @@ h1, h2, h3, h4, .heading { font-family: var(--font-head); }
   box-shadow:var(--shadow);
   padding:1rem;
   position:relative;
+  z-index:2147483001;
 }
 .tutorial-close{
   position:absolute;
@@ -500,12 +501,12 @@ h1, h2, h3, h4, .heading { font-family: var(--font-head); }
 .tutorial-mascot{width:150px;height:150px;object-fit:contain;}
 .tutorial-progress{font-size:.85rem;color:var(--muted);margin-bottom:.2rem}
 .tutorial-title{margin:.25rem 0}
-.tutorial-text{margin:0;color:var(--text)}
+.tutorial-text{margin:0;color:var(--text); white-space:pre-line}
 .tutorial-actions{display:flex;justify-content:space-between;gap:.5rem;margin-top:1rem}
 .tutorial-highlight-target{
   position:relative;
-  z-index:10051;
-  outline:3px solid color-mix(in oklab, var(--primary) 65%, white);
+  z-index:2147482990;
+  outline:3px solid color-mix(in oklab, var(--primary) 65%, rgb(1, 217, 255));
   border-radius:12px;
   box-shadow:0 0 0 6px color-mix(in oklab, var(--primary) 16%, transparent);
 }

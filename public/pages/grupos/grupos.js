@@ -107,8 +107,7 @@ let CAN_EDIT_CONFORMITY = false;
       <table class="tbl">
         <tr><th></th><th>ID</th><th>Apellido</th><th>Nombre</th><th>Legajo</th></tr>
         ${free.map(r => `<tr>
-             <td>${pickCell(r)}</td>
-            <td><input type="checkbox" class="pick-free" data-enrid="${r.id}"></td>
+            <td>${pickCell(r)}</td>
             <td>${r.course_id_seq}</td><td>${r.apellido}</td><td>${r.nombre}</td><td>${r.legajo ?? ''}</td>
           </tr>`).join('')}
       </table>`;

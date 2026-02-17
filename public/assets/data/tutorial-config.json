@@ -10,7 +10,12 @@
       "id": "pio-amigo",
       "name": "Pío Amigo",
       "image": "/assets/img/tutorial/PollitoGuia2.png"
-    }
+    },
+    {
+      "id": "pio-construccion",
+      "name": "Pío en construcción",
+      "image": "/assets/img/tutorial/PollitoGuiaConstruccion.png"
+      }
   ],
   "journeys": {
     "onboarding": [
@@ -62,16 +67,28 @@
   "pageTutorials": {
     "home": [
       {
+        "title": "¡Bienvenido a SyPdN!",
+        "text": "Soy tu guía de a-pollo y te voy a enseñar como funciona cada página. \nCuando necesites saber como funciona, solo toca el boron TUTORIAL y te voy a explicar.",
+        "selector": "#kpis",
+        "mascotId": "profe-pio"
+      },
+      {
         "title": "Seleccioná tu comisión",
-        "text": "Elegí la comisión que vas a gestionar para habilitar el menú y trabajar con contexto de curso.",
+        "text": "En este bloque podés elegir la comisión en la que estás inscripto para trabajar con ese curso. \nTodos los roles con acceso al curso pueden seleccionarla.",
         "selector": "#courseBox",
         "mascotId": "profe-pio"
       },
       {
-        "title": "Accesos rápidos",
-        "text": "Desde acá podés iniciar el tutorial completo y acceder a acciones principales según tu rol.",
-        "selector": "#kpis",
+        "title": "Curso seleccionado",
+        "text": "Acá aparece el curso que seleccionaste. \nLa parte que muestra \"Hola\" con tu nombre es solamente informativa y no requiere ninguna acción.",
+        "selector": "#selectedCourse",
         "mascotId": "pio-amigo"
+      },
+      {
+        "title": "Menú principal y botones",
+        "text": "Desde el menú superior te movés por las pantallas habilitadas para tu rol. \n\nTambién tenés: \n* botón de Modo (cambia claro/oscuro)\n* botón de Perfil (editar perfil) \n* botón Salir (cerrar sesión).",
+        "selector": "#appMenu",
+        "mascotId": "profe-pio"
       }
     ],
     "planificacion": [
@@ -82,12 +99,90 @@
         "mascotId": "profe-pio"
       }
     ],
+    "cursoDashboard": [
+      {
+        "title": "Dashboard en construcción",
+        "text": "🚧Esta página todavía se encuentra en construcción🚧 \n\nPróximamente vamos a tener más funcionalidades, por ahora está en modo de muestra y pruebas para todos los roles.",
+        "selector": "main",
+        "mascotId": "pio-construccion"
+      }
+    ],
+    "reportes": [
+      {
+        "title": "Novedades y Reportes (todos los cursos)",
+        "text": "Esta pantalla aplica a TODOS LOS CURSOS. \nEn Novedades se publican las últimas noticias que deben llegar a todas las comisiones.",
+        "selector": "#newsList",
+        "mascotId": "profe-pio"
+      },
+      {
+        "title": "Recursos generales",
+        "text": "En esta sección vas a encontrar links, recursos y herramientas de acceso rápido para toda la cursada. \nLa carga/edición de recursos depende de los permisos de tu rol.",
+        "selector": "#resourcesGrid",
+        "mascotId": "pio-amigo"
+      },
+      {
+        "title": "Botón Enviar reporte",
+        "text": "Este botón fué creado principalmente para Guido... 😂\n\nCon este botón podés enviar reportes de bugs, solicitudes o ideas. \n\n🚧EN CONSTRUCCIÓN🚧",
+        "selector": "#btnReport",
+        "mascotId": "profe-pio"
+      }
+    ],
     "estudiantes": [
       {
         "title": "Gestión de estudiantes",
-        "text": "Administrá estudiantes, datos y acciones relacionadas al curso seleccionado.",
+        "text": "Acá se encuentran todos los estudiantes registrados al curso seleccionado. \n\n Solamente los roles GURU y SENIOR pueden editar/cargar información \nAYUDANTE solo tiener vista y acciones limitadas.",
         "selector": "main",
         "mascotId": "pio-amigo"
+      },
+      {
+        "title": "Carga CSV",
+        "text": "Podés cargar estudiantes por CSV en 2 formatos: Estándar y SIU.\n El check \"Validar sin guardar\" (dry-run) sirve para testear formato/carga sin impactar datos\n\nPara guardar de verdad, desmarcá esa opción antes de ejecutar.",
+        "selector": "#btnBulk",
+        "mascotId": "profe-pio"
+      },
+      {
+        "title": "Acciones y filtros",
+        "text": "También podés agregar un estudiante nuevo de manera manual. \nTenés filtros para mostrar todos / solo ALTA / solo BAJA \n Y podes tocar Editar para cambios masivos según permisos.",
+        "selector": ".bar",
+        "mascotId": "pio-amigo"
+      },
+      {
+        "title": "Reasignar IDs (A→Z)",
+        "text": "Reasigna los IDs por orden alfabético. \nSolo debe usarse una vez y con cuidado, porque si cambian estudiantes puede generar problemas de reasignación de IDs.",
+        "selector": "#btnReid",
+        "mascotId": "profe-pio"
+      }
+    ],
+    "grupos": [
+      {
+        "title": "Alumnos sin grupo",
+        "text": "En esta tabla aparece la lista de estudiantes que todavía no tienen grupo asignado.",
+        "selector": "#noGroup",
+        "mascotId": "profe-pio"
+      },
+      {
+        "title": "Grupos creados",
+        "text": "Acá se muestran los grupos creados. \n\nSi un grupo aparece con borde rojo, está sin conformidad. \nCon Editar podés cambiar nombre y marcar conformidad entregada.",
+        "selector": "#groups",
+        "mascotId": "pio-amigo"
+      },
+      {
+        "title": "Crear grupo",
+        "text": "Para crear un grupo, usá el botón \"Crear grupo\", completá nombre (opcional) y presioná Crear. ",
+        "selector": "#g_new",
+        "mascotId": "profe-pio"
+      },
+      {
+        "title": "Ver miembros y mover",
+        "text": "Con \"Ver miembros\" podés seleccionar integrantes y moverlos a otro grupo o quitarlos.",
+        "selector": "#groups",
+        "mascotId": "pio-amigo"
+      },
+      {
+        "title": "Asignar alumnos",
+        "text": "Primero seleccioná alumnos de la lista \"sin grupo\", después tocá \"Asignar alumnos\" y elegí el grupo destino.",
+        "selector": "#g_assign_open",
+        "mascotId": "profe-pio"
       }
     ],
     "notasFinales": [
