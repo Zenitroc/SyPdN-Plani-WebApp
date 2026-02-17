@@ -453,3 +453,60 @@ small, .muted{color:var(--muted)}
 /* Usar tokens en todo el UI */
 html, body, button, input, select, textarea, table { font-family: var(--font-ui); }
 h1, h2, h3, h4, .heading { font-family: var(--font-head); }
+
+
+/* ===== Tutorial guiado ===== */
+#menuTutorialBtn{
+  white-space:nowrap;
+}
+.tutorial-overlay{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:flex-end;
+  justify-content:flex-end;
+  padding:1rem;
+  background:color-mix(in oklab, var(--bg) 35%, transparent);
+  backdrop-filter:blur(1px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s ease;
+  z-index:2147483000;
+}
+.tutorial-overlay.is-visible{
+  opacity:1;
+  pointer-events:auto;
+}
+.tutorial-panel{
+  width:min(420px, 100%);
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+  padding:1rem;
+  position:relative;
+  z-index:2147483001;
+}
+.tutorial-close{
+  position:absolute;
+  right:.5rem;
+  top:.5rem;
+  border:none;
+  background:transparent;
+  color:var(--muted);
+  cursor:pointer;
+  font-size:1rem;
+}
+.tutorial-mascot-wrap{display:flex;justify-content:center;margin-top:.3rem;}
+.tutorial-mascot{width:150px;height:150px;object-fit:contain;}
+.tutorial-progress{font-size:.85rem;color:var(--muted);margin-bottom:.2rem}
+.tutorial-title{margin:.25rem 0}
+.tutorial-text{margin:0;color:var(--text); white-space:pre-line}
+.tutorial-actions{display:flex;justify-content:space-between;gap:.5rem;margin-top:1rem}
+.tutorial-highlight-target{
+  position:relative;
+  z-index:2147482990;
+  outline:3px solid color-mix(in oklab, var(--primary) 65%, rgb(1, 217, 255));
+  border-radius:12px;
+  box-shadow:0 0 0 6px color-mix(in oklab, var(--primary) 16%, transparent);
+}
