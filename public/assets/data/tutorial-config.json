@@ -1,0 +1,103 @@
+{
+  "defaultMascotId": "profe-pio",
+  "mascots": [
+    {
+      "id": "profe-pio",
+      "name": "Profe Pío",
+      "image": "/assets/img/tutorial/PollitoGuia1.png"
+    },
+    {
+      "id": "pio-amigo",
+      "name": "Pío Amigo",
+      "image": "/assets/img/tutorial/cPollitoGuia2.png"
+    }
+  ],
+  "journeys": {
+    "onboarding": [
+      {
+        "routeKey": "home",
+        "title": "¡Bienvenido a SyPdN!",
+        "text": "Este recorrido te guía por las pantallas principales. Podés editar estos textos desde assets/data/tutorial-config.json.",
+        "selector": "#kpis",
+        "mascotId": "profe-pio"
+      },
+      {
+        "routeKey": "planificacion",
+        "title": "Planificación",
+        "text": "Acá podés consultar la planificación vigente del curso seleccionado.",
+        "selector": "#planFrame",
+        "mascotId": "pio-amigo"
+      },
+      {
+        "routeKey": "cursoDashboard",
+        "title": "Dashboard del curso",
+        "text": "Visualizá métricas rápidas y estado general del curso.",
+        "selector": "main",
+        "mascotId": "profe-pio"
+      },
+      {
+        "routeKey": "estudiantes",
+        "title": "Estudiantes",
+        "text": "Gestioná altas, bajas y seguimiento de estudiantes de la comisión.",
+        "selector": "main",
+        "mascotId": "profe-pio"
+      },
+      {
+        "routeKey": "parciales",
+        "title": "Parciales y evaluaciones",
+        "text": "Cargá y revisá información de parciales del curso activo.",
+        "selector": "main",
+        "mascotId": "pio-amigo"
+      },
+      {
+        "routeKey": "notasFinales",
+        "rolesAny": ["GURU", "SENIOR"],
+        "title": "Calificación final",
+        "text": "Esta pantalla se muestra solo para roles habilitados (GURU / SENIOR).",
+        "selector": "main",
+        "mascotId": "profe-pio"
+      }
+    ]
+  },
+  "pageTutorials": {
+    "home": [
+      {
+        "title": "Seleccioná tu comisión",
+        "text": "Elegí la comisión que vas a gestionar para habilitar el menú y trabajar con contexto de curso.",
+        "selector": "#courseBox",
+        "mascotId": "profe-pio"
+      },
+      {
+        "title": "Accesos rápidos",
+        "text": "Desde acá podés iniciar el tutorial completo y acceder a acciones principales según tu rol.",
+        "selector": "#kpis",
+        "mascotId": "pio-amigo"
+      }
+    ],
+    "planificacion": [
+      {
+        "title": "Planificación del curso",
+        "text": "Si hay URL cargada para el curso, la vas a ver embebida en esta página.",
+        "selector": "#planFrame",
+        "mascotId": "profe-pio"
+      }
+    ],
+    "estudiantes": [
+      {
+        "title": "Gestión de estudiantes",
+        "text": "Administrá estudiantes, datos y acciones relacionadas al curso seleccionado.",
+        "selector": "main",
+        "mascotId": "pio-amigo"
+      }
+    ],
+    "notasFinales": [
+      {
+        "rolesAny": ["GURU", "SENIOR"],
+        "title": "Calificación final",
+        "text": "Solo se muestra para roles permitidos. Podés ajustar reglas por paso con rolesAny.",
+        "selector": "main",
+        "mascotId": "profe-pio"
+      }
+    ]
+  }
+}
