@@ -39,7 +39,7 @@ renderMenu();
 
     const isBlank = (c) => c == null || String(c).trim() === '';
     const pass = (c) => !!c && !FAIL.has(String(c).toUpperCase());
-    const hasApprovedFinal = (row) => ['FIRMA', 'PROMOCIONA'].includes(conditionInfo(row).text);
+    //const hasApprovedFinal = (row) => ['FIRMA', 'PROMOCIONA'].includes(conditionInfo(row).text);
 
     function escapeHtml(value) {
         return String(value ?? '').replace(/[&<>"']/g, (m) => ({
@@ -165,9 +165,9 @@ renderMenu();
     function renderPendingLegend() {
         const legend = qs('siuPendingLegend');
         if (!legend) return;
-        const pendingCount = (DATA.students || []).filter(r => hasApprovedFinal(r) && Number(r.siu_loaded) !== 1).length;
+        const pendingCount = (DATA.students || []).filter(r => shouldWarnPendingSiu(r) && Number(r.siu_loaded) !== 1).length;
         if (pendingCount > 0) {
-            legend.textContent = 'Hay alumnos que faltan cargar en SIU';
+            legend.textContent = '* Hay alumnos que faltan cargar en el SIU';
             legend.style.display = '';
         } else {
             legend.textContent = '';
@@ -212,7 +212,7 @@ renderMenu();
             const tps2 = row.tps_2c == null ? '<span class="muted-cell">-</span>' : `${row.tps_2c}%`;
             const cond = conditionInfo(row);
             const rowClass = Number(row.siu_loaded) === 1 ? 'row-siu' : '';
-            const pendingSiu = hasApprovedFinal(row) && Number(row.siu_loaded) !== 1;
+            const pendingSiu = shouldWarnPendingSiu(row) && Number(row.siu_loaded) !== 1;
             const apellido = escapeHtml(row.apellido);
             const nombre = escapeHtml(row.nombre);
             const partialCells = [];
@@ -280,6 +280,19 @@ renderMenu();
     function cellClassFromGrade(code) {
         if (isBlank(code)) return '';
         return FAIL.has(String(code).toUpperCase()) ? 'td-fail' : 'td-pass';
+    }
+
+    function topicApprovedInAnyAttempt(partialData, topic) {
+        return ALL_ATTEMPTS.some(att => pass(partialData?.[topic]?.[att]));
+    }
+
+    function shouldWarnPendingSiu(row) {
+        const topics = topicData();
+        const p1Approved = (topics.p1 || []).every(topic => topicApprovedInAnyAttempt(row.p1, topic));
+        const p2Approved = (topics.p2 || []).every(topic => topicApprovedInAnyAttempt(row.p2, topic));
+        const tps1Approved = Number(row.tps_1c) > 60;
+        const tps2Approved = Number(row.tps_2c) > 60;
+        return p1Approved && p2Approved && tps1Approved && tps2Approved;
     }
 
     function setupScrollSync() {
