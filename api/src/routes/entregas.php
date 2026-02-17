@@ -242,8 +242,8 @@ function register_entregas_routes() {
     if ($courseId<=0 || !in_array($type,['TP','TPC','TPR'],true) || !in_array($term,[1,2],true)) {
       return json_error('Parámetros inválidos', 400);
     }
-    $st = $pdo->prepare("SELECT COALESCE(MAX(number),0) FROM assignments WHERE course_id=? AND type=? AND term=?");
-    $st->execute([$courseId, $type, $term]);
+    $st = $pdo->prepare("SELECT COALESCE(MAX(number),0) FROM assignments WHERE course_id=? AND type=?");
+    $st->execute([$courseId, $type]);
     $next = (int)$st->fetchColumn() + 1;
     return json_ok(['next' => $next]);
   });
@@ -268,8 +268,8 @@ function register_entregas_routes() {
 
     $pdo->beginTransaction();
     try {
-      $st = $pdo->prepare("SELECT COALESCE(MAX(number),0) FROM assignments WHERE course_id=? AND term=? AND type=?");
-      $st->execute([$courseId, (int)$input['term'], $input['type']]);
+      $st = $pdo->prepare("SELECT COALESCE(MAX(number),0) FROM assignments WHERE course_id=? AND type=?");
+      $st->execute([$courseId, $input['type']]);
       $number = (int)$st->fetchColumn() + 1;
 
       $st = $pdo->prepare("INSERT INTO assignments (course_id, term, type, number, topic, due_date, name, returned, created_at)
