@@ -84,6 +84,40 @@
             opacity: .55;
             cursor: not-allowed;
         }
+
+        .summary-wrap {
+            margin: .75rem 0;
+        }
+
+        .summary-wrap h2 {
+            margin: 0 0 .4rem;
+            font-size: 1rem;
+        }
+
+        .summary-table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 520px;
+        }
+
+        .summary-table th,
+        .summary-table td {
+            border-bottom: 1px solid var(--border);
+            padding: .35rem .5rem;
+            text-align: left;
+        }
+
+        .summary-table td.count {
+            font-weight: 700;
+            text-align: center;
+            width: 130px;
+        }
+
+        .reminder-note {
+            color: #dc2626;
+            font-weight: 700;
+            margin: .5rem 0 .9rem;
+        }
     </style>
 </head>
 
@@ -91,6 +125,8 @@
     <nav id="appMenu"></nav>
     <main class="container">
         <h1>Asistencia a parciales</h1>
+        <div id="summary" class="summary-wrap"></div>
+        <p class="reminder-note">Recuerde chequear si los alumnos desean levantar nota.</p>
         <div class="toolbar">
             <label>Parcial:
                 <select id="partialFilter" class="select" style="width:auto">

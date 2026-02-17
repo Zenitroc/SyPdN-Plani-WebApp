@@ -6,6 +6,7 @@ function esc(s){ return (s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;","
 const partialFilter = qs('partialFilter');
 const attemptFilter = qs('attemptFilter');
 const content = qs('content');
+const summary = qs('summary');
 const btnDownloadXls = qs('btnDownloadXls');
 const btnDownloadPdf = qs('btnDownloadPdf');
 
@@ -64,8 +65,9 @@ async function load(){
   students = data.students || [];
   currentTopics = data.topics || [];
 
+  renderSummary();
+
   let html = '<table class="tbl"><thead><tr>'+
-    '<th><input type="checkbox" id="selAll" class="check-btn"></th>'+
     '<th>ID</th><th>Apellido</th><th>Nombre</th><th>Presente</th>';
   currentTopics.forEach(t => { html += `<th>${t}</th>`; });
   html += '</tr></thead><tbody>';
@@ -73,7 +75,6 @@ async function load(){
   students.forEach(s => {
     const rowCls = s.present ? 'row-present' : '';
     html += `<tr data-enroll="${s.enrollment_id}" class="${rowCls}">`+
-      '<td><input type="checkbox" class="sel check-btn"></td>'+
       `<td>${s.course_id_seq}</td>`+
       `<td>${esc(s.apellido)}</td>`+
       `<td>${esc(s.nombre)}</td>`+
@@ -91,9 +92,6 @@ async function load(){
   html += '</tbody></table>';
   content.innerHTML = html;
 
-  qs('selAll').onchange = (ev)=>{
-    document.querySelectorAll('tbody .sel').forEach(cb=>cb.checked=ev.target.checked);
-  };
   document.querySelectorAll('tbody .present').forEach(cb=>{
     cb.onchange = async ev => {
       const tr = ev.target.closest('tr');
@@ -104,6 +102,7 @@ async function load(){
         if (!present) tcb.checked = false;
       });
       updateRowStyles(tr);
+      renderSummary();
       await save(en);
     };
   });
@@ -111,11 +110,34 @@ async function load(){
     cb.onchange = async ev => {
       const tr = ev.target.closest('tr');
       updateRowStyles(tr);
+      renderSummary();
       const en = parseInt(tr.getAttribute('data-enroll'),10);
       await save(en);
     };
   });
   document.querySelectorAll('tbody tr').forEach(updateRowStyles);
+}
+
+function renderSummary(){
+  if (!currentTopics.length) {
+    summary.innerHTML = '';
+    return;
+  }
+
+  let html = '<h2>Alumnos que adeudan por tema</h2>';
+  html += '<table class="summary-table"><thead><tr><th>Tema</th><th>Cantidad</th></tr></thead><tbody>';
+
+  currentTopics.forEach(topic => {
+    const count = students.reduce((acc, student) => {
+      const approved = !!(student.approved_topics && student.approved_topics[topic]);
+      const delivered = !!(student.topics && student.topics[topic]);
+      return acc + (!approved && !delivered ? 1 : 0);
+    }, 0);
+    html += `<tr><td>${esc(topic)}</td><td class="count">${count}</td></tr>`;
+  });
+
+  html += '</tbody></table>';
+  summary.innerHTML = html;
 }
 
 async function save(enrollId){
@@ -148,41 +170,73 @@ function updateRowStyles(tr){
   });
 }
 
-function collectSelected(){
+function getTopicCellValue(cb){
+  if (!cb) return '';
+  if (cb.dataset.approved === '1') return 'Aprobado';
+  return cb.checked ? 'Adeuda' : 'No adeuda';
+}
+
+function collectRows(){
   const rows = [];
   document.querySelectorAll('tbody tr').forEach(tr=>{
-    if(tr.querySelector('.sel').checked){
-      const row = [];
-      row.push(tr.children[1].textContent.trim());
-      row.push(tr.children[2].textContent.trim());
-      row.push(tr.children[3].textContent.trim());
-      row.push(tr.querySelector('.present').checked ? 'Presente' : 'Ausente');
-      currentTopics.forEach(t=>{
-        const cb = tr.querySelector(`.topic[data-topic="${t}"]`);
-        row.push(cb && cb.checked ? 'Entregado' : '');
-      });
-      rows.push(row);
-    }
+    const row = [];
+    row.push(tr.children[0].textContent.trim());
+    row.push(tr.children[1].textContent.trim());
+    row.push(tr.children[2].textContent.trim());
+    row.push(tr.querySelector('.present').checked ? 'Presente' : 'Ausente');
+    currentTopics.forEach(t=>{
+      const cb = tr.querySelector(`.topic[data-topic="${t}"]`);
+      row.push(getTopicCellValue(cb));
+    });
+    rows.push(row);
   });
   return rows;
 }
 
+function isGrayTopicValue(value){
+  return value === 'No adeuda' || value === 'Aprobado';
+}
+
 function downloadXls(){
-  const rows = collectSelected();
-  if(!rows.length){ alert('Seleccioná al menos un estudiante'); return; }
+  const rows = collectRows();
+  if(!rows.length){ alert('No hay estudiantes para exportar'); return; }
   const header = ['ID','Apellido','Nombre','Presente', ...currentTopics];
   const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+
+  rows.forEach((row, rowIdx) => {
+    currentTopics.forEach((_, topicIdx) => {
+      const value = row[4 + topicIdx];
+      if (!isGrayTopicValue(value)) return;
+      const cellRef = XLSX.utils.encode_cell({ r: rowIdx + 1, c: 4 + topicIdx });
+      if (!ws[cellRef]) return;
+      ws[cellRef].s = {
+        fill: { patternType: 'solid', fgColor: { rgb: 'D1D5DB' } },
+        font: { color: { rgb: '374151' } }
+      };
+    });
+  });
+
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Asistencia');
   XLSX.writeFile(wb, 'asistencia.xlsx');
 }
 
 function downloadPdf(){
-  const rows = collectSelected();
-  if(!rows.length){ alert('Seleccioná al menos un estudiante'); return; }
+  const rows = collectRows();
+  if(!rows.length){ alert('No hay estudiantes para exportar'); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   const header = ['ID','Apellido','Nombre','Presente', ...currentTopics];
-  doc.autoTable({ head: [header], body: rows });
+  doc.autoTable({
+    head: [header],
+    body: rows,
+    didParseCell(data) {
+      if (data.section !== 'body' || data.column.index < 4) return;
+      if (isGrayTopicValue(data.cell.raw)) {
+        data.cell.styles.fillColor = [229, 231, 235];
+        data.cell.styles.textColor = [55, 65, 81];
+      }
+    }
+  });
   doc.save('asistencia.pdf');
 }
