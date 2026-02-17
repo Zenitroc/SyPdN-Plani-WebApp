@@ -51,6 +51,19 @@
             flex-wrap: wrap;
         }
 
+        .siu-legend {
+            width: 100%;
+            color: #ca8a04;
+            font-weight: 700;
+            font-size: .9rem;
+        }
+
+        .id-alert {
+            color: #ca8a04;
+            font-weight: 700;
+            margin-left: .2rem;
+        }
+
         .table-scroll {
             overflow-x: auto;
             overflow-y: hidden;
@@ -232,6 +245,12 @@
             background: var(--row-siu);
         }
 
+        .row-siu td.sticky-col-1,
+        .row-siu td.sticky-col-2,
+        .row-siu td.sticky-col-3 {
+            background: var(--row-siu);
+        }
+
         select.final-grade {
             min-width: 110px;
         }
@@ -296,9 +315,10 @@
                 </select>
             </div>
             <div class="right">
-                <button id="btnDownloadPdf" class="btn">Descargar PDF</button>
+                <button id="btnExportExcel" class="btn">Exportar a EXCEL</button>
                 <input id="q" class="input" placeholder="Buscar por apellido o nombre..." style="min-width:260px" />
             </div>
+            <div id="siuPendingLegend" class="siu-legend" style="display:none"></div>
         </div>
 
         <div class="table-wrap" id="finalsTableWrap">
@@ -316,8 +336,7 @@
     <script src="/assets/js/theme.js"></script>
     <script src="/assets/js/course-context.js"></script>
     <script src="/assets/js/menu.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="/pages/notas-finales/notas-finales.js"></script>
 </body>
 

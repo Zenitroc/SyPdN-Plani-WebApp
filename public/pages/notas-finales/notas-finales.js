@@ -21,6 +21,7 @@ renderMenu();
     let ATT = 'ALL';
     let TOPIC_FILTER = 'ALL';
     let SCROLL_SYNC_READY = false;
+    let COURSE_NAME = '';
 
     const MAP_P1 = { ORG: 'O', MET: 'M', TEO1: 'T' };
     const MAP_P2 = { PLS: 'P', CUR: 'C', TEO2: 'T' };
@@ -38,6 +39,7 @@ renderMenu();
 
     const isBlank = (c) => c == null || String(c).trim() === '';
     const pass = (c) => !!c && !FAIL.has(String(c).toUpperCase());
+    const hasApprovedFinal = (row) => ['FIRMA', 'PROMOCIONA'].includes(conditionInfo(row).text);
 
     function escapeHtml(value) {
         return String(value ?? '').replace(/[&<>"']/g, (m) => ({
@@ -126,6 +128,17 @@ renderMenu();
         IS_GURU = roles.includes('GURU');
     }
 
+    async function loadCourseName() {
+        try {
+            const coursesRes = payload(await api.get(IS_GURU ? '/courses?scope=all' : '/courses'));
+            const courses = Array.isArray(coursesRes) ? coursesRes : (coursesRes?.courses || []);
+            const selected = courses.find(c => Number(c.id ?? c.course_id ?? c.ID) === Number(COURSE_ID));
+            COURSE_NAME = selected?.name ?? selected?.title ?? selected?.codigo ?? '';
+        } catch {
+            COURSE_NAME = '';
+        }
+    }
+
     async function load() {
         await ensurePermissions();
         if (!api.getToken()) {
@@ -136,6 +149,7 @@ renderMenu();
         COURSE_ID = Number(await courseContext.require());
         if (!Number.isFinite(COURSE_ID) || COURSE_ID <= 0) throw new Error('No hay curso seleccionado');
 
+        await loadCourseName();
         const res = payload(await apiGet(`?course_id=${COURSE_ID}`));
         DATA = res || DATA;
         renderTopicOptions();
@@ -144,7 +158,21 @@ renderMenu();
 
     function renderTables() {
         renderFinalsTable();
+        renderPendingLegend();
         setupScrollSync();
+    }
+
+    function renderPendingLegend() {
+        const legend = qs('siuPendingLegend');
+        if (!legend) return;
+        const pendingCount = (DATA.students || []).filter(r => hasApprovedFinal(r) && Number(r.siu_loaded) !== 1).length;
+        if (pendingCount > 0) {
+            legend.textContent = 'Hay alumnos que faltan cargar en SIU';
+            legend.style.display = '';
+        } else {
+            legend.textContent = '';
+            legend.style.display = 'none';
+        }
     }
 
     function renderFinalsTable() {
@@ -184,6 +212,7 @@ renderMenu();
             const tps2 = row.tps_2c == null ? '<span class="muted-cell">-</span>' : `${row.tps_2c}%`;
             const cond = conditionInfo(row);
             const rowClass = Number(row.siu_loaded) === 1 ? 'row-siu' : '';
+            const pendingSiu = hasApprovedFinal(row) && Number(row.siu_loaded) !== 1;
             const apellido = escapeHtml(row.apellido);
             const nombre = escapeHtml(row.nombre);
             const partialCells = [];
@@ -218,7 +247,7 @@ renderMenu();
 
             return `
       <tr class="${rowClass}">
-        <td class="center sticky-col-1">${row.course_id_seq}</td>
+        <td class="center sticky-col-1">${row.course_id_seq}${pendingSiu ? '<span class="id-alert" title="Hay alumnos que faltan cargar en SIU">★</span>' : ''}</td>
         <td class="sticky-col-2">${apellido}</td>
         <td class="sticky-col-3">${nombre}</td>
         <td class="center">${p1}</td>
@@ -369,82 +398,52 @@ renderMenu();
         });
     })();
 
-    const btnDownloadPdf = qs('btnDownloadPdf');
-    if (btnDownloadPdf) {
-        btnDownloadPdf.addEventListener('click', () => downloadPdf());
+    const btnExportExcel = qs('btnExportExcel');
+    if (btnExportExcel) {
+        btnExportExcel.addEventListener('click', () => exportExcel());
     }
 
-    function parcialPlain(adeuda, p) {
-        if (!adeuda || adeuda.length === 0) return 'AP';
-        const map = p === 1 ? MAP_P1 : MAP_P2;
-        return adeuda.map(t => map[t] || t).join('-');
+    function slug(value) {
+        return String(value || 'curso')
+            .normalize('NFD')
+            .replace(/[̀-ͯ]/g, '')
+            .replace(/[^a-zA-Z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+            .toLowerCase() || 'curso';
     }
 
-    function downloadPdf() {
-        const { jsPDF } = window.jspdf || {};
-        if (!jsPDF) {
-            alert('No se pudo cargar la librería de PDF.');
+    function exportExcel() {
+        if (!window.XLSX) {
+            alert('No se pudo cargar la librería para exportar a Excel.');
             return;
         }
-        const doc = new jsPDF({ orientation: 'landscape' });
-        doc.setFontSize(14);
-        doc.text('Notas finales', 14, 14);
+        const table = qs('finalsTable');
+        if (!table) return;
 
-        const finalsRows = filteredFinals().map(row => {
-            const cond = conditionInfo(row);
-            return [
-                row.course_id_seq,
-                row.apellido,
-                row.nombre,
-                parcialPlain(row.adeuda_p1, 1),
-                parcialPlain(row.adeuda_p2, 2),
-                row.tps_1c == null ? '-' : `${row.tps_1c}%`,
-                row.tps_2c == null ? '-' : `${row.tps_2c}%`,
-                row.final_deserto ? 'AUSENTE' : (row.final_grade ?? '-'),
-                cond.text || '-',
-                Number(row.siu_loaded) === 1 ? 'Sí' : 'No',
-                row.observaciones || ''
-            ];
+        const clone = table.cloneNode(true);
+        clone.querySelectorAll('select.final-grade').forEach(sel => {
+            const td = sel.closest('td');
+            if (!td) return;
+            const value = sel.value;
+            td.textContent = value === 'DESERTO' ? 'AUSENTE' : (value || '-');
         });
-        doc.autoTable({
-            startY: 20,
-            head: [[
-                'ID', 'Apellido', 'Nombre', '1°P', '2°P', 'TPS 1C', 'TPS 2C',
-                'Final', 'Condición', 'SIU', 'Observaciones'
-            ]],
-            body: finalsRows
+        clone.querySelectorAll('input.siu-check').forEach(chk => {
+            const td = chk.closest('td');
+            if (!td) return;
+            td.textContent = chk.checked ? 'Sí' : '-';
+        });
+        clone.querySelectorAll('input.obs-input').forEach(inp => {
+            const td = inp.closest('td');
+            if (!td) return;
+            td.textContent = inp.value || '-';
         });
 
-        const partialsRows = filteredBase().map(row => {
-            const atts = attemptsShown();
-            const { p1, p2 } = topicsForShow();
-            const base = [
-                row.course_id_seq,
-                row.apellido,
-                row.nombre,
-                parcialPlain(row.adeuda_p1, 1),
-                parcialPlain(row.adeuda_p2, 2)
-            ];
-            p1.forEach(topic => atts.forEach(a => base.push(row.p1?.[topic]?.[a] ?? '')));
-            p2.forEach(topic => atts.forEach(a => base.push(row.p2?.[topic]?.[a] ?? '')));
-            return base;
-        });
-
-        const partialHeaders = (() => {
-            const atts = attemptsShown();
-            const { p1, p2 } = topicsForShow();
-            const cols = ['ID', 'Apellido', 'Nombre', '1°P', '2°P'];
-            [...p1, ...p2].forEach(topic => atts.forEach(a => cols.push(`${topic}_${ATT_LABEL[a]}`)));
-            return cols;
-        })();
-
-        doc.autoTable({
-            startY: doc.lastAutoTable.finalY + 10,
-            head: [partialHeaders],
-            body: partialsRows
-        });
-
-        doc.save('notas-finales.pdf');
+        const wb = XLSX.utils.table_to_book(clone, { sheet: 'Notas finales' });
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const stamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+        const fileName = `notas-finales-${slug(COURSE_NAME || `curso-${COURSE_ID}`)}-${stamp}.xlsx`;
+        XLSX.writeFile(wb, fileName);
     }
 
     load().catch(e => {
