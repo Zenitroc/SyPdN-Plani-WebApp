@@ -30,8 +30,30 @@ function register_asistencia_routes() {
     $pdo->exec($sql);
   };
 
+  // ==== Ensure schema for partial_grades (read-only dependency) ============
+  $ensure_partial_grades_schema = function(PDO $pdo) {
+    static $done = false; if ($done) return; $done = true;
+    $sql = "
+      CREATE TABLE IF NOT EXISTS partial_grades (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        course_id BIGINT UNSIGNED NOT NULL,
+        enrollment_id BIGINT UNSIGNED NOT NULL,
+        partial_no TINYINT NOT NULL,
+        topic VARCHAR(8) NOT NULL,
+        attempt ENUM('PA','1R','2R') NOT NULL,
+        grade_code VARCHAR(32) NULL,
+        updated_at DATETIME NOT NULL,
+        UNIQUE KEY ux_pg_unique (enrollment_id, partial_no, topic, attempt),
+        KEY ix_pg_course (course_id),
+        CONSTRAINT fk_pg_course  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+        CONSTRAINT fk_pg_enroll  FOREIGN KEY (enrollment_id) REFERENCES enrollments(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ";
+    $pdo->exec($sql);
+  };
+
   // ==== GET /api/asistencia =================================================
-  route('GET', '/api/asistencia', function() use ($ensure_schema) {
+  route('GET', '/api/asistencia', function() use ($ensure_schema, $ensure_partial_grades_schema) {
     $courseId = (int)($_GET['course_id'] ?? 0);
     $partial = (int)($_GET['partial'] ?? 1);
     $attempt = $_GET['attempt'] ?? 'PA';
@@ -42,6 +64,7 @@ function register_asistencia_routes() {
 
     $pdo = db();
     $ensure_schema($pdo);
+    $ensure_partial_grades_schema($pdo);
 
     $st = $pdo->prepare("SELECT e.id AS enrollment_id, e.course_student_id AS course_id_seq, p.last_name AS apellido, p.first_name AS nombre
                          FROM enrollments e
