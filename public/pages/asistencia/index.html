@@ -86,37 +86,43 @@
         }
 
         .summary-wrap {
-            margin: .75rem 0;
+            margin: 1rem 0 .5rem;
+            max-width: 420px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            background: color-mix(in oklab, var(--surface) 92%, #000 8%);
         }
 
         .summary-wrap h2 {
-            margin: 0 0 .4rem;
-            font-size: 1rem;
-        }
-
-        .summary-table {
-            border-collapse: collapse;
-            width: 100%;
-            max-width: 520px;
+            margin: 0;
+            font-size: .95rem;
+            padding: .55rem .7rem;
+            background: color-mix(in oklab, var(--primary) 16%, var(--surface));
         }
 
         .summary-table th,
         .summary-table td {
             border-bottom: 1px solid var(--border);
-            padding: .35rem .5rem;
+            padding: .3rem .5rem;
             text-align: left;
+            font-size: .9rem;
         }
 
         .summary-table td.count {
             font-weight: 700;
             text-align: center;
-            width: 130px;
+            width: 100px;
         }
 
         .reminder-note {
             color: #dc2626;
             font-weight: 700;
-            margin: .5rem 0 .9rem;
+            margin: .7rem 0 .5rem;
+            max-width: 420px;
+            padding: .45rem .65rem;
+            border-radius: 10px;
+            background: color-mix(in oklab, #ef4444 16%, var(--surface));
         }
     </style>
 </head>
@@ -125,8 +131,6 @@
     <nav id="appMenu"></nav>
     <main class="container">
         <h1>Asistencia a parciales</h1>
-        <div id="summary" class="summary-wrap"></div>
-        <p class="reminder-note">Recuerde chequear si los alumnos desean levantar nota.</p>
         <div class="toolbar">
             <label>Parcial:
                 <select id="partialFilter" class="select" style="width:auto">
@@ -146,6 +150,8 @@
             <button id="btnDownloadPdf" class="btn">Descargar PDF</button>
         </div>
         <div id="content"></div>
+        <p class="reminder-note">Recuerde chequear si los alumnos desean levantar nota.</p>
+        <div id="summary" class="summary-wrap"></div>
     </main>
     <script src="/assets/js/api.js"></script>
     <script src="/assets/js/theme.js"></script>

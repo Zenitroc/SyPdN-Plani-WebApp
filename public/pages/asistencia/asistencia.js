@@ -140,6 +140,17 @@ function renderSummary(){
   summary.innerHTML = html;
 }
 
+function buildSummaryRows(){
+  return currentTopics.map(topic => {
+    const count = students.reduce((acc, student) => {
+      const approved = !!(student.approved_topics && student.approved_topics[topic]);
+      const delivered = !!(student.topics && student.topics[topic]);
+      return acc + (!approved && !delivered ? 1 : 0);
+    }, 0);
+    return [topic, count];
+  });
+}
+
 async function save(enrollId){
   const tr = document.querySelector(`tr[data-enroll="${enrollId}"]`);
   const present = tr.querySelector('.present').checked ? 1 : 0;
@@ -173,12 +184,12 @@ function updateRowStyles(tr){
 function getTopicCellValue(cb){
   if (!cb) return '';
   if (cb.dataset.approved === '1') return 'Aprobado';
-  return cb.checked ? 'Adeuda' : 'No adeuda';
+  return cb.checked ? 'X' : '  ';
 }
 
 function collectRows(){
   const rows = [];
-  document.querySelectorAll('tbody tr').forEach(tr=>{
+  content.querySelectorAll('tbody tr').forEach(tr=>{
     const row = [];
     row.push(tr.children[0].textContent.trim());
     row.push(tr.children[1].textContent.trim());
@@ -194,14 +205,19 @@ function collectRows(){
 }
 
 function isGrayTopicValue(value){
-  return value === 'No adeuda' || value === 'Aprobado';
+  return value === '  ' || value === 'Aprobado';
 }
 
 function downloadXls(){
+   if (!window.XLSX) { alert('No se pudo cargar la librería de Excel.'); return; }
   const rows = collectRows();
   if(!rows.length){ alert('No hay estudiantes para exportar'); return; }
   const header = ['ID','Apellido','Nombre','Presente', ...currentTopics];
-  const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+  const summaryHeader = ['Tema', 'Cantidad'];
+  const summaryRows = buildSummaryRows();
+  const spacer = [];
+  const wsRows = [header, ...rows, spacer, ['Alumnos que adeudan por tema'], summaryHeader, ...summaryRows];
+  const ws = XLSX.utils.aoa_to_sheet(wsRows);
 
   rows.forEach((row, rowIdx) => {
     currentTopics.forEach((_, topicIdx) => {
@@ -216,18 +232,37 @@ function downloadXls(){
     });
   });
 
+  const summaryTitleRef = XLSX.utils.encode_cell({ r: rows.length + 2, c: 0 });
+  if (ws[summaryTitleRef]) {
+    ws[summaryTitleRef].s = {
+      font: { bold: true }
+    };
+  }
+
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Asistencia');
-  XLSX.writeFile(wb, 'asistencia.xlsx');
+  try {
+    XLSX.writeFile(wb, 'asistencia.xlsx');
+  } catch (err) {
+    console.error(err);
+    alert('No se pudo descargar el Excel.');
+  }
 }
 
 function downloadPdf(){
+  if (!window.jspdf || !window.jspdf.jsPDF) { alert('No se pudo cargar la librería de PDF.'); return; }
   const rows = collectRows();
   if(!rows.length){ alert('No hay estudiantes para exportar'); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
+  const runAutoTable = (config) => {
+    if (typeof doc.autoTable === 'function') return doc.autoTable(config);
+    if (window.jspdf && typeof window.jspdf.autoTable === 'function') return window.jspdf.autoTable(doc, config);
+    throw new Error('autoTable unavailable');
+  };
+
   const header = ['ID','Apellido','Nombre','Presente', ...currentTopics];
-  doc.autoTable({
+  const attendanceTableConfig = {
     head: [header],
     body: rows,
     didParseCell(data) {
@@ -237,6 +272,29 @@ function downloadPdf(){
         data.cell.styles.textColor = [55, 65, 81];
       }
     }
+  };
+
+  try {
+    runAutoTable(attendanceTableConfig);
+  } catch (err) {
+    alert('No se pudo cargar el plugin de tabla para PDF.');
+    return;
+  }
+
+  const summaryRows = buildSummaryRows();
+  const afterAttendanceY = (doc.lastAutoTable && doc.lastAutoTable.finalY) ? doc.lastAutoTable.finalY + 10 : 20;
+  doc.setFontSize(12);
+  doc.text('Alumnos que adeudan por tema', 14, afterAttendanceY);
+  runAutoTable({
+    startY: afterAttendanceY + 3,
+    head: [['Tema', 'Cantidad']],
+    body: summaryRows
   });
-  doc.save('asistencia.pdf');
+
+  try {
+    doc.save('asistencia.pdf');
+  } catch (err) {
+    console.error(err);
+    alert('No se pudo descargar el PDF.');
+  }
 }
