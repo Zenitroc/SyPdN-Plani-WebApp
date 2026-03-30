@@ -69,9 +69,20 @@ function payload(res) { return (res && typeof res === 'object' && 'data' in res)
       location.href = `${profileRoute}?force=1`;
       return;
     }
-  } catch {
-    api.clearToken();
-    location.href = window.getPageRoute ? window.getPageRoute('login') : '/pages/login/';
+  } catch (err) {
+    const msg = String(err?.message || '').toLowerCase();
+    const authError = msg.includes('401')
+      || msg.includes('missing token')
+      || msg.includes('invalid token')
+      || msg.includes('token expired');
+
+    if (authError) {
+      api.clearToken();
+      location.href = window.getPageRoute ? window.getPageRoute('login') : '/pages/login/';
+      return;
+    }
+
+    alert('No se pudo validar tu sesión por un error temporal. Reintentá en unos segundos.');
     return;
   }
 

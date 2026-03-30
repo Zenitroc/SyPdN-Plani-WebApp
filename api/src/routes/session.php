@@ -29,12 +29,15 @@ function register_session_routes(): void {
     $cs->execute([$u['id']]);
     $course_ids = array_map('intval', array_column($cs->fetchAll(), 'course_id'));
 
+    $jwtExpSeconds = (int)(getenv('JWT_EXP_SECONDS') ?: 60 * 60 * 8); // 8 horas por defecto
+    if ($jwtExpSeconds < 300) $jwtExpSeconds = 300; // piso de 5 minutos
+
     $token = jwt_encode([
       'sub' => (int)$u['id'],
       'name'=> $u['name'],
       'roles'=> $roles,
       'course_ids'=> $course_ids
-    ], getenv('JWT_SECRET') ?: 'CAMBIA_ESTE_SECRETO_LARGO', 60*15); // 15 min
+    ], getenv('JWT_SECRET') ?: 'CAMBIA_ESTE_SECRETO_LARGO', $jwtExpSeconds);
 
     json_ok(['token'=>$token, 'user'=>[
       'id'=>(int)$u['id'],
