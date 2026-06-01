@@ -11,6 +11,7 @@ async function apiTryGet(path) { // prueba /path luego /api/path
     if (r && r.error && isNotFound(r)) throw new Error('NF1');
     return r;
   } catch (e1) {
+    if (api.isAuthError?.(e1)) throw e1;
     try {
       const r2 = await api.get('/api' + path);
       if (r2 && r2.error && isNotFound(r2)) throw new Error('NF2');
@@ -24,6 +25,7 @@ async function apiTryPost(path, body, opts) {
     if (r && r.error && isNotFound(r)) throw new Error('NF1');
     return r;
   } catch (e1) {
+    if (api.isAuthError?.(e1)) throw e1;
     try {
       const r2 = await api.post('/api' + path, body, opts);
       if (r2 && r2.error && isNotFound(r2)) throw new Error('NF2');

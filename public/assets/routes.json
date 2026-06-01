@@ -1,7 +1,7 @@
 {
   "apiBase": "/api",
   "assetsBase": "/assets",
-  "serviceWorker": "/sw.js",
+  "serviceWorker": null,
   "pages": {
     "home": "/pages/home/index.html",
     "login": "/pages/login/index.html",

@@ -1,23 +1,3 @@
-// Helpers API (Los dejamos igual)
-function isNotFound(val){
-  const s = String(val?.message || val?.error || val || '').toLowerCase();
-  return s.includes('not found') || s.includes('404');
-}
-
-async function apiTryPost(path, body, opts){
-  try{
-    const r = await api.post(path, body, opts);
-    if (r && r.error && isNotFound(r)) throw new Error('NF1');
-    return r;
-  }catch(e1){
-    try{
-      const r2 = await api.post('/api' + path, body, opts);
-      if (r2 && r2.error && isNotFound(r2)) throw new Error('NF2');
-      return r2;
-    }catch(e2){ throw e2; }
-  }
-}
-
 // Envolvemos todo en DOMContentLoaded para asegurar que el HTML existe
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('Login.js: Iniciando script...'); // Debug
@@ -137,13 +117,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 7. Recordar usuario
-  if (remember && username && password) {
+  localStorage.removeItem('password');
+  if (remember && username) {
     const saved = localStorage.getItem('remember') === 'true';
     if (saved) {
       remember.checked = true;
       username.value = localStorage.getItem('username') || '';
-      password.value = localStorage.getItem('password') || '';
     }
+  }
+
+  const authMessage = sessionStorage.getItem('spn_auth_message');
+  if (authMessage && loginMsg) {
+    loginMsg.textContent = authMessage;
+    sessionStorage.removeItem('spn_auth_message');
   }
 
   // 8. Chequeo de Token (Para redirigir si ya está logueado)
@@ -173,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Verificamos que 'api' exista antes de llamar
         if (typeof api === 'undefined') throw new Error('Error interno: API no cargada');
 
-        const r = await apiTryPost('/auth/login', {
+        const r = await api.post('/auth/login', {
           username: userVal,
           password: passVal
         }, { noAuth: true });
@@ -184,12 +170,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (remember && remember.checked) {
           localStorage.setItem('remember', 'true');
           localStorage.setItem('username', userVal);
-          localStorage.setItem('password', passVal);
         } else {
           localStorage.removeItem('remember');
           localStorage.removeItem('username');
-          localStorage.removeItem('password');
         }
+        localStorage.removeItem('password');
 
         api.setToken(tk);
         location.href = homeUrl;

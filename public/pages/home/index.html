@@ -48,23 +48,6 @@
 
   </div>
 
-  
-  <script>
-    (function () {
-      if (!('serviceWorker' in navigator)) return;
-
-      // Detecta BASE_APP sin depender de variables globales
-      const parts = location.pathname.split('/').filter(Boolean);
-      const i = parts.indexOf('pages');
-      const BASE_APP = i > 0 ? '/' + parts.slice(0, i).join('/') : '';
-
-      navigator.serviceWorker.register(BASE_APP + '/sw.js')
-        .then(r => console.log('[SW] registrado en', r.scope))
-        .catch(err => console.warn('[SW] error', err));
-    })();
-  </script>
-
-
   <script src="/assets/js/api.js"></script>
   <script src="/assets/js/theme.js"></script>
   <script src="/assets/js/course-context.js"></script>

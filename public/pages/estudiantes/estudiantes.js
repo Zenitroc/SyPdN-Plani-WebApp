@@ -192,7 +192,12 @@ qs('btnBulk').onclick = () => {
         method:'POST', headers: { Authorization: `Bearer ${api.getToken()}` }, body: fd
       });
       const txt = await res.text(); const data = txt ? JSON.parse(txt) : {};
-      if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+      if (!res.ok) {
+        if (api.isAuthError?.(res.status)) api.handleAuthError?.(res.status);
+        const error = new Error(data?.error || `HTTP ${res.status}`);
+        error.status = res.status;
+        throw error;
+      }
       qs('b_msg').textContent = `OK: Insertados=${data.inserted||0}, Actualizados=${data.updated||0}, dry_run=${data.dry_run}. ${data.errors?.length ? 'Errores: '+data.errors.join(' | ') : ''}`;
       if (!dry) { await load(); setTimeout(()=>modalHide('modalBulk'), 800); }
     } catch (e) { qs('b_msg').textContent = e.message || 'Error en carga'; }
