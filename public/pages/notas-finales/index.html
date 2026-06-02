@@ -285,6 +285,78 @@
         .td-topic-pass {
             background: color-mix(in oklab, var(--ok) 14%, var(--surface));
         }
+
+        @media (max-width: 860px) {
+            body.notas-finales main.container {
+                padding: 0 .65rem 3rem;
+            }
+
+            .toolbar .left,
+            .toolbar .right {
+                width: 100%;
+                align-items: stretch;
+            }
+
+            .toolbar select,
+            .toolbar input,
+            .toolbar button {
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            .tbl {
+                min-width: 860px;
+            }
+
+            .tbl th,
+            .tbl td {
+                padding: .42rem .48rem;
+                font-size: .86rem;
+            }
+
+            .tbl th.sticky-col-1,
+            .tbl td.sticky-col-1 {
+                min-width: 48px;
+                max-width: 48px;
+            }
+
+            .tbl th.sticky-col-2,
+            .tbl td.sticky-col-2 {
+                left: 48px;
+                min-width: 118px;
+                max-width: 118px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .tbl th.sticky-col-3,
+            .tbl td.sticky-col-3 {
+                left: 166px;
+                min-width: 118px;
+                max-width: 118px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .obs-input {
+                min-width: 150px;
+            }
+        }
+
+        @media (max-width: 460px) {
+            .tbl th.sticky-col-2,
+            .tbl td.sticky-col-2,
+            .tbl th.sticky-col-3,
+            .tbl td.sticky-col-3 {
+                min-width: 104px;
+                max-width: 104px;
+            }
+
+            .tbl th.sticky-col-3,
+            .tbl td.sticky-col-3 {
+                left: 152px;
+            }
+        }
     </style>
 </head>
 

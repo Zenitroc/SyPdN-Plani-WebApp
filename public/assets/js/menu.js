@@ -33,6 +33,13 @@
       </details>`;
   }
 
+  function closeMobileMenu(menu) {
+    if (!menu) return;
+    menu.classList.remove('is-open');
+    const toggle = menu.querySelector('.menu-toggle');
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+  }
+
   function createTutorialManager() {
     if (window.tutorialManager) return window.tutorialManager;
 
@@ -305,6 +312,11 @@
       </a>` : '';
     const html = `
       <div class="menu">
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="appMenuContent">
+          <span class="menu-toggle__icon" aria-hidden="true"></span>
+          <span>MenÃº</span>
+        </button>
+        <div class="menu-content" id="appMenuContent">
         ${item(page('home'), 'Home')}
         ${item(page('planificacion'), 'Planificación')}
         ${menuGroup('Dashboard', [
@@ -326,9 +338,20 @@
         <button class="btn btn-ghost round" onclick="theme.toggle()">🌓 Modo</button>
         ${profile}
         <button id="logoutBtn" class="btn btn-neutral">Salir</button>
+        </div>
       </div>`;
     const el = document.getElementById(containerId);
     if (el) el.innerHTML = html;
+
+    const menu = el?.querySelector('.menu');
+    const toggle = el?.querySelector('.menu-toggle');
+    toggle?.addEventListener('click', () => {
+      const isOpen = menu?.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    el?.querySelectorAll('.menu-content a').forEach(link => {
+      link.addEventListener('click', () => closeMobileMenu(menu));
+    });
 
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
       api.clearToken(); courseContext.clear(); location.href = page('home');
@@ -343,6 +366,8 @@
       });
     };
 
+    const canHoverMenu = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 861px)');
+
     groups.forEach(group => {
       group.addEventListener('toggle', () => {
         if (group.open) {
@@ -350,12 +375,18 @@
         }
       });
       group.addEventListener('mouseenter', () => {
+        if (!canHoverMenu.matches) return;
         group.setAttribute('open', '');
         closeOtherGroups(group);
       });
       group.addEventListener('mouseleave', () => {
+        if (!canHoverMenu.matches) return;
         group.removeAttribute('open');
       });
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 860) closeMobileMenu(menu);
     });
 
     const tutorialManager = createTutorialManager();

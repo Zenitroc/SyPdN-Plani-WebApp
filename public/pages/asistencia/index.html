@@ -124,6 +124,24 @@
             border-radius: 10px;
             background: color-mix(in oklab, #ef4444 16%, var(--surface));
         }
+
+        #content {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (max-width: 640px) {
+            .toolbar label,
+            .toolbar select,
+            .toolbar button {
+                width: 100% !important;
+            }
+
+            .summary-wrap,
+            .reminder-note {
+                max-width: none;
+            }
+        }
     </style>
 </head>
 

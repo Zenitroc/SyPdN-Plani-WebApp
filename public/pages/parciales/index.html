@@ -318,6 +318,62 @@
             border-right: 3px solid var(--divider-partial);
             box-shadow: inset -1px 0 0 color-mix(in oklab, white 45%, transparent);
         }
+
+        @media (max-width: 860px) {
+            :root {
+                --w-id: 48px;
+                --w-ape: 132px;
+                --w-nom: 132px;
+                --w-p1: 46px;
+                --w-p2: 46px;
+                --score-w: 5.4rem;
+            }
+
+            body.parciales main.container {
+                padding: 0 .65rem 3rem;
+            }
+
+            .toolbar .left,
+            .toolbar .right {
+                width: 100%;
+                align-items: stretch;
+            }
+
+            .toolbar label,
+            .toolbar select,
+            .toolbar input {
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            .twin {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .twin-inner {
+                min-width: calc(var(--w-left-total) + 360px);
+            }
+
+            .tbl th,
+            .tbl td {
+                padding: .4rem .45rem;
+                font-size: .86rem;
+            }
+
+            .table-scroll-bottom {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 460px) {
+            :root {
+                --w-ape: 112px;
+                --w-nom: 112px;
+                --score-w: 5rem;
+            }
+        }
     </style>
 </head>
 

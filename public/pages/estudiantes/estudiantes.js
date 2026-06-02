@@ -26,7 +26,7 @@ function renderSummary(){
 
 function renderTable(containerId, rows) {
   const el = document.getElementById(containerId);
-  if (!rows || !rows.length) { el.innerHTML = '<div class="card">No hay estudiantes para mostrar.</div>'; renderSummary(); return; }
+  if (!rows || !rows.length) { el.innerHTML = '<div>No hay estudiantes para mostrar.</div>'; renderSummary(); return; }
   const th = `<tr>
     <th><input type="checkbox" id="pickAll"></th>
     <th>ID</th><th>Estado</th><th>Apellido</th><th>Nombre</th>
@@ -45,7 +45,7 @@ function renderTable(containerId, rows) {
   </tr>`).join('');
   el.innerHTML = `
     <style>.tbl{border-collapse:collapse;width:100%} .tbl th,.tbl td{border:1px solid var(--border);padding:.5rem} .tbl th{background:color-mix(in oklab, var(--surface) 70%, var(--bg));text-align:left}</style>
-    <div class="card"><table class="tbl">${th}${tr}</table></div>`;
+    <div class="scroll-x"><table class="tbl">${th}${tr}</table></div>`;
 
   const pickAll = document.getElementById('pickAll');
   if (pickAll) pickAll.onchange = () => {
@@ -83,7 +83,7 @@ function renderEditTable(rows){
       <td><input class="input" data-k="group_number" type="number" min="1" step="1" value="${r.group_no ?? ''}" placeholder=""></td>
       <td><input class="input" data-k="observaciones" value="${r.observaciones ?? ''}"></td>
     </tr>`).join('');
-  qs('editTable').innerHTML = `<div class="card"><table class="tbl">${th}${tr}</table></div>`;
+  qs('editTable').innerHTML = `<div class="scroll-x"><table class="tbl">${th}${tr}</table></div>`;
 }
 
 (async function () {
