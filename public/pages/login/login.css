@@ -93,10 +93,26 @@
   justify-content:center;
 }
 
+.login-brand{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  margin: .2rem 0 .5rem;
+}
+
 .login-info h1{
-  margin: .2rem 0 .5rem 0;
+  margin:0;
   font-size: 2.05rem;
   letter-spacing:-0.02em;
+}
+
+.login-brand-icon{
+  width:86px;
+  height:86px;
+  object-fit:contain;
+  border-radius:22px;
+  flex:0 0 86px;
+  filter: drop-shadow(0 14px 24px rgba(0,0,0,.18));
 }
 
 .login-info h2{
@@ -320,6 +336,12 @@
   .login-info{ text-align:center; }
   .login-info p{ margin-left:auto; margin-right:auto; }
   .login-meta{ justify-content:center; }
+  .login-brand{ justify-content:center; }
+  .login-brand-icon{
+    width:72px;
+    height:72px;
+    flex-basis:72px;
+  }
 }
 
 /* Reduce motion */

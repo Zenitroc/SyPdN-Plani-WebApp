@@ -1,4 +1,8 @@
-# SyPdN-Plani-WebApp
+# La PolliWeb
+
+## Versiones
+
+El historial funcional de versiones esta en [`docs/README_VERSIONES.md`](docs/README_VERSIONES.md).
 
 ## Desarrollo local en Windows
 

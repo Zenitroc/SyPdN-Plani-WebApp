@@ -21,7 +21,7 @@
     "onboarding": [
       {
         "routeKey": "home",
-        "title": "¡Bienvenido a SyPdN!",
+        "title": "¡Bienvenido a Polliweb!",
         "text": "Este recorrido te guía por las pantallas principales. Podés editar estos textos desde assets/data/tutorial-config.json.",
         "selector": "#kpis",
         "mascotId": "profe-pio"
@@ -67,7 +67,7 @@
   "pageTutorials": {
     "home": [
       {
-        "title": "¡Bienvenido a SyPdN!",
+        "title": "¡Bienvenido a Polliweb!",
         "text": "Soy tu guía de a-pollo y te voy a enseñar como funciona cada página. \nCuando necesites saber como funciona, solo toca el boron TUTORIAL y te voy a explicar.",
         "selector": "#kpis",
         "mascotId": "profe-pio"
