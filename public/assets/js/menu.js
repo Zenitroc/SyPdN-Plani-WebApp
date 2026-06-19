@@ -314,7 +314,7 @@
       <div class="menu">
         <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="appMenuContent">
           <span class="menu-toggle__icon" aria-hidden="true"></span>
-          <span>MenÃº</span>
+          <span>Menú</span>
         </button>
         <div class="menu-content" id="appMenuContent">
         ${item(page('home'), 'Home')}
