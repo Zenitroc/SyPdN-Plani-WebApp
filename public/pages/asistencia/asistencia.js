@@ -65,8 +65,6 @@ async function load(){
   students = data.students || [];
   currentTopics = data.topics || [];
 
-  renderSummary();
-
   let html = '<table class="tbl"><thead><tr>'+
     '<th>ID</th><th>Apellido</th><th>Nombre</th><th>Presente</th>';
   currentTopics.forEach(t => { html += `<th>${t}</th>`; });
@@ -89,7 +87,13 @@ async function load(){
     });
     html += '</tr>';
   });
-  html += '</tbody></table>';
+  html += '</tbody><tfoot><tr class="attendance-totals-row">'+
+    '<td colspan="3" class="total-label">Totales</td>'+
+    '<td class="total-count" data-total="attendance">Presentes: 0 / Ausentes: 0</td>';
+  currentTopics.forEach(t => {
+    html += `<td class="total-count" data-total-topic="${esc(t)}">0</td>`;
+  });
+  html += '</tr></tfoot></table>';
   content.innerHTML = html;
 
   document.querySelectorAll('tbody .present').forEach(cb=>{
@@ -102,6 +106,7 @@ async function load(){
         if (!present) tcb.checked = false;
       });
       updateRowStyles(tr);
+      updateTotalsRow();
       renderSummary();
       await save(en);
     };
@@ -110,12 +115,15 @@ async function load(){
     cb.onchange = async ev => {
       const tr = ev.target.closest('tr');
       updateRowStyles(tr);
+      updateTotalsRow();
       renderSummary();
       const en = parseInt(tr.getAttribute('data-enroll'),10);
       await save(en);
     };
   });
   document.querySelectorAll('tbody tr').forEach(updateRowStyles);
+  updateTotalsRow();
+  renderSummary();
 }
 
 function renderSummary(){
@@ -127,12 +135,7 @@ function renderSummary(){
   let html = '<h2>Alumnos que adeudan por tema</h2>';
   html += '<table class="summary-table"><thead><tr><th>Tema</th><th>Cantidad</th></tr></thead><tbody>';
 
-  currentTopics.forEach(topic => {
-    const count = students.reduce((acc, student) => {
-      const approved = !!(student.approved_topics && student.approved_topics[topic]);
-      const delivered = !!(student.topics && student.topics[topic]);
-      return acc + (!approved && !delivered ? 1 : 0);
-    }, 0);
+  buildSummaryRows().forEach(([topic, count]) => {
     html += `<tr><td>${esc(topic)}</td><td class="count">${count}</td></tr>`;
   });
 
@@ -141,6 +144,19 @@ function renderSummary(){
 }
 
 function buildSummaryRows(){
+  const tableRows = Array.from(content.querySelectorAll('tbody tr'));
+  if (tableRows.length) {
+    return currentTopics.map(topic => {
+      const count = tableRows.reduce((acc, tr) => {
+        const cb = tr.querySelector(`.topic[data-topic="${cssEscape(topic)}"]`);
+        const approved = cb && cb.dataset.approved === '1';
+        const delivered = cb && cb.checked;
+        return acc + (!approved && !delivered ? 1 : 0);
+      }, 0);
+      return [topic, count];
+    });
+  }
+
   return currentTopics.map(topic => {
     const count = students.reduce((acc, student) => {
       const approved = !!(student.approved_topics && student.approved_topics[topic]);
@@ -149,6 +165,60 @@ function buildSummaryRows(){
     }, 0);
     return [topic, count];
   });
+}
+
+function cssEscape(value) {
+  if (window.CSS && typeof window.CSS.escape === 'function') return window.CSS.escape(value);
+  return String(value).replace(/["\\]/g, '\\$&');
+}
+
+function getAttendanceTotals(){
+  const rows = Array.from(content.querySelectorAll('tbody tr'));
+  const totals = {
+    present: 0,
+    absent: 0,
+    topics: Object.fromEntries(currentTopics.map(topic => [topic, 0]))
+  };
+
+  rows.forEach(tr => {
+    const isPresent = !!tr.querySelector('.present')?.checked;
+    if (isPresent) totals.present += 1;
+    else totals.absent += 1;
+
+    currentTopics.forEach(topic => {
+      const cb = tr.querySelector(`.topic[data-topic="${cssEscape(topic)}"]`);
+      if (cb && cb.checked) totals.topics[topic] += 1;
+    });
+  });
+
+  return totals;
+}
+
+function updateTotalsRow(){
+  const row = content.querySelector('.attendance-totals-row');
+  if (!row) return;
+
+  const totals = getAttendanceTotals();
+  const attendanceCell = row.querySelector('[data-total="attendance"]');
+  if (attendanceCell) {
+    attendanceCell.textContent = `Presentes: ${totals.present} / Ausentes: ${totals.absent}`;
+  }
+
+  currentTopics.forEach(topic => {
+    const cell = row.querySelector(`[data-total-topic="${cssEscape(topic)}"]`);
+    if (cell) cell.textContent = totals.topics[topic] || 0;
+  });
+}
+
+function buildTotalsExportRow(){
+  const totals = getAttendanceTotals();
+  return [
+    '',
+    '',
+    'Totales',
+    `Presentes: ${totals.present} / Ausentes: ${totals.absent}`,
+    ...currentTopics.map(topic => totals.topics[topic] || 0)
+  ];
 }
 
 async function save(enrollId){
@@ -196,7 +266,7 @@ function collectRows(){
     row.push(tr.children[2].textContent.trim());
     row.push(tr.querySelector('.present').checked ? 'Presente' : 'Ausente');
     currentTopics.forEach(t=>{
-      const cb = tr.querySelector(`.topic[data-topic="${t}"]`);
+      const cb = tr.querySelector(`.topic[data-topic="${cssEscape(t)}"]`);
       row.push(getTopicCellValue(cb));
     });
     rows.push(row);
@@ -213,10 +283,11 @@ function downloadXls(){
   const rows = collectRows();
   if(!rows.length){ alert('No hay estudiantes para exportar'); return; }
   const header = ['ID','Apellido','Nombre','Presente', ...currentTopics];
+  const totalsRow = buildTotalsExportRow();
   const summaryHeader = ['Tema', 'Cantidad'];
   const summaryRows = buildSummaryRows();
   const spacer = [];
-  const wsRows = [header, ...rows, spacer, ['Alumnos que adeudan por tema'], summaryHeader, ...summaryRows];
+  const wsRows = [header, ...rows, totalsRow, spacer, ['Alumnos que adeudan por tema'], summaryHeader, ...summaryRows];
   const ws = XLSX.utils.aoa_to_sheet(wsRows);
 
   rows.forEach((row, rowIdx) => {
@@ -232,7 +303,17 @@ function downloadXls(){
     });
   });
 
-  const summaryTitleRef = XLSX.utils.encode_cell({ r: rows.length + 2, c: 0 });
+  const totalsRowIdx = rows.length + 1;
+  header.forEach((_, colIdx) => {
+    const cellRef = XLSX.utils.encode_cell({ r: totalsRowIdx, c: colIdx });
+    if (!ws[cellRef]) return;
+    ws[cellRef].s = {
+      font: { bold: true },
+      fill: { patternType: 'solid', fgColor: { rgb: 'E0F2FE' } }
+    };
+  });
+
+  const summaryTitleRef = XLSX.utils.encode_cell({ r: rows.length + 3, c: 0 });
   if (ws[summaryTitleRef]) {
     ws[summaryTitleRef].s = {
       font: { bold: true }
@@ -262,11 +343,18 @@ function downloadPdf(){
   };
 
   const header = ['ID','Apellido','Nombre','Presente', ...currentTopics];
+  const totalsRow = buildTotalsExportRow();
   const attendanceTableConfig = {
     head: [header],
-    body: rows,
+    body: [...rows, totalsRow],
     didParseCell(data) {
-      if (data.section !== 'body' || data.column.index < 4) return;
+      if (data.section !== 'body') return;
+      if (data.row.index === rows.length) {
+        data.cell.styles.fontStyle = 'bold';
+        data.cell.styles.fillColor = [224, 242, 254];
+        return;
+      }
+      if (data.column.index < 4) return;
       if (isGrayTopicValue(data.cell.raw)) {
         data.cell.styles.fillColor = [229, 231, 235];
         data.cell.styles.textColor = [55, 65, 81];
