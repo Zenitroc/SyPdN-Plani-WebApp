@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $root = dirname(__DIR__);
-$public = realpath($root . DIRECTORY_SEPARATOR . 'public');
+$public = realpath($root . DIRECTORY_SEPARATOR . 'frontend');
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 
 function dev_content_type(string $file): string {
@@ -26,7 +26,7 @@ function dev_content_type(string $file): string {
 
 if (!$public) {
   http_response_code(500);
-  echo 'No se encontro la carpeta public';
+  echo 'No se encontro la carpeta frontend';
   return true;
 }
 
@@ -37,9 +37,9 @@ header('Expires: 0');
 // API PHP
 if (str_starts_with($path, '/api')) {
   $_SERVER['SCRIPT_NAME'] = '/api/index.php';
-  $_SERVER['SCRIPT_FILENAME'] = $root . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR . 'index.php';
+  $_SERVER['SCRIPT_FILENAME'] = $root . DIRECTORY_SEPARATOR . 'backend' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'index.php';
 
-  require $root . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR . 'index.php';
+  require $root . DIRECTORY_SEPARATOR . 'backend' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'index.php';
   return true;
 }
 

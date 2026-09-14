@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "dev": "php -S localhost:8080 -t public dev/router.php",
-    "dev:host": "php -S 0.0.0.0:8080 -t public dev/router.php"
+    "dev": "php -S localhost:8080 -t frontend dev/router.php",
+    "dev:host": "php -S 0.0.0.0:8080 -t frontend dev/router.php"
   },
   "devDependencies": {}
 }

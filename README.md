@@ -1,134 +1,45 @@
 # La PolliWeb
 
-## Versiones
+## Estructura
 
-El historial funcional de versiones esta en [`docs/README_VERSIONES.md`](docs/README_VERSIONES.md).
+- `frontend/`: interfaz HTML, CSS, JavaScript y recursos estáticos.
+- `backend/public/`: punto de entrada HTTP de la API.
+- `backend/src/Domain`: conceptos del negocio sin dependencias HTTP.
+- `backend/src/Controllers`, `Services` y `Repositories`: API, lógica de negocio y persistencia.
+- `backend/src/Middleware`: autenticación JWT, roles y acceso a cursos.
+- `backend/src/Infrastructure`: configuración, PDO, HTTP y JWT.
+- `backend/src/Legacy`: módulos aún conservados durante la migración, para mantener sus endpoints y comportamiento.
 
-## Desarrollo local en Windows
+La interfaz solo se comunica con la API bajo `/api`; no accede a la base de datos.
 
-Este proyecto se puede levantar localmente en Windows sin VM Ubuntu. El frontend
-esta en `public/`, el backend PHP esta en `api/` y `npm` se usa solo como comando
-comodo para iniciar el servidor local.
+## Requisitos
 
-### Requisitos
+- PHP 8.2 o superior con `pdo_mysql`
+- MySQL o MariaDB
+- Node.js (solo para ejecutar los scripts de desarrollo)
 
-- Node.js LTS
-- PHP 8.2 o superior
-- MariaDB/MySQL
-- Extension `pdo_mysql` habilitada en PHP
+## Configuración
 
-### Verificar herramientas
+Copiá `.env.example` a `.env` y configurá `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`, `JWT_SECRET` y `CORS_ORIGINS`.
 
-```powershell
-php -v
-node -v
-npm -v
-mysql --version
-php -m | findstr /i "pdo_mysql"
-```
+El backend carga `.env` y luego `.env.{APP_ENV}`; por ejemplo, `.env.development` o `.env.production` sobrescribe los valores comunes.
 
-### Configurar variables locales
-
-La configuracion local esperada es:
-
-```env
-APP_ENV=development
-DB_HOST=127.0.0.1
-DB_NAME=spn
-DB_USER=root
-DB_PASS=admin
-JWT_SECRET=dev_secret_cambialo_despues_por_algo_largo
-JWT_EXP_SECONDS=28800
-CORS_ORIGINS=http://localhost:8080,http://127.0.0.1:8080
-```
-
-Importante: si existe `.env.development`, sus valores sobrescriben los de `.env`
-cuando `APP_ENV=development`.
-
-### Crear base local
-
-Entrar a MySQL/MariaDB:
-
-```powershell
-mysql -u root -p
-```
-
-Crear la base:
-
-```sql
-CREATE DATABASE IF NOT EXISTS spn
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
-```
-
-### Levantar el servidor
-
-```powershell
-npm run dev
-```
-
-Si PowerShell bloquea `npm.ps1` por Execution Policy, ejecuta el mismo script con:
+## Desarrollo en Windows
 
 ```powershell
 npm.cmd run dev
 ```
 
-Abrir:
+Abrí `http://localhost:8080`. La API queda disponible en `http://localhost:8080/api` y el endpoint de prueba es `http://localhost:8080/api/ping`.
 
-```text
-http://localhost:8080
-```
+El dashboard consume `GET /api/dashboard?course_id={id}`; el backend aplica permisos de curso y devuelve las métricas calculadas.
 
-Probar API:
-
-```text
-http://localhost:8080/api/ping
-```
-
-El comando usa PHP con `public/` como document root:
+El comando equivalente es:
 
 ```powershell
-php -S localhost:8080 -t public dev/router.php
+php -S localhost:8080 -t frontend dev/router.php
 ```
 
-Para detener el servidor:
+## Historial
 
-```text
-Ctrl + C
-```
-
-Para volver a levantarlo:
-
-```powershell
-npm run dev
-```
-
-Si queres exponerlo en la red local:
-
-```powershell
-npm run dev:host
-```
-
-## Configuracion de entorno (perfiles)
-
-El backend carga variables desde `.env` y, si definis `APP_ENV`, tambien carga un
-perfil con prioridad desde `.env.{APP_ENV}`. Ese perfil sobrescribe valores
-anteriores.
-
-Ejemplos disponibles:
-
-- `.env.development`
-- `.env.production`
-
-### Como usarlo
-
-1. Copia `.env.example` a `.env` y ajusta valores comunes.
-2. Defini `APP_ENV` en `.env` para elegir el perfil, por ejemplo `development`
-   o `production`.
-3. Ajusta los valores especificos del perfil en `.env.development` o
-   `.env.production`.
-
-Orden de carga:
-
-1. `.env`
-2. `.env.{APP_ENV}` sobrescribe valores anteriores.
+El historial funcional de versiones está en [`docs/README_VERSIONES.md`](docs/README_VERSIONES.md).

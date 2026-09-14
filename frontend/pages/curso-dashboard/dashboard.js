@@ -21,27 +21,9 @@ renderMenu();
     syncStatus: document.getElementById('syncStatus'),
   };
 
-  const apiBases = {
-    entregas: ['/api/entregas', '/entregas'],
-    parciales: ['/api/parciales', '/parciales'],
-  };
-  const nf = (v) => String(v?.message || v?.error || v || '').toLowerCase().includes('not found');
-  const apiGet = async (bases, path) => {
-    let idx = 0;
-    try {
-      const res = await api.get(bases[idx] + path);
-      if (res?.error && nf(res)) throw new Error('fallback');
-      return res;
-    } catch (err) {
-      idx = 1;
-      return api.get(bases[idx] + path);
-    }
-  };
-
   const data = {
     courseId: null,
-    entregas: null,
-    parciales: null,
+    dashboard: null,
   };
 
   const formatDate = (value) => {
@@ -64,16 +46,11 @@ renderMenu();
   }[topic] || topic);
 
   function getTopicSets() {
-    const assignmentTopics = (data.entregas?.assignments || []).map(a => a.topic);
-    const parcialTopics = [
-      ...(data.parciales?.topics?.p1 || []),
-      ...(data.parciales?.topics?.p2 || []),
-    ];
-    return Array.from(new Set([...assignmentTopics, ...parcialTopics])).filter(Boolean);
+    return data.dashboard?.filters?.topics || [];
   }
 
   function buildGroupOptions() {
-    const groups = data.entregas?.groups || [];
+    const groups = data.dashboard?.filters?.groups || [];
     if (state.group !== 'ALL' && !groups.some(g => String(g.id) === String(state.group))) {
       state.group = 'ALL';
     }
@@ -860,17 +837,8 @@ renderMenu();
   }
 
   function render() {
-    const tpStats = computeTpStats();
-    const groupPerformance = computeGroupPerformance();
-    const topicStats = computeTpByTopic();
-    const parcialStats = computeParcialesStats();
-    const alerts = computeAlertStudents(groupPerformance);
-    const highlights = computeHighlights(groupPerformance);
-    const upcoming = computeUpcomingAssignments();
-    const tpStatus = computeTpStatus();
-    const tpHistory = computeTpHistory();
-
-    const stats = { tpStats, groupPerformance, topicStats, parcialStats, alerts, highlights, upcoming, tpStatus, tpHistory };
+    const stats = data.dashboard;
+    if (!stats) return;
     renderKpis(stats);
     renderCharts(stats);
   }
@@ -878,19 +846,19 @@ renderMenu();
   function bindFilters() {
     els.term.addEventListener('change', (event) => {
       state.term = event.target.value;
-      render();
+      refreshDashboard();
     });
     els.topic.addEventListener('change', (event) => {
       state.topic = event.target.value;
-      render();
+      refreshDashboard();
     });
     els.group.addEventListener('change', (event) => {
       state.group = event.target.value;
-      render();
+      refreshDashboard();
     });
     els.risk.addEventListener('change', (event) => {
       state.risk = Number(event.target.value);
-      render();
+      refreshDashboard();
     });
   }
 
@@ -904,20 +872,31 @@ renderMenu();
 
     try {
       data.courseId = Number(await courseContext.require());
-      const [entregas, parciales] = await Promise.all([
-        apiGet(apiBases.entregas, `?course_id=${data.courseId}&term=ALL`),
-        apiGet(apiBases.parciales, `?course_id=${data.courseId}`),
-      ]);
-      data.entregas = entregas || { assignments: [], groups: [], grades: [], grade_options: [] };
-      data.parciales = parciales || { students: [], topics: { p1: [], p2: [] }, grade_options: [] };
-      els.syncStatus.textContent = 'Datos actualizados';
+      await refreshDashboard();
     } catch (err) {
       console.warn('No se pudo cargar el dashboard', err);
-      data.entregas = { assignments: [], groups: [], grades: [], grade_options: [] };
-      data.parciales = { students: [], topics: { p1: [], p2: [] }, grade_options: [] };
+      data.dashboard = null;
       els.syncStatus.textContent = 'Sin datos disponibles';
     }
 
+    buildTopicOptions();
+    buildGroupOptions();
+    render();
+  }
+
+  async function refreshDashboard() {
+    if (!data.courseId) return;
+    els.syncStatus.textContent = 'Actualizando...';
+    const query = new URLSearchParams({
+      course_id: data.courseId,
+      term: state.term,
+      topic: state.topic,
+      group_id: state.group === 'ALL' ? '' : state.group,
+      risk: state.risk,
+    });
+    const response = await api.get(`/dashboard?${query}`);
+    data.dashboard = response?.data || response;
+    els.syncStatus.textContent = 'Datos actualizados';
     buildTopicOptions();
     buildGroupOptions();
     render();
