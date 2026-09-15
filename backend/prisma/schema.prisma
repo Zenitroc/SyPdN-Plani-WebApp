@@ -1,0 +1,99 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "mysql" url = env("DATABASE_URL") }
+
+model Course {
+  id        BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  code      String       @unique @db.VarChar(32)
+  name      String       @db.VarChar(120)
+  colorHex  String?      @map("color_hex") @db.Char(7)
+  term      String?      @db.VarChar(32)
+  isActive  Boolean      @default(true) @map("is_active")
+  planUrl   String?      @map("plan_url") @db.Text
+  users     UserCourse[]
+  groups    Group[]
+  assignments Assignment[]
+  @@map("courses")
+}
+
+model User {
+  id                 BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  name               String     @db.VarChar(120)
+  lastName           String?    @map("last_name") @db.VarChar(120)
+  email              String     @unique @db.VarChar(190)
+  personalEmail      String?    @map("personal_email") @db.VarChar(190)
+  legajo             String?    @db.VarChar(60)
+  phone              String?    @db.VarChar(60)
+  photoData          String?    @map("photo_data") @db.LongText
+  photoMime          String?    @map("photo_mime") @db.VarChar(120)
+  passwordHash       String     @map("password_hash") @db.VarChar(255)
+  mustChangePassword Boolean    @default(false) @map("must_change_password")
+  username           String     @unique @db.VarChar(255)
+  roles              UserRole[]
+  courses            UserCourse[]
+  @@map("users")
+}
+
+model Role {
+  id          Int        @id @default(autoincrement()) @db.UnsignedTinyInt
+  code        String     @unique @db.VarChar(16)
+  description String?    @db.VarChar(120)
+  users       UserRole[]
+  @@map("roles")
+}
+
+model UserRole {
+  userId BigInt @map("user_id") @db.UnsignedBigInt
+  roleId Int    @map("role_id") @db.UnsignedTinyInt
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model UserCourse {
+  userId   BigInt @map("user_id") @db.UnsignedBigInt
+  courseId BigInt @map("course_id") @db.UnsignedBigInt
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  @@id([userId, courseId])
+  @@map("user_courses")
+}
+
+model Group {
+  id       BigInt @id @default(autoincrement()) @db.UnsignedBigInt
+  courseId BigInt @map("course_id") @db.UnsignedBigInt
+  number   Int
+  name     String? @db.VarChar(120)
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  grades   AssignmentGrade[]
+  @@unique([courseId, number])
+  @@map("groups")
+}
+
+model Assignment {
+  id        Int       @id @default(autoincrement())
+  courseId  BigInt    @map("course_id") @db.UnsignedBigInt
+  term      Int       @db.TinyInt
+  type      String    @db.VarChar(8)
+  number    Int
+  topic     String    @db.VarChar(8)
+  dueDate   DateTime? @map("due_date") @db.Date
+  name      String    @db.VarChar(255)
+  returned  Boolean   @default(false)
+  createdAt DateTime  @map("created_at") @db.DateTime(0)
+  course    Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  grades    AssignmentGrade[]
+  @@unique([courseId, term, type, number])
+  @@map("assignments")
+}
+
+model AssignmentGrade {
+  id           Int        @id @default(autoincrement())
+  assignmentId Int        @map("assignment_id")
+  groupId      BigInt     @map("group_id") @db.UnsignedBigInt
+  gradeCode    String?    @map("grade_code") @db.VarChar(32)
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  group        Group      @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  @@unique([assignmentId, groupId])
+  @@map("assignment_grades")
+}

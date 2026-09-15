@@ -1,7 +1,19 @@
 {
   "scripts": {
-    "dev": "php -S localhost:8080 -t frontend dev/router.php",
-    "dev:host": "php -S 0.0.0.0:8080 -t frontend dev/router.php"
+    "dev": "vite --host 127.0.0.1",
+    "dev:host": "vite --host 0.0.0.0",
+    "dev:backend": "npm.cmd --prefix backend run dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "npm.cmd --prefix backend run typecheck"
   },
-  "devDependencies": {}
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-router-dom": "latest"
+  },
+  "devDependencies": {
+    "vite": "latest"
+  }
 }

@@ -27,10 +27,16 @@ El backend carga `.env` y luego `.env.{APP_ENV}`; por ejemplo, `.env.development
 ## Desarrollo en Windows
 
 ```powershell
+npm.cmd run dev:api
+```
+
+En otra terminal, iniciá el frontend React:
+
+```powershell
 npm.cmd run dev
 ```
 
-Abrí `http://localhost:8080`. La API queda disponible en `http://localhost:8080/api` y el endpoint de prueba es `http://localhost:8080/api/ping`.
+Abrí `http://localhost:5173`. La API queda disponible en `http://localhost:8080/api` y el endpoint de prueba es `http://localhost:8080/api/ping`.
 
 El dashboard consume `GET /api/dashboard?course_id={id}`; el backend aplica permisos de curso y devuelve las métricas calculadas.
 
@@ -39,6 +45,14 @@ El comando equivalente es:
 ```powershell
 php -S localhost:8080 -t frontend dev/router.php
 ```
+
+Para el build de producción:
+
+```powershell
+npm.cmd run build
+```
+
+El resultado queda en `frontend/dist/`; configurá el servidor web para servir ese directorio y dirigir `/api` a `backend/public/`.
 
 ## Historial
 
