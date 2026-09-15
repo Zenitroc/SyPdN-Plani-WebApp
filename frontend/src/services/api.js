@@ -28,6 +28,10 @@ export const api = {
   login: (credentials) => request('/auth/login', { method: 'POST', body: credentials, public: true }),
   me: () => request('/me'),
   courses: (scope = 'mine') => request(`/courses?scope=${encodeURIComponent(scope)}`),
+  courseColors: async (scope = 'mine') => {
+    const response = await request(`/courses/colors?scope=${encodeURIComponent(scope)}`);
+    return response.colors || response;
+  },
   dashboard: (courseId, filters = {}) => request(`/dashboard?${new URLSearchParams({ course_id: courseId, ...filters })}`),
   resource: (path) => request(path),
   post: (path, body) => request(path, { method: 'POST', body }),
