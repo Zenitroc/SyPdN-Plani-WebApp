@@ -1,0 +1,34 @@
+services:
+  backend:
+    build: ./backend
+    env_file: ./backend/.env
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: mariadb:11
+    environment:
+      MARIADB_DATABASE: spn
+      MARIADB_USER: spn_user
+      MARIADB_PASSWORD: change-me
+      MARIADB_ROOT_PASSWORD: change-root-password
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./docs/baseDeDatos.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  caddy:
+    image: caddy:2-alpine
+    ports: ["80:80"]
+    volumes:
+      - ./frontend/dist:/srv/frontend:ro
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on: [backend]
+
+volumes:
+  mariadb_data:

@@ -83,3 +83,31 @@ Este documento resume las funcionalidades y mejoras más relevantes incorporadas
 - **Nuevo método de carga CSV (SIU):** se agregó un método adicional para importar estudiantes desde CSV, ampliando compatibilidad con formatos externos.
 
 **Comparado con antes:** no había filtros ni señales visuales por tema; ahora el seguimiento es más claro y la importación de datos es más flexible.
+## Periodo: 10 de octubre de 2026 — SPA de cliente pesado y rediseño naranja
+**Enfoque:** una sola aplicación en el navegador, nueva identidad visual y menos reglas repetidas en el código.
+
+**Qué se incorporó y por qué importa**
+- **SPA completa en React:** todas las pantallas (antes páginas HTML separadas) pasaron a una única aplicación que navega sin recargar, guarda en memoria lo ya consultado y actualiza en segundo plano.
+- **Rediseño con paleta naranja:** nuevo sistema de diseño con tema claro y oscuro, animaciones de entrada, gráficos en el dashboard y versión para teléfono.
+- **Autoguardado con confirmación visual:** notas de TPs y parciales, asistencia, conformidad y cierre se guardan al cambiarlas.
+- **Grupos arrastrando:** los integrantes se mueven entre grupos con arrastrar y soltar, o en lote desde la selección.
+- **Importación CSV con revisión previa:** el archivo se valida antes de confirmar y muestra qué filas no entrarían.
+- **Buscador global (Ctrl/⌘ + K)** y **guía por pantalla** con la mascota.
+- **Catálogo académico único:** temas, instancias, tipos de TP, escala de notas y umbrales se definen en `backend/src/Domain/AcademicCatalog.php` y el front los lee de `GET /api/catalog`.
+- **Prueba de humo de la API:** `npm run test:api` recorre todos los endpoints.
+
+**Correcciones en la API**
+- Los colores de los cursos no cargaban: la ruta `/api/courses/colors` quedaba tapada por `/api/courses/{id}`.
+- Crear un usuario sin servidor de correo devolvía una respuesta ilegible aunque el usuario se creaba.
+- No se podía borrar una calificación final ya cargada, y al marcar “ausente” la nota anterior quedaba guardada.
+- Un estudiante sin legajo devolvía un error de base de datos; ahora se valida con un mensaje claro (y en la importación solo se rechaza esa fila).
+- Asignar o quitar a un docente de un curso recién regía cuando volvía a iniciar sesión; ahora es inmediato.
+
+**Comparado con antes:** cada pantalla era una página aparte con sus propias reglas copiadas; ahora es una sola aplicación, más rápida de usar, con las reglas académicas en un único lugar.
+
+**Ajustes posteriores (misma fecha)**
+- **Entregas con tema libre:** además de los temas de la lista, “Otro” despliega un campo para escribir el tema (hasta 8 caracteres, se guarda en mayúsculas).
+- **Parciales:** resumen de cuántos estudiantes adeudan cada tema (para saber cuántos exámenes imprimir), exportación eligiendo temas, instancias y datos, y encabezado fijo al bajar.
+- **Asistencia:** en los recuperatorios se listan por defecto solo quienes adeudan algún tema, y el botón *Cerrar asistencia* carga `A` a los ausentes y `N_E` a los temas no entregados, solo en lo que cada uno adeuda.
+- **Solo estudiantes en ALTA** en grupos, parciales y asistencia.
+- **Estudiantes:** columna N° con el orden de la lista visible, independiente del ID.
