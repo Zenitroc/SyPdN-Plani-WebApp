@@ -17,7 +17,12 @@ final class Router
         $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
         $path = '/' . ltrim($path, '/');
 
-        foreach ($this->routes as [$routeMethod, $pattern, $handler, $public]) {
+        // Las rutas literales ganan sobre las que tienen parámetros, sin importar el orden de
+        // registro: así /api/courses/colors no queda tapada por /api/courses/{id}.
+        $routes = $this->routes;
+        usort($routes, static fn(array $a, array $b): int => str_contains($a[1], '{') <=> str_contains($b[1], '{'));
+
+        foreach ($routes as [$routeMethod, $pattern, $handler, $public]) {
             $params = $this->match($pattern, $path);
             if ($routeMethod !== $method || $params === null) {
                 continue;

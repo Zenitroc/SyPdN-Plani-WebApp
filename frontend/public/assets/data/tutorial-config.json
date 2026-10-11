@@ -10,349 +10,187 @@
       "id": "pio-amigo",
       "name": "Pío Amigo",
       "image": "/assets/img/tutorial/PollitoGuia2.png"
-    },
-    {
-      "id": "pio-construccion",
-      "name": "Pío en construcción",
-      "image": "/assets/img/tutorial/PollitoGuiaConstruccion.png"
     }
   ],
-  "journeys": {
-    "onboarding": [
+  "pages": {
+    "dashboard": [
       {
-        "routeKey": "home",
-        "title": "¡Bienvenido a Polliweb!",
-        "text": "Este recorrido te guía por las pantallas principales. Podés editar estos textos desde assets/data/tutorial-config.json.",
-        "selector": "#kpis",
+        "title": "¡Bienvenido a PolliWeb!",
+        "text": "Soy tu guía de a-pollo. En cada pantalla tocá el botón Guía y te cuento cómo funciona.",
         "mascotId": "profe-pio"
       },
       {
-        "routeKey": "planificacion",
-        "title": "Planificación",
-        "text": "Acá podés consultar la planificación vigente del curso seleccionado.",
-        "selector": "#planFrame",
+        "title": "El curso manda",
+        "text": "Todo lo que ves corresponde al curso elegido en la barra lateral. Cambialo desde ahí o con Ctrl + K.",
         "mascotId": "pio-amigo"
       },
       {
-        "routeKey": "cursoDashboard",
-        "title": "Dashboard del curso",
-        "text": "Visualizá métricas rápidas y estado general del curso.",
-        "selector": "main",
-        "mascotId": "profe-pio"
+        "title": "Indicadores y filtros",
+        "text": "Filtrá por cuatrimestre, tema o grupo. Las tarjetas y gráficos se recalculan al instante con los datos de TPs y parciales."
       },
       {
-        "routeKey": "estudiantes",
-        "title": "Estudiantes",
-        "text": "Gestioná altas, bajas y seguimiento de estudiantes de la comisión.",
-        "selector": "main",
-        "mascotId": "profe-pio"
-      },
-      {
-        "routeKey": "parciales",
-        "title": "Parciales y evaluaciones",
-        "text": "Cargá y revisá información de parciales del curso activo.",
-        "selector": "main",
-        "mascotId": "pio-amigo"
-      },
-      {
-        "routeKey": "notasFinales",
-        "rolesAny": ["GURU", "SENIOR"],
-        "title": "Calificación final",
-        "text": "Esta pantalla se muestra solo para roles habilitados (GURU / SENIOR).",
-        "selector": "main",
-        "mascotId": "profe-pio"
-      }
-    ]
-  },
-  "pageTutorials": {
-    "home": [
-      {
-        "title": "¡Bienvenido a Polliweb!",
-        "text": "Soy tu guía de a-pollo y te voy a enseñar como funciona cada página. \nCuando necesites saber como funciona, solo toca el boron TUTORIAL y te voy a explicar.",
-        "selector": "#kpis",
-        "mascotId": "profe-pio"
-      },
-      {
-        "title": "Seleccioná tu comisión",
-        "text": "En este bloque podés elegir la comisión en la que estás inscripto para trabajar con ese curso. \nTodos los roles con acceso al curso pueden seleccionarla.",
-        "selector": "#courseBox",
-        "mascotId": "profe-pio"
-      },
-      {
-        "title": "Curso seleccionado",
-        "text": "Acá aparece el curso que seleccionaste. \nLa parte que muestra \"Hola\" con tu nombre es solamente informativa y no requiere ninguna acción.",
-        "selector": "#selectedCourse",
-        "mascotId": "pio-amigo"
-      },
-      {
-        "title": "Menú principal y botones",
-        "text": "Desde el menú superior te movés por las pantallas habilitadas para tu rol. \n\nTambién tenés: \n* botón de Modo (cambia claro/oscuro)\n* botón de Perfil (editar perfil) \n* botón Salir (cerrar sesión).",
-        "selector": "#appMenu",
-        "mascotId": "profe-pio"
+        "title": "Alertas de seguimiento",
+        "text": "Acá aparecen los estudiantes que adeudan temas o cuyo grupo está por debajo del umbral de aprobación que elijas."
       }
     ],
-    "planificacion": [
+    "courses": [
+      {
+        "title": "Tus cursos",
+        "text": "Estas son las comisiones a las que tenés acceso. Elegí una para trabajar: queda guardada para la próxima vez."
+      },
+      {
+        "title": "Colores",
+        "text": "El Gurú puede asignarle un color a cada curso para reconocerlo de un vistazo en toda la app.",
+        "mascotId": "pio-amigo"
+      }
+    ],
+    "news": [
+      {
+        "title": "Novedades y recursos",
+        "text": "Las novedades y los recursos son comunes a todos los cursos. El Gurú los publica y edita desde acá."
+      },
+      {
+        "title": "Enviar un reporte",
+        "text": "¿Encontraste un error o tenés una idea? En la pestaña Enviar reporte podés escribirnos y adjuntar una captura.",
+        "mascotId": "pio-amigo"
+      }
+    ],
+    "students": [
+      {
+        "title": "Padrón del curso",
+        "text": "Buscá por apellido, legajo o email y filtrá por estado. Hacé clic en una fila para editar a ese estudiante."
+      },
+      {
+        "title": "Número de orden",
+        "text": "La columna N° numera la lista que estás viendo, sin importar el ID: si filtrás o reordenás, vuelve a empezar en 1."
+      },
+      {
+        "title": "Importar desde CSV",
+        "text": "Subí la lista en formato estándar o tal como la exporta el SIU. Primero se simula la carga para que revises los errores antes de confirmar.",
+        "mascotId": "pio-amigo"
+      },
+      {
+        "title": "Acciones en lote",
+        "text": "Marcá varias filas para darlas de baja, de alta o asignarlas a un grupo de una sola vez."
+      },
+      {
+        "title": "Reasignar IDs",
+        "text": "Renumera a los estudiantes en ALTA por orden alfabético. Usalo cuando el padrón ya esté cerrado."
+      }
+    ],
+    "groups": [
+      {
+        "title": "Grupos del curso",
+        "text": "Cada tarjeta es un grupo con sus integrantes en alta. El borde indica si ya entregó la conformidad."
+      },
+      {
+        "title": "Mover integrantes",
+        "text": "Arrastrá a un estudiante de un grupo a otro, o a la columna Sin grupo para quitarlo. También podés marcarlos y usar el botón Mover.",
+        "mascotId": "pio-amigo"
+      },
+      {
+        "title": "Conformidad",
+        "text": "Con el interruptor de cada tarjeta marcás la conformidad como entregada. Los ayudantes también pueden hacerlo."
+      }
+    ],
+    "planning": [
       {
         "title": "Planificación del curso",
-        "text": "Si hay URL cargada para el curso, la vas a ver embebida en esta página.",
-        "selector": "#planFrame",
-        "mascotId": "profe-pio"
+        "text": "Se muestra el plan de clases publicado para el curso. Si el sitio no permite verlo embebido, usá Abrir en otra pestaña."
       }
     ],
-    "cursoDashboard": [
+    "assignments": [
       {
-        "title": "Dashboard en construcción",
-        "text": "🚧Esta página todavía se encuentra en construcción🚧 \n\nPróximamente vamos a tener más funcionalidades, por ahora está en modo de muestra y pruebas para todos los roles.",
-        "selector": "main",
-        "mascotId": "pio-construccion"
+        "title": "Trabajos prácticos por grupo",
+        "text": "Cada columna es una entrega y cada fila un grupo. Elegí la nota en la celda y se guarda sola."
+      },
+      {
+        "title": "Nueva entrega",
+        "text": "Definí tipo, cuatrimestre, tema y fecha. Si el tema no está en la lista, elegí Otro y escribilo. El número se asigna automáticamente según el tipo.",
+        "mascotId": "pio-amigo"
+      },
+      {
+        "title": "Devueltas y aprobación",
+        "text": "Marcá una entrega como devuelta cuando ya entregaste las correcciones. El porcentaje de cada grupo se recalcula con cada nota."
       }
     ],
-    "reportes": [
-      {
-        "title": "Novedades y Reportes (todos los cursos)",
-        "text": "Esta pantalla aplica a TODOS LOS CURSOS. \nEn Novedades se publican las últimas noticias que deben llegar a todas las comisiones.",
-        "selector": "#newsList",
-        "mascotId": "profe-pio"
-      },
-      {
-        "title": "Recursos generales",
-        "text": "En esta sección vas a encontrar links, recursos y herramientas de acceso rápido para toda la cursada. \nLa carga/edición de recursos depende de los permisos de tu rol.",
-        "selector": "#resourcesGrid",
-        "mascotId": "pio-amigo"
-      },
-      {
-        "title": "Botón Enviar reporte",
-        "text": "Este botón fué creado principalmente para Guido... 😂\n\nCon este botón podés enviar reportes de bugs, solicitudes o ideas. \n\n🚧EN CONSTRUCCIÓN🚧",
-        "selector": "#btnReport",
-        "mascotId": "pio-construccion"
-      }
-    ],
-    "estudiantes": [
-      {
-        "title": "Gestión de estudiantes",
-        "text": "Acá se encuentran todos los estudiantes registrados al curso seleccionado. \n\n Solamente los roles GURU y SENIOR pueden editar/cargar información \nAYUDANTE solo tiene vista y acciones limitadas.",
-        "selector": "main",
-        "mascotId": "pio-amigo"
-      },
-      {
-        "title": "Carga CSV",
-        "text": "Podés cargar estudiantes por CSV en 2 formatos: Estándar y SIU.\n El check \"Validar sin guardar\" (dry-run) sirve para testear formato/carga sin impactar datos\n\nPara guardar de verdad, desmarcá esa opción antes de ejecutar.",
-        "selector": "#btnBulk",
-        "mascotId": "profe-pio"
-      },
-      {
-        "title": "Acciones y filtros",
-        "text": "También podés agregar un estudiante nuevo de manera manual. \nTenés filtros para mostrar todos / solo ALTA / solo BAJA \n Y podes tocar Editar para cambios masivos según permisos.",
-        "selector": ".bar",
-        "mascotId": "pio-amigo"
-      },
-      {
-        "title": "Reasignar IDs (A→Z)",
-        "text": "Reasigna los IDs por orden alfabético. \nSolo debe usarse una vez y con cuidado, porque si cambian estudiantes puede generar problemas de reasignación de IDs.",
-        "selector": "#btnReid",
-        "mascotId": "profe-pio"
-      }
-    ],
-    "grupos": [
-      {
-        "title": "Alumnos sin grupo",
-        "text": "En esta tabla aparece la lista de estudiantes que todavía no tienen grupo asignado.",
-        "selector": "#noGroup",
-        "mascotId": "profe-pio"
-      },
-      {
-        "title": "Grupos creados",
-        "text": "Acá se muestran los grupos creados. \n\nSi un grupo aparece con borde rojo, está sin conformidad. \nCon Editar podés cambiar nombre y marcar conformidad entregada.",
-        "selector": "#groups",
-        "mascotId": "pio-amigo"
-      },
-      {
-        "title": "Crear grupo",
-        "text": "Para crear un grupo, usá el botón \"Crear grupo\", completá nombre (opcional) y presioná Crear. ",
-        "selector": "#g_new",
-        "mascotId": "profe-pio"
-      },
-      {
-        "title": "Ver miembros y mover",
-        "text": "Con \"Ver miembros\" podés seleccionar integrantes y moverlos a otro grupo o quitarlos.",
-        "selector": "#groups",
-        "mascotId": "pio-amigo"
-      },
-      {
-        "title": "Asignar alumnos",
-        "text": "Primero seleccioná alumnos de la lista \"sin grupo\", después tocá \"Asignar alumnos\" y elegí el grupo destino.",
-        "selector": "#g_assign_open",
-        "mascotId": "profe-pio"
-      }
-    ],
-    "notasFinales": [
-      {
-        "rolesAny": [
-          "GURU",
-          "SENIOR"
-        ],
-        "title": "Calificación final (cierre de año)",
-        "text": "Esta página se usa para el cierre anual. Permite ver todos los estudiantes, qué parciales tienen aprobados y el porcentaje de aprobación de trabajos prácticos.",
-        "selector": "#finalsTableWrap",
-        "mascotId": "profe-pio"
-      },
-      {
-        "rolesAny": [
-          "GURU",
-          "SENIOR"
-        ],
-        "title": "Filtros de la tabla",
-        "text": "Podés filtrar por estado (ALTA/BAJA), por columnas (1°P/2°P), por tema, por instancia (Parcial/Recuperatorios), por estado SIU y combinar todo con el buscador por apellido o nombre.",
-        "selector": ".toolbar",
-        "mascotId": "pio-amigo"
-      },
-      {
-        "rolesAny": [
-          "GURU",
-          "SENIOR"
-        ],
-        "title": "Leyenda y alumnos pendientes en SIU",
-        "text": "La leyenda superior avisa cuando hay estudiantes pendientes de carga: \"* Hay alumnos que faltan cargar en el SIU...\" para que no se pasen por alto antes del cierre.",
-        "selector": "#siuPendingLegend",
-        "mascotId": "profe-pio"
-      },
-      {
-        "rolesAny": [
-          "GURU",
-          "SENIOR"
-        ],
-        "title": "Estrella de cumplimiento",
-        "text": "Cuando un alumno cumple todas las condiciones para aprobar o ya tiene nota final asignada, aparece con una estrella para identificarlo rápidamente.",
-        "selector": "#tbodyFinals",
-        "mascotId": "pio-amigo"
-      },
-      {
-        "rolesAny": [
-          "GURU",
-          "SENIOR"
-        ],
-        "title": "Marcar carga en SIU",
-        "text": "Una vez cargado en SIU, podés marcar la opción correspondiente y toda la fila se tiñe de amarillo para indicar que ese registro ya fue informado oficialmente.",
-        "selector": "#tbodyFinals",
-        "mascotId": "profe-pio"
-      },
-      {
-        "rolesAny": [
-          "GURU",
-          "SENIOR"
-        ],
-        "title": "Observaciones y exportación",
-        "text": "Al final podés ver o editar observaciones por alumno y, si hace falta, exportar toda la tabla a Excel para compartir o archivar el cierre.",
-        "selector": "#btnExportExcel",
-        "mascotId": "pio-amigo"
-      }
-    ],
-    "entregas": [
-      {
-        "title": "Trabajos Prácticos por grupo",
-        "text": "En este apartado ves todas las entregas por grupo del curso seleccionado. \nEstán organizadas por 1° cuatrimestre y 2° cuatrimestre para seguir el avance durante todo el año.",
-        "selector": "#content",
-        "mascotId": "profe-pio"
-      },
-      {
-        "title": "Filtrar por cuatrimestre",
-        "text": "Podés filtrar rápidamente con el selector de Cuatrimestre que está al lado del botón \"+ Nueva entrega\". Elegí General, 1° Cuatri o 2° Cuatri para mostrar solo lo que necesitás revisar.",
-        "selector": "#termFilter",
-        "mascotId": "pio-amigo"
-      },
-      {
-        "title": "Nueva entrega (TP / TPC / TPR)",
-        "text": "Al crear una entrega podés elegir el tipo (TP, TPC o TPR), seleccionar cuatrimestre y tema, definir la fecha de cierre y asignar un nombre claro para identificarla.",
-        "selector": "#btnNew",
-        "mascotId": "profe-pio"
-      },
-      {
-        "title": "Numeración automática",
-        "text": "La numeración se carga automáticamente para evitar confusiones y mantener el orden de cada tipo de entrega en el cuatrimestre correspondiente.",
-        "selector": "#nextNumberHint",
-        "mascotId": "pio-amigo"
-      },
-      {
-        "title": "Carga de notas y devolución",
-        "text": "Una vez creada la entrega, se asignan las notas por grupo. \nTambién tenés el botón para marcar cuando una tarea ya fue devuelta, así podés identificar rápido qué grupos ya fueron corregidos y entregados.",
-        "selector": "#content",
-        "mascotId": "profe-pio"
-      }
-    ],
-    "parciales": [
+    "partials": [
       {
         "title": "Cómo funciona Parciales",
-        "text": "Esta pantalla centraliza la carga y el seguimiento de notas de parciales y recuperatorios por estudiante. Podés trabajar por tema, por instancia y por parcial en una sola vista.",
-        "selector": ".toolbar",
-        "mascotId": "profe-pio"
+        "text": "Cargá la nota de cada tema en el parcial y sus recuperatorios. Solo se listan estudiantes en alta y las celdas se pintan según aprueben o no."
       },
       {
-        "title": "Filtro Ver (ALTA / BAJA)",
-        "text": "\"Ver\" permite mostrar Todos, solo estudiantes en ALTA o solo BAJA. Es útil para enfocarte en la cursada activa o revisar historiales.",
-        "selector": "#statusFilter",
+        "title": "Adeudan por tema",
+        "text": "El resumen de arriba cuenta cuántos estudiantes todavía no aprobaron cada tema: es la cantidad de exámenes a imprimir para la próxima instancia.",
         "mascotId": "pio-amigo"
       },
       {
-        "title": "Filtro Columnas (1°P / 2°P)",
-        "text": "Con \"Columnas\" podés mostrar todos los parciales o concentrarte únicamente en 1° Parcial o 2° Parcial. Así simplificás la visualización según la etapa del año.",
-        "selector": "#showCols",
-        "mascotId": "profe-pio"
+        "title": "Filtros combinables",
+        "text": "Podés ver solo un parcial, un tema o una instancia, y buscar por apellido. El encabezado queda fijo mientras bajás por la lista."
       },
       {
-        "title": "Filtro Tema",
-        "text": "\"Tema\" deja ver únicamente las columnas del tema elegido (por ejemplo ORG, MET, etc.). Sirve para analizar avances tema por tema.",
-        "selector": "#topicFilter",
+        "title": "Exportar",
+        "text": "Con Exportar elegís qué temas, instancias y datos incluir, o usás Seleccionar todo. Se descarga un archivo que Excel abre directo.",
         "mascotId": "pio-amigo"
-      },
-      {
-        "title": "Filtro Instancia",
-        "text": "En instancia podés elegir Parcial, 1° Recuperatorio, 2° Recuperatorio o solo recuperatorios. Esto ayuda a revisar cada momento de evaluación por separado.",
-        "selector": "#attemptFilter",
-        "mascotId": "profe-pio"
-      },
-      {
-        "title": "Búsqueda y combinación de filtros",
-        "text": "Podés combinar todos los filtros entre sí y además usar el buscador por apellido o nombre. Ejemplo: ALTA + 2° Parcial + Tema específico + solo recuperatorios.",
-        "selector": "#q",
-        "mascotId": "pio-amigo"
-      },
-      {
-        "title": "Pintado automático y estados 1°P / 2°P",
-        "text": "A medida que cargás notas, las celdas se tiñen automáticamente para reflejar el estado. Los indicadores de 1°P y 2°P cambian según los resultados registrados en cada instancia.",
-        "selector": "#tblRight",
-        "mascotId": "profe-pio"
       }
     ],
-    "asistencia": [
+    "attendance": [
       {
-        "title": "Objetivo de Asistencia",
-        "text": "Esta página está pensada para facilitar la toma de asistencia en parciales y recuperatorios, con una vista clara para registrar presentes por estudiante.",
-        "selector": ".toolbar",
-        "mascotId": "profe-pio"
+        "title": "Asistencia a parciales",
+        "text": "Elegí el parcial y la instancia, marcá quién se presentó y qué temas rindió. Cada cambio se guarda al instante."
       },
       {
-        "title": "Seleccionar parcial e instancia",
-        "text": "Podés elegir el tipo de parcial (1° o 2°) y la instancia (Parcial, 1° Recu o 2° Recu) para tomar asistencia en el contexto exacto que corresponde.",
-        "selector": "#partialFilter",
+        "title": "Quiénes aparecen",
+        "text": "En el parcial se listan todos los estudiantes en alta. En los recuperatorios, solo quienes adeudan algún tema; desactivá Solo quienes adeudan para anotar a quien viene a levantar nota.",
         "mascotId": "pio-amigo"
       },
       {
-        "title": "Descargar planilla",
-        "text": "Tenés botones para descargar la asistencia en Excel o en PDF, ideal para llevar registro, imprimir o compartir con el equipo docente.",
-        "selector": "#btnDownloadXls",
-        "mascotId": "profe-pio"
+        "title": "Colores por tema",
+        "text": "Verde: el tema ya está aprobado. Naranja: lo rinde en esta instancia. Sin color: todavía lo adeuda."
       },
       {
-        "title": "Marcado en verde por aprobación",
-        "text": "Si un estudiante ya tiene el tema aprobado en la página de Parciales, acá aparece resaltado en verde. Igual podés tomar asistencia normalmente en esa instancia.",
-        "selector": "#content",
+        "title": "Cerrar asistencia",
+        "text": "Al terminar, Cerrar asistencia carga en Parciales una A a los ausentes y N_E a los temas no entregados, solo en los temas que cada uno adeuda. Lo aprobado y las notas ya cargadas no se tocan.",
+        "mascotId": "pio-amigo"
+      }
+    ],
+    "finals": [
+      {
+        "title": "Calificación final",
+        "text": "Reúne el estado de parciales y TPs de cada estudiante para cerrar la cursada con su nota y condición."
+      },
+      {
+        "title": "Pendientes de SIU",
+        "text": "La estrella marca a quienes ya cumplen todo pero todavía no fueron cargados en el SIU.",
         "mascotId": "pio-amigo"
       },
       {
-        "title": "Resumen final para logística",
-        "text": "Al final de la página hay una tabla resumen con cuántos estudiantes adeudan en esa instancia. Te sirve para estimar copias a imprimir y cuántos alumnos esperar.",
-        "selector": "#summary",
-        "mascotId": "profe-pio"
+        "title": "Observaciones y exportación",
+        "text": "Anotá observaciones por estudiante y exportá la tabla para Excel cuando la necesites."
+      }
+    ],
+    "admin-courses": [
+      {
+        "title": "Administración de cursos",
+        "text": "Creá y editá cursos, definí su enlace de planificación y asigná a los docentes que pueden verlos."
+      }
+    ],
+    "admin-users": [
+      {
+        "title": "Usuarios y roles",
+        "text": "Gestioná las cuentas, sus roles y los cursos asignados. Un usuario nuevo ingresa con su nombre de usuario como contraseña y debe cambiarla."
+      }
+    ],
+    "admin-students": [
+      {
+        "title": "Padrón consolidado",
+        "text": "Reúne a los estudiantes de todos los cursos para buscar a alguien sin importar su comisión."
+      }
+    ],
+    "profile": [
+      {
+        "title": "Tu perfil",
+        "text": "Actualizá tu foto, tus datos de contacto y tu contraseña. El nombre y el usuario los administra el Gurú."
       }
     ]
   }

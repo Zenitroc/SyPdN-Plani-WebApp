@@ -53,7 +53,7 @@ function register_notas_finales_routes(): void
     $pdo->exec($sqlPartial);
   };
 
-  $FAIL = ['A','N_E','NO_SAT','N_S'];
+  $FAIL = AcademicCatalog::FAILING_GRADES;
   $pass = function(?string $code) use ($FAIL) {
     if ($code === null || $code === '') return false;
     return !in_array($code, $FAIL, true);
@@ -96,11 +96,7 @@ function register_notas_finales_routes(): void
     return $approval;
   };
   $compute_condition = function(?int $finalGrade, int $finalDeserto): ?string {
-    if ($finalDeserto === 1) return 'DESERTO';
-    if ($finalGrade === null) return null;
-    if ($finalGrade < 6) return 'RECURSA';
-    if ($finalGrade < 8) return 'FIRMA';
-    return 'PROMOCIONA';
+    return AcademicCatalog::finalCondition($finalGrade, $finalDeserto === 1);
   };
 
   // ====== GET /api/notas-finales?course_id=... ==============================
@@ -143,9 +139,9 @@ function register_notas_finales_routes(): void
       $idx[$e][$p][$t][$a] = $g['grade_code'];
     }
 
-    $P1 = ['ORG','MET','TEO1'];
-    $P2 = ['PLS','CUR','TEO2'];
-    $ATT = ['PA','1R','2R'];
+    $P1 = AcademicCatalog::PARTIAL_TOPICS[1];
+    $P2 = AcademicCatalog::PARTIAL_TOPICS[2];
+    $ATT = AcademicCatalog::ATTEMPTS;
 
     $stf = $pdo->prepare("SELECT enrollment_id, final_grade, final_deserto, siu_loaded, final_condition FROM final_grades WHERE course_id=?");
     $stf->execute([$courseId]);
@@ -242,7 +238,7 @@ function register_notas_finales_routes(): void
     $finalDeserto = array_key_exists('final_deserto', $in) ? (int)((bool)$in['final_deserto']) : null;
     $siuLoaded = array_key_exists('siu_loaded', $in) ? (int)((bool)$in['siu_loaded']) : null;
 
-    if ($finalGrade !== null && ($finalGrade < 1 || $finalGrade > 10)) {
+    if ($finalGrade !== null && ($finalGrade < AcademicCatalog::FINAL_GRADE_MIN || $finalGrade > AcademicCatalog::FINAL_GRADE_MAX)) {
       json_error('Calificación final inválida', 422);
     }
 
@@ -257,8 +253,10 @@ function register_notas_finales_routes(): void
 
     $existing = db_one($pdo, "SELECT final_grade, final_deserto, final_condition, siu_loaded FROM final_grades WHERE enrollment_id=?", [$enrollId]);
 
-    $nextFinal = $finalGrade ?? ($existing['final_grade'] ?? null);
+    // Un final_grade explícito en null borra la nota; si el campo no viene, se conserva la existente.
+    $nextFinal = array_key_exists('final_grade', $in) ? $finalGrade : ($existing['final_grade'] ?? null);
     $nextDeserto = $finalDeserto ?? ($existing['final_deserto'] ?? 0);
+    if ((int)$nextDeserto === 1) $nextFinal = null;
     $nextSiu = $siuLoaded ?? ($existing['siu_loaded'] ?? 0);
     $nextCond = $compute_condition($nextFinal !== null ? (int)$nextFinal : null, (int)$nextDeserto);
 

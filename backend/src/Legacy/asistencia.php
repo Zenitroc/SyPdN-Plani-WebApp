@@ -60,13 +60,13 @@ function register_asistencia_routes() {
     if ($courseId <= 0) json_error('course_id requerido', 422);
     ensure_course_access($courseId);
     if (!in_array($partial, [1,2], true)) json_error('partial invalido', 422);
-    if (!in_array($attempt, ['PA','1R','2R'], true)) json_error('attempt invalido', 422);
+    if (!in_array($attempt, AcademicCatalog::ATTEMPTS, true)) json_error('attempt invalido', 422);
 
     $pdo = db();
     $ensure_schema($pdo);
     $ensure_partial_grades_schema($pdo);
 
-    $st = $pdo->prepare("SELECT e.id AS enrollment_id, e.course_student_id AS course_id_seq, p.last_name AS apellido, p.first_name AS nombre
+    $st = $pdo->prepare("SELECT e.id AS enrollment_id, e.course_student_id AS course_id_seq, e.status, p.last_name AS apellido, p.first_name AS nombre
                          FROM enrollments e
                          JOIN people p ON p.id=e.person_id
                          WHERE e.course_id=?
@@ -85,7 +85,7 @@ function register_asistencia_routes() {
     }
 
     $approvedGrades = [];
-    $FAIL = ['A','N_E','NO_SAT','N_S'];
+    $FAIL = AcademicCatalog::FAILING_GRADES;
     $pass = function(?string $code) use ($FAIL) {
       if ($code===null || $code==='') return false;
       return !in_array($code, $FAIL, true);
@@ -100,7 +100,7 @@ function register_asistencia_routes() {
       $t = strtoupper((string)$r['topic']);
       $approvedGrades[$e][$t][$r['attempt']] = $r['grade_code'];
     }
-    $topics = ($partial === 1) ? ['ORG','MET','TEO1'] : ['PLS','CUR','TEO2'];
+    $topics = ($partial === 1) ? AcademicCatalog::PARTIAL_TOPICS[1] : AcademicCatalog::PARTIAL_TOPICS[2];
 
     $out = [];
     foreach ($students as $s) {
@@ -110,6 +110,7 @@ function register_asistencia_routes() {
         'course_id_seq' => (int)$s['course_id_seq'],
         'apellido' => $s['apellido'],
         'nombre' => $s['nombre'],
+        'status' => $s['status'],
         'present' => isset($idx[$e]) ? (int)$idx[$e]['present'] === 1 : 0,
         'topics' => [],
         'approved_topics' => []
@@ -136,7 +137,7 @@ function register_asistencia_routes() {
     $attempt = strtoupper(trim((string)($in['attempt'] ?? '')));
     $present = isset($in['present']) ? (int)$in['present'] : 0;
     $topics = $in['topics'] ?? [];
-    if ($courseId<=0 || $enrollId<=0 || !in_array($partial,[1,2],true) || !in_array($attempt,['PA','1R','2R'],true)) {
+    if ($courseId<=0 || $enrollId<=0 || !in_array($partial,[1,2],true) || !in_array($attempt,AcademicCatalog::ATTEMPTS,true)) {
       json_error('Parametros invalidos', 422);
     }
     ensure_course_access($courseId);
@@ -178,5 +179,86 @@ function register_asistencia_routes() {
     ]);
 
     json_ok(['saved'=>1]);
+  });
+
+  // ==== POST /api/asistencia/cerrar ========================================
+  // Body: { course_id, partial:1|2, attempt:'PA'|'1R'|'2R' }
+  // Pasa a Parciales lo que dejó la asistencia de esa instancia, solo para estudiantes en ALTA
+  // y solo en los temas que todavía adeudan:
+  //   - ausente                          → nota de ausente en cada tema adeudado
+  //   - presente sin entregar un tema    → nota de no entregado en ese tema
+  // No pisa una nota real ya cargada en la instancia; sí reemplaza una automática anterior,
+  // así se puede volver a cerrar después de corregir la asistencia.
+  route('POST', '/api/asistencia/cerrar', function() use ($ensure_schema, $ensure_partial_grades_schema) {
+    require_role(current_user(), ['GURU','SENIOR']);
+    $in = read_json();
+    $courseId = (int)($in['course_id'] ?? 0);
+    $partial = (int)($in['partial'] ?? 0);
+    $attempt = strtoupper(trim((string)($in['attempt'] ?? '')));
+    if ($courseId<=0 || !in_array($partial,[1,2],true) || !in_array($attempt,AcademicCatalog::ATTEMPTS,true)) {
+      json_error('Parametros invalidos', 422);
+    }
+    ensure_course_access($courseId);
+
+    $pdo = db();
+    $ensure_schema($pdo);
+    $ensure_partial_grades_schema($pdo);
+
+    $topics = AcademicCatalog::topicsFor($partial);
+    $auto = [AcademicCatalog::ABSENT_GRADE, AcademicCatalog::NOT_DELIVERED_GRADE];
+
+    $st = $pdo->prepare("SELECT id FROM enrollments WHERE course_id=? AND status='ALTA'");
+    $st->execute([$courseId]);
+    $enrollments = array_map('intval', $st->fetchAll(PDO::FETCH_COLUMN));
+
+    $st = $pdo->prepare("SELECT enrollment_id,present,org,met,teo1,pls,cur,teo2 FROM partial_attendance WHERE course_id=? AND partial_no=? AND attempt=?");
+    $st->execute([$courseId, $partial, $attempt]);
+    $attendance = [];
+    foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $r) $attendance[(int)$r['enrollment_id']] = $r;
+
+    $st = $pdo->prepare("SELECT enrollment_id, topic, attempt, grade_code FROM partial_grades WHERE course_id=? AND partial_no=?");
+    $st->execute([$courseId, $partial]);
+    $grades = [];
+    foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $r) $grades[(int)$r['enrollment_id']][strtoupper((string)$r['topic'])][$r['attempt']] = $r['grade_code'];
+
+    $save = $pdo->prepare("
+      INSERT INTO partial_grades (course_id,enrollment_id,partial_no,topic,attempt,grade_code,updated_at)
+      VALUES (?,?,?,?,?,?,NOW())
+      ON DUPLICATE KEY UPDATE grade_code=VALUES(grade_code), updated_at=NOW()
+    ");
+
+    $result = ['absent' => 0, 'not_delivered' => 0, 'kept' => 0, 'students' => 0];
+    $pdo->beginTransaction();
+    try {
+      foreach ($enrollments as $e) {
+        $present = isset($attendance[$e]) && (int)$attendance[$e]['present'] === 1;
+        $touched = false;
+        foreach ($topics as $t) {
+          $approved = false;
+          foreach (AcademicCatalog::ATTEMPTS as $a) {
+            if (AcademicCatalog::passed($grades[$e][$t][$a] ?? null)) { $approved = true; break; }
+          }
+          if ($approved) continue; // no adeuda el tema: no se toca
+
+          $delivered = $present && (int)$attendance[$e][strtolower($t)] === 1;
+          if ($delivered) continue; // lo rindió: la nota la carga el docente
+
+          $current = $grades[$e][$t][$attempt] ?? null;
+          if ($current !== null && $current !== '' && !in_array($current, $auto, true)) { $result['kept']++; continue; }
+
+          $code = $present ? AcademicCatalog::NOT_DELIVERED_GRADE : AcademicCatalog::ABSENT_GRADE;
+          $save->execute([$courseId, $e, $partial, $t, $attempt, $code]);
+          $result[$present ? 'not_delivered' : 'absent']++;
+          $touched = true;
+        }
+        if ($touched) $result['students']++;
+      }
+      $pdo->commit();
+    } catch (Throwable $ex) {
+      $pdo->rollBack();
+      json_error('No se pudo cerrar la asistencia: ' . $ex->getMessage(), 500);
+    }
+
+    json_ok($result);
   });
 }

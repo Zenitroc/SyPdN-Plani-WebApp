@@ -123,7 +123,7 @@ function register_session_routes(): void {
         $data = $m[2];
         $bin = base64_decode($data, true);
         if ($bin === false) json_error('Foto inválida', 422);
-        if (strlen($bin) > 200 * 1024) json_error('La foto supera el límite de 200KB', 422);
+        if (strlen($bin) > AcademicCatalog::MAX_IMAGE_BYTES) json_error('La foto supera el límite de 200KB', 422);
         $fields[] = 'photo_data=?';
         $params[] = $data;
         $fields[] = 'photo_mime=?';

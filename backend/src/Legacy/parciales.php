@@ -67,10 +67,10 @@ function register_parciales_routes() {
       $idx[$e][$p][$t][$a] = $g['grade_code'];
     }
 
-    $P1 = ['ORG','MET','TEO1'];
-    $P2 = ['PLS','CUR','TEO2'];
-    $ATT = ['PA','1R','2R'];
-    $FAIL = ['A','N_E','NO_SAT','N_S']; // igual que entregas.js
+    $P1 = AcademicCatalog::PARTIAL_TOPICS[1];
+    $P2 = AcademicCatalog::PARTIAL_TOPICS[2];
+    $ATT = AcademicCatalog::ATTEMPTS;
+    $FAIL = AcademicCatalog::FAILING_GRADES; // igual que entregas.js
     $pass = function(?string $code) use ($FAIL) {
       if ($code===null || $code==='') return false;
       return !in_array($code, $FAIL, true);
@@ -138,13 +138,13 @@ function register_parciales_routes() {
     $attempt = strtoupper(trim((string)($in['attempt'] ?? '')));
     $code = isset($in['grade_code']) && $in['grade_code']!=='' ? (string)$in['grade_code'] : null;
     if ($courseId<=0 || $enrollId<=0 || !in_array($partial,[1,2],true)
-        || !in_array($attempt,['PA','1R','2R'],true)
+        || !in_array($attempt,AcademicCatalog::ATTEMPTS,true)
         || $topic==='') {
       json_error('Parámetros inválidos', 422);
     }
     ensure_course_access($courseId);
 
-    $P1 = ['ORG','MET','TEO1']; $P2=['PLS','CUR','TEO2'];
+    $P1 = AcademicCatalog::PARTIAL_TOPICS[1]; $P2=AcademicCatalog::PARTIAL_TOPICS[2];
     if ($partial===1 && !in_array($topic,$P1,true)) json_error('Tema inválido para 1º parcial',422);
     if ($partial===2 && !in_array($topic,$P2,true)) json_error('Tema inválido para 2º parcial',422);
 

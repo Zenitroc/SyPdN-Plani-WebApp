@@ -77,6 +77,8 @@ function register_student_routes(): void
 
     $email = trim((string) ($in['email_inst'] ?? ''));
     $legajo = trim((string) ($in['legajo'] ?? ''));
+    if ($error = legajo_error($legajo))
+      json_error($error, 422);
     $obs = (string) ($in['observaciones'] ?? '');
     $status = strtoupper((string) ($in['status'] ?? 'ALTA')) === 'BAJA' ? 'BAJA' : 'ALTA';
     $manualId = (int) ($in['course_student_id'] ?? 0);
@@ -147,6 +149,8 @@ function register_student_routes(): void
     $first = isset($in['first_name']) ? trim((string) $in['first_name']) : null;
     $email = isset($in['email_inst']) ? trim((string) $in['email_inst']) : null;
     $leg = isset($in['legajo']) ? trim((string) $in['legajo']) : null;
+    if ($leg !== null && ($error = legajo_error($leg)))
+      json_error($error, 422);
 
     $status = isset($in['status']) ? (strtoupper((string) $in['status']) === 'BAJA' ? 'BAJA' : 'ALTA') : null;
     $obs = array_key_exists('observaciones', $in) ? (string) $in['observaciones'] : null;
@@ -342,6 +346,10 @@ function register_student_routes(): void
 
         $email = trim((string) ($r['email_inst'] ?? ''));
         $leg = trim((string) ($r['legajo'] ?? ''));
+        if ($error = legajo_error($leg)) {
+          $errors[] = "Fila " . ($i + 1) . ": " . $error;
+          continue;
+        }
 
         if ($dry) {
           continue;
@@ -385,6 +393,15 @@ function register_student_routes(): void
 }
 
 /* ===== Helpers ===== */
+/** people.legajo es obligatorio, único y de hasta 10 caracteres: se valida acá para no devolver un error crudo de SQL. */
+function legajo_error(string $legajo): ?string
+{
+  if ($legajo === '')
+    return 'Legajo requerido';
+  if (strlen($legajo) > 10)
+    return 'El legajo admite hasta 10 caracteres';
+  return null;
+}
 function find_or_create_person(PDO $pdo, string $last, string $first, string $email = '', string $legajo = ''): int
 {
   if ($email !== '') {

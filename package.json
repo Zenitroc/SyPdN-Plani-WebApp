@@ -2,10 +2,13 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "dev:host": "vite --host 0.0.0.0",
+    "dev:api": "php -S 127.0.0.1:8080 dev/router.php",
     "dev:backend": "npm.cmd --prefix backend run dev",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "npm.cmd --prefix backend run typecheck"
+    "typecheck": "tsc -p frontend/tsconfig.json",
+    "typecheck:backend": "npm.cmd --prefix backend run typecheck",
+    "test:api": "node backend/tests/api-smoke.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
@@ -14,6 +17,9 @@
     "react-router-dom": "latest"
   },
   "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^7.0.2",
     "vite": "latest"
   }
 }

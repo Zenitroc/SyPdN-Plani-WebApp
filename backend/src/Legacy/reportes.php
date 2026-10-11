@@ -57,7 +57,7 @@ function register_report_routes(): void {
       $data = $m[2];
       $bin = base64_decode($data, true);
       if ($bin === false) json_error('Imagen inválida', 422);
-      if (strlen($bin) > 200 * 1024) json_error('La imagen supera el límite de 200KB', 422);
+      if (strlen($bin) > AcademicCatalog::MAX_IMAGE_BYTES) json_error('La imagen supera el límite de 200KB', 422);
     }
     $user = auth_user();
 
@@ -103,7 +103,7 @@ function register_report_routes(): void {
       $data = $m[2];
       $bin = base64_decode($data, true);
       if ($bin === false) json_error('Imagen inválida', 422);
-      if (strlen($bin) > 200 * 1024) json_error('La imagen supera el límite de 200KB', 422);
+      if (strlen($bin) > AcademicCatalog::MAX_IMAGE_BYTES) json_error('La imagen supera el límite de 200KB', 422);
     }
     $user = auth_user();
 
@@ -139,7 +139,7 @@ function register_report_routes(): void {
     $link = trim($in['link'] ?? '');
     $image = $in['image'] ?? null;
 
-    $allowed = ['bug','solicitud','idea','otro'];
+    $allowed = array_keys(AcademicCatalog::REPORT_TYPES);
     if (!in_array($type, $allowed, true)) $type = 'otro';
     if ($message === '') json_error('Mensaje requerido', 422);
 
@@ -172,10 +172,10 @@ function register_report_routes(): void {
       $bodyMail .= "Content-Disposition: attachment; filename=\"imagen\"\r\n\r\n";
       $bodyMail .= chunk_split($data)."\r\n";
       $bodyMail .= "--$boundary--";
-      $sent = mail($to, $subject, $bodyMail, $headers);
+      $sent = @mail($to, $subject, $bodyMail, $headers);
     } else {
       $headers .= "Content-Type: text/plain; charset=\"utf-8\"";
-      $sent = mail($to, $subject, $body, $headers);
+      $sent = @mail($to, $subject, $body, $headers);
     }
     if (!$sent) json_error('No se pudo enviar el correo', 500);
     json_ok(['ok'=>true]);

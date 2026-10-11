@@ -9,6 +9,7 @@ require __DIR__ . '/src/Middleware/AuthMiddleware.php';
 require __DIR__ . '/src/Middleware/Rbac.php';
 require __DIR__ . '/src/Middleware/CourseGuard.php';
 require __DIR__ . '/src/Infrastructure/Http/Router.php';
+require __DIR__ . '/src/Domain/AcademicCatalog.php';
 require __DIR__ . '/src/Domain/Course.php';
 require __DIR__ . '/src/Repositories/CourseRepository.php';
 require __DIR__ . '/src/Services/CourseService.php';
@@ -16,6 +17,9 @@ require __DIR__ . '/src/Controllers/CourseController.php';
 require __DIR__ . '/src/Repositories/DashboardRepository.php';
 require __DIR__ . '/src/Services/DashboardService.php';
 require __DIR__ . '/src/Controllers/DashboardController.php';
+
+// La API solo responde JSON: un warning impreso en el cuerpo lo vuelve ilegible para el cliente.
+ini_set('display_errors', '0');
 
 load_env_stack(dirname(__DIR__) . '/.env');
 
@@ -43,6 +47,7 @@ function route(string $method, string $path, callable $handler, bool $public = f
 $courseController = new CourseController(new CourseService(new CourseRepository(db())));
 $courseController->register();
 (new DashboardController(new DashboardService(new DashboardRepository(db()))))->register();
+route('GET', '/api/catalog', static fn() => json_ok(AcademicCatalog::toArray(db())));
 
 foreach (['session', 'estudiantes', 'grupos', 'entregas', 'parciales', 'notas_finales', 'reportes', 'asistencia', 'planificacion', 'course_admin', 'user_admin', 'course_color'] as $module) {
     require __DIR__ . '/src/Legacy/' . $module . '.php';

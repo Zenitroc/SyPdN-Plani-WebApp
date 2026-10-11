@@ -9,6 +9,18 @@ git commit -m "Descripcion del cambio"
 git push origin nombre-de-tu-rama
 ```
 
+## Compilar el front
+
+El front es una SPA que se compila: el servidor publica `frontend/dist/`, que no se versiona.
+Después de traer cambios que toquen `frontend/`, en el servidor:
+
+```bash
+npm ci
+npm run build
+```
+
+El sitio debe servir `frontend/dist/` como raíz, responder `index.html` para cualquier ruta que no sea un archivo (rutas `/login` y `/app/...`) y dirigir `/api` a `backend/public/index.php`.
+
 ## Probar rama en servidor
 
 ```bash
@@ -61,5 +73,5 @@ sudo caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
 * Antes de hacer pull en servidor, correr `git status --short`.
 * Si aparece `.env.production` modificado, hacer backup antes.
 * Si se cambió PHP, reiniciar `php-fpm`.
-* Si solo cambió HTML/CSS/JS, recargar navegador sin caché.
+* Si cambió algo de `frontend/`, volver a correr `npm run build`.
   ::: 

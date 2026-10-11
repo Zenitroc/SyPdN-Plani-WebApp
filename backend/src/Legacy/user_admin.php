@@ -110,7 +110,7 @@ function register_user_admin_routes(): void {
       $data = $m[2];
       $bin = base64_decode($data, true);
       if ($bin === false) json_error('Foto inválida', 422);
-      if (strlen($bin) > 200 * 1024) json_error('La foto supera el límite de 200KB', 422);
+      if (strlen($bin) > AcademicCatalog::MAX_IMAGE_BYTES) json_error('La foto supera el límite de 200KB', 422);
       $photoData = $data;
       $photoMime = $mime;
     }
@@ -147,7 +147,7 @@ function register_user_admin_routes(): void {
     $subject = 'Alta de cuenta en SyPdN';
     $body = "Hola $name $lastName,\n\nTu cuenta fue creada.\nUsuario: $username\nContraseña inicial: $username\nAl ingresar por primera vez, el sistema te pedirá cambiar la contraseña.\n";
     $headers = "From: noreply@example.com\r\nContent-Type: text/plain; charset=\"utf-8\"";
-    $sent = mail($to, $subject, $body, $headers);
+    $sent = @mail($to, $subject, $body, $headers);
 
     json_ok([
       'id' => $userId,
@@ -218,7 +218,7 @@ function register_user_admin_routes(): void {
         $data = $m[2];
         $bin = base64_decode($data, true);
         if ($bin === false) json_error('Foto inválida', 422);
-        if (strlen($bin) > 200 * 1024) json_error('La foto supera el límite de 200KB', 422);
+        if (strlen($bin) > AcademicCatalog::MAX_IMAGE_BYTES) json_error('La foto supera el límite de 200KB', 422);
         $fields[] = 'photo_data=?';
         $params[] = $data;
         $fields[] = 'photo_mime=?';

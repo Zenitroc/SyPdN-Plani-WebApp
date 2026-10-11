@@ -1,9 +1,32 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
-const ThemeContext = createContext(null);
-export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => localStorage.getItem('spn_theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
-  useEffect(() => { document.documentElement.dataset.theme = theme; localStorage.setItem('spn_theme', theme); }, [theme]);
-  return <ThemeContext.Provider value={{ theme, toggleTheme: () => setTheme(value => value === 'dark' ? 'light' : 'dark') }}>{children}</ThemeContext.Provider>;
+type Theme = 'light' | 'dark';
+type ThemeValue = { theme: Theme; toggleTheme: () => void };
+
+const ThemeContext = createContext<ThemeValue | null>(null);
+const STORAGE_KEY = 'spn_theme';
+
+const initialTheme = (): Theme => {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored === 'light' || stored === 'dark') return stored;
+  return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>(initialTheme);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem(STORAGE_KEY, theme);
+  }, [theme]);
+
+  const toggleTheme = useCallback(() => setTheme(current => (current === 'dark' ? 'light' : 'dark')), []);
+  const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
-export const useTheme = () => useContext(ThemeContext);
+
+export function useTheme(): ThemeValue {
+  const value = useContext(ThemeContext);
+  if (!value) throw new Error('useTheme debe usarse dentro de <ThemeProvider>');
+  return value;
+}

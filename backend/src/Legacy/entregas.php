@@ -123,7 +123,7 @@ function register_entregas_routes() {
       $rows = $pdo->query("SELECT code FROM grade_lookup ORDER BY ordinal ASC")->fetchAll(PDO::FETCH_COLUMN);
       if ($rows && is_array($rows)) return array_values(array_unique(array_map('strval', $rows)));
     } catch (Throwable $e) { /* fallback */ }
-    return ['A','N_E','NO_SAT','SAT-','SAT','SAT+','DIST-','DIST'];
+    return AcademicCatalog::DEFAULT_GRADES;
   };
 
     $validate = function(array $input, array $rules) {
@@ -146,10 +146,10 @@ function register_entregas_routes() {
           if (!in_array((int)$v, [1,2], true)) return "term debe ser 1 o 2";
           break;
         case 'type':
-          if (!in_array($v, ['TP','TPC','TPR'], true)) return "type inválido (TP|TPC|TPR)";
+          if (!in_array($v, AcademicCatalog::ASSIGNMENT_TYPES, true)) return "type inválido (TP|TPC|TPR)";
           break;
         case 'topic':
-          if (!in_array($v, ['ORG','MET','PLS','CUR'], true)) return "topic inválido (ORG|MET|PLS|CUR)";
+          if (AcademicCatalog::assignmentTopic($v) === null) return "Tema inválido: elegí uno de la lista o escribí uno de hasta " . AcademicCatalog::CUSTOM_TOPIC_MAX_LENGTH . " caracteres (letras, números, espacios y - _ +)";
           break;
         case 'bool':
           if (!in_array($v, [0,1,'0','1',true,false], true)) return "Campo $k debe ser bool 0|1";
@@ -198,7 +198,7 @@ function register_entregas_routes() {
     }
 
     // Aprobación por grupo
-    $notApproved = ['A','N_E','NO_SAT','N_S'];
+    $notApproved = AcademicCatalog::FAILING_GRADES;
     $gradeIndex = [];
     foreach ($grades as $g) { $gradeIndex[$g['assignment_id']][$g['group_id']] = $g['grade_code']; }
 
@@ -239,7 +239,7 @@ function register_entregas_routes() {
     $term = (int)($_GET['term'] ?? 0);
     auth_require();
     ensure_course_access($courseId);
-    if ($courseId<=0 || !in_array($type,['TP','TPC','TPR'],true) || !in_array($term,[1,2],true)) {
+    if ($courseId<=0 || !in_array($type,AcademicCatalog::ASSIGNMENT_TYPES,true) || !in_array($term,[1,2],true)) {
       return json_error('Parámetros inválidos', 400);
     }
     $st = $pdo->prepare("SELECT COALESCE(MAX(number),0) FROM assignments WHERE course_id=? AND type=?");
@@ -276,14 +276,14 @@ function register_entregas_routes() {
                            VALUES (?,?,?,?,?,?,?,0, NOW())");
       $due = $input['due_date'] ?: null;
       $st->execute([
-        $courseId, (int)$input['term'], $input['type'], $number, $input['topic'], $due, $input['name']
+        $courseId, (int)$input['term'], $input['type'], $number, AcademicCatalog::assignmentTopic($input['topic']), $due, $input['name']
       ]);
       $id = (int)$pdo->lastInsertId();
       $pdo->commit();
 
       return json_ok(['assignment' => [
         'id'=>$id,'course_id'=>$courseId,'term'=>(int)$input['term'],'type'=>$input['type'],
-        'number'=>$number,'topic'=>$input['topic'],'due_date'=>$due,'name'=>$input['name'],'returned'=>0
+        'number'=>$number,'topic'=>AcademicCatalog::assignmentTopic($input['topic']),'due_date'=>$due,'name'=>$input['name'],'returned'=>0
       ]]);
     } catch (Throwable $e) {
       $pdo->rollBack();
@@ -317,7 +317,11 @@ function register_entregas_routes() {
       if ($due!==null && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $due)) return json_error('due_date inválida',400);
       $fields[]='due_date=?'; $args[]=$due;
     }
-    if (isset($input['topic']) && in_array($input['topic'], ['ORG','MET','PLS','CUR'], true)) { $fields[]='topic=?'; $args[]=$input['topic']; }
+    if (isset($input['topic'])) {
+      $topic = AcademicCatalog::assignmentTopic($input['topic']);
+      if ($topic === null) return json_error('Tema inválido', 400);
+      $fields[]='topic=?'; $args[]=$topic;
+    }
 
     if (!$fields) return json_ok(['updated'=>0]);
     $args[] = $aid;
