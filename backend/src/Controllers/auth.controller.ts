@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { AuthService } from '../services/auth.service.js';
-import { requireUser } from '../middleware/auth.js';
+import { AuthService } from '../Services/auth.service.js';
+import { requireUser } from '../Middleware/auth.js';
 
 export async function authRoutes(app: FastifyInstance) {
   const service = new AuthService();

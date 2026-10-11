@@ -1,5 +1,5 @@
-import type { AuthUser } from '../domain/auth.js';
-import { CourseRepository } from '../repositories/course.repository.js';
+import type { AuthUser } from '../Domain/auth.js';
+import { CourseRepository } from '../Repositories/course.repository.js';
 
 export class CourseService {
   constructor(private readonly courses = new CourseRepository()) {}

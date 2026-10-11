@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
-import type { AuthUser } from '../domain/auth.js';
-import { UserRepository } from '../repositories/user.repository.js';
+import type { AuthUser } from '../Domain/auth.js';
+import { UserRepository } from '../Repositories/user.repository.js';
 
 export class AuthService {
   constructor(private readonly users = new UserRepository()) {}

@@ -90,7 +90,9 @@ Para probar el build en local con un solo proceso: `npm run dev:api` y abrir `ht
 
 ## Estado del backend en Node
 
-`backend/src/**/*.ts`, `backend/prisma/`, `backend/Dockerfile`, `docker-compose.yml` y `Caddyfile` son una migración a Node/Fastify **sin terminar**: solo cubre login, perfil y listado de cursos, y no compila (dependencias sin instalar e imports con mayúsculas distintas a las carpetas). La API en uso es la de PHP; levantar el `docker-compose` actual dejaría sin funcionar todos los módulos.
+`backend/src/**/*.ts`, `backend/prisma/`, `backend/Dockerfile`, `docker-compose.yml` y `Caddyfile` son una migración a Node/Fastify **sin terminar**. Compila y arranca (Node 22, Prisma 6.19.2, escucha en `0.0.0.0:3000`), pero solo implementa `GET /api/ping`, `POST /api/auth/login`, `GET /api/me`, `GET /api/courses` y `GET /api/courses/:id`. El resto de la aplicación (estudiantes, grupos, entregas, parciales, asistencia, cierre, novedades, administración, catálogo) solo existe en la API PHP: con el `Caddyfile` actual, que manda todo `/api` a Node, esas pantallas no funcionan.
+
+Las carpetas de `backend/src` llevan mayúscula inicial porque las comparte la API PHP (`backend/index.php` las carga con ese nombre); los imports de TypeScript deben respetar exactamente esas mayúsculas para que compile en Linux.
 
 ## Historial
 

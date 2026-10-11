@@ -3,8 +3,8 @@ import jwt from '@fastify/jwt';
 import Fastify from 'fastify';
 import { ZodError } from 'zod';
 import { env } from './config/env.js';
-import { authRoutes } from './controllers/auth.controller.js';
-import { courseRoutes } from './controllers/course.controller.js';
+import { authRoutes } from './Controllers/auth.controller.js';
+import { courseRoutes } from './Controllers/course.controller.js';
 
 export async function buildApp() {
   const app = Fastify({ logger: { level: process.env.NODE_ENV === 'production' ? 'info' : 'warn' } });
@@ -13,6 +13,8 @@ export async function buildApp() {
   await app.register(jwt, { secret: env.JWT_SECRET });
   app.setErrorHandler((error, _request, reply) => {
     if (error instanceof ZodError) return reply.code(422).send({ error: { code: 'VALIDATION_ERROR', message: 'Datos de entrada inválidos.', details: error.flatten() } });
+    // Token ausente, vencido o inválido: @fastify/jwt lo informa con statusCode 401.
+    if ((error as { statusCode?: number }).statusCode === 401) return reply.code(401).send({ error: { code: 'UNAUTHORIZED', message: 'Token ausente o inválido.' } });
     app.log.error(error);
     return reply.code(500).send({ error: { code: 'INTERNAL_ERROR', message: 'Ocurrió un error inesperado.' } });
   });

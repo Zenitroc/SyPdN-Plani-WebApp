@@ -12,14 +12,14 @@
   "dependencies": {
     "@fastify/cors": "latest",
     "@fastify/jwt": "latest",
-    "@prisma/client": "latest",
+    "@prisma/client": "6.19.2",
     "bcryptjs": "latest",
     "dotenv": "latest",
     "fastify": "latest",
     "zod": "latest"
   },
   "devDependencies": {
-    "prisma": "latest",
+    "prisma": "6.19.2",
     "tsx": "latest",
     "typescript": "latest",
     "@types/node": "latest"

@@ -1,4 +1,4 @@
-import { prisma } from '../infrastructure/prisma.js';
+import { prisma } from '../Infrastructure/prisma.js';
 
 export class CourseRepository {
   async listAll() { return prisma.course.findMany({ orderBy: { name: 'asc' } }); }
